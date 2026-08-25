@@ -71,9 +71,25 @@ $$
 =
 -Gm
 \int_V \rho(\vec{r'}) \frac{\vec{r}-\vec{r'}}{|\vec{r}-\vec{r'}|^3}\,dV'.
+$$ (eq:extemded-body-gravity-force)
+
+Each element pulls the test mass toward $\vec{r'}$. The integral appears straightforward, but evaluating it directly for every point outside an extended body can be a substantial calculation. We will come back to the problem described by Equation {eq}`eq:extended-body-gravity-force` later in the course.
+
+Dividing by the mass $m$ of the object being pulled by the Earth gives us a relation between the mass distribution of the Earth, $\rho(\vec{r'})$, and the gravitational vector field, $\vec{g}(\vec{r})$. This is an example of a **forward problem**:
+
+$$
+\rho(\vec{r'}) \quad \longrightarrow \quad \vec{g}(\vec{r}).
 $$
 
-Each element pulls the test mass toward $\vec{r'}$. The integral appears straightforward, but evaluating it directly for every point outside a sphere would be a substantial calculation.
+Given a distribution of mass, we calculate the gravity field that it produces. In Earth science, however, we are often interested in the opposite direction. We can measure the gravity field, while the distribution of mass inside the Earth is not directly observable from those measurements. This leads to the **inverse problem**:
+
+$$
+\vec{g}(\vec{r}) \quad \longrightarrow \quad \rho(\vec{r'}).
+$$
+
+This direction is considerably more difficult. In general, many — if not most — inverse problems do not have a unique solution: different distributions of mass may produce the same observations.
+
+
 
 ```{admonition} Reading the mathematics
 :class: tip
@@ -111,7 +127,7 @@ Try to read this new expression as a sentence:
 Hint: introduce $\vec{R}=\vec{r}-\vec{r'}$ and compare the resulting expression directly with the point-mass force above. The goal is not only to manipulate the expression, but to read it as a compact description of the geometry and physics.
 ```
 
-This was not merely a modern technical detail. The inverse-square law describes attraction between point masses, but the Earth, Moon, Sun, and planets are extended bodies. Newton therefore had to establish how a spherical distribution of matter attracts another body before he could apply the point-mass law to planetary motion.
+This was not merely a modern technical detail. The inverse-square law describes attraction between point masses, but the Earth, Moon, Sun, and planets are extended bodies. To apply his theory of gravitational attraction to real celestial bodies, Newton therefore had to determine how the attraction of an extended spherical body relates to the inverse-square law for individual particles.
 
 In Book I, Section XII of the *Principia*, entitled *Of the attractive forces of spherical bodies*, Newton begins with a thin, uniform spherical shell and proves two remarkable results.
 
