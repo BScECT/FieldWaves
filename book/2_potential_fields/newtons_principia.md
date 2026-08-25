@@ -71,7 +71,7 @@ $$
 =
 -Gm
 \int_V \rho(\vec{r'}) \frac{\vec{r}-\vec{r'}}{|\vec{r}-\vec{r'}|^3}\,dV'.
-$$ (eq:extemded-body-gravity-force)
+$$ (eq:extended-body-gravity-force)
 
 Each element pulls the test mass toward $\vec{r'}$. The integral appears straightforward, but evaluating it directly for every point outside an extended body can be a substantial calculation. We will come back to the problem described by Equation {eq}`eq:extended-body-gravity-force` later in the course.
 
