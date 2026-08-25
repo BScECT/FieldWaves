@@ -89,8 +89,6 @@ $$
 
 This direction is considerably more difficult. In general, many — if not most — inverse problems do not have a unique solution: different distributions of mass may produce the same observations.
 
-
-
 ```{admonition} Reading the mathematics
 :class: tip
 
@@ -149,3 +147,49 @@ $$
 exactly as if the entire mass of the Earth were concentrated at its centre.
 
 Thus, treating the Earth as a point mass is not merely an approximation that improves with distance. Outside a perfectly spherically symmetric Earth, it is an exact consequence of the inverse-square law. This result justifies the gravitational field used in the examples that follow and gives us a concrete setting in which to introduce work and potential.
+
+## Example: gravity inside and outside a thick shell
+
+Consider a uniform spherical shell with inner radius $R_i$, outer radius $R_o$, density $\rho$, and total mass $M$. By symmetry, its gravitational field must be radial. Newton's shell results also tell us that only matter at radii smaller than the observation point contributes to the field there. The enclosed mass is therefore
+
+$$
+M_{\mathrm{enc}}(r)
+=
+\begin{cases}
+0, & 0 \leq r < R_i,\\[4pt]
+\dfrac{4\pi\rho}{3}\left(r^3-R_i^3\right), & R_i \leq r \leq R_o,\\[6pt]
+M, & r>R_o.
+\end{cases}
+$$
+
+The gravitational field follows immediately:
+
+$$
+\vec{g}(\vec{r})
+=
+-G\frac{M_{\mathrm{enc}}(r)}{r^2}\hat{r}.
+$$
+
+```{figure} figures/spherical_shell_field.png
+:name: thick-spherical-shell-field
+:width: 100%
+
+The gravitational field of a uniform thick spherical shell. The field vanishes throughout the empty cavity, grows as progressively more mass is enclosed within the shell material, and decreases as $1/r^2$ outside the shell. Arrow direction and colour represent the direction and magnitude of $\vec{g}$. The figure is generated in the accompanying {doc}`spherical_shell_gravity` notebook.
+```
+
+The zero field in the cavity is especially striking: it holds everywhere inside the cavity, not only at its centre. Outside the shell, the field depends on the total mass $M$ but not on how that mass is distributed with radius, provided the distribution remains spherically symmetric.
+
+### What if the mass distribution is not spherical?
+
+To break the symmetry, imagine moving part of the shell's mass into two compact concentrations. In the example below, $0.82M$ remains in the uniform shell, while point-like masses $0.11M$ and $0.07M$ are placed at different locations within it. The total mass is still $M$, so any difference in the measured field must come from its distribution rather than its total amount.
+
+```{figure} figures/spherical_shell_disturbance.png
+:name: disturbed-spherical-shell-field
+:width: 100%
+
+A uniform shell and a disturbed shell with the same total mass. The disturbance changes both the direction and magnitude of the field. Measurements on a circle outside the shell acquire angle-dependent radial and tangential components; a uniform spherical shell would instead produce a constant radial component and no tangential component. The disturbances are intentionally exaggerated to make the effect visible. The figure is generated in the accompanying {doc}`spherical_shell_gravity` notebook.
+```
+
+The shell theorem no longer applies to the complete disturbed distribution. The field is not a function of $r$ alone, and knowing the total mass is not sufficient to predict it at finite distances. Conversely, variations in gravity measured at different positions can reveal departures from spherical symmetry and provide information about how mass is distributed.
+
+There is an important limit to this conclusion. Far from any bounded mass distribution, the leading contribution approaches the field of a point mass containing the total mass, while the signatures of its internal structure become progressively weaker. Measurements made closer to the source retain more spatial detail, but they still do not generally determine a unique mass distribution without additional assumptions or information. This is precisely the promise and the difficulty of the inverse problem introduced above: gravity anomalies can constrain a hidden mass distribution without uniquely revealing it.

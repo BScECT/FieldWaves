@@ -19,6 +19,7 @@ parts:
     - file: 2_potential_fields/intro.md
       sections:
       - file: 2_potential_fields/newtons_principia.md
+      - file: 2_potential_fields/spherical_shell_gravity.ipynb
       - file: 2_potential_fields/fundamentals.md
       - file: 2_potential_fields/work.md
       - file: 2_potential_fields/conservative_fields.md

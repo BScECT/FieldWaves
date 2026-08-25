@@ -7,3 +7,5 @@ sphinx-tudelft-theme
 sphinx-apa-references
 numpy
 matplotlib
+ipywidgets
+ipympl
