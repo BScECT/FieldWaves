@@ -18,9 +18,11 @@ parts:
     chapters:
     - file: 2_potential_fields/intro.md
       sections:
+      - file: 2_potential_fields/newtons_principia.md
       - file: 2_potential_fields/fundamentals.md
       - file: 2_potential_fields/work.md
       - file: 2_potential_fields/conservative_fields.md
+      - file: 2_potential_fields/potential.md
       - file: 2_potential_fields/earth_gravity_work.ipynb
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md

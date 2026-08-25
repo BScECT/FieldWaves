@@ -17,13 +17,13 @@ For a small displacement in the $\hat{x}$ direction, the displacement vector is
 
 $$
   \vec{ds} = dx \, \hat{x}.
-$$
+$$ 
 
 If the force is $\vec{F} = F_x \hat{x}$ at that point, then the differential work is
 
 $$
   dW = \vec{F} \cdot \vec{ds} = F_x \, dx.
-$$
+$$ (eq:work-differential-work)
 
 For example, if $F_x = 4~\mathrm{N}$ and $dx = 0.01~\mathrm{m}$, then
 
@@ -36,7 +36,7 @@ The total work can be calculated integrating $dW$ following the trajectory of th
 
 $$
   W = \int_s dW = \int_s \vec{F}(x,y,z) \cdot \vec{ds}
-$$
+$$ (eq:work-integrated-work)
 
 ```{admonition} Example: work in Earth's gravity field
 Consider a spacecraft of mass $m$ moving from Earth's surface to a circular orbit at radius $r_o$. Earth's gravitational force is radial:
