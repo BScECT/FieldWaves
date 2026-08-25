@@ -146,7 +146,8 @@ $$
 
 exactly as if the entire mass of the Earth were concentrated at its centre.
 
-Thus, treating the Earth as a point mass is not merely an approximation that improves with distance. Outside a perfectly spherically symmetric Earth, it is an exact consequence of the inverse-square law. This result justifies the gravitational field used in the examples that follow and gives us a concrete setting in which to introduce work and potential.
+Thus, treating the Earth as a point mass is not merely an approximation that improves with distance. Outside a perfectly spherically symmetric Earth, it is an exact consequence of the inverse-square law. These examples leave us with a general problem: how can we describe and calculate gravitational fields produced by distributed sources efficiently? To answer that question, we will develop the concept of a scalar potential. 
+%This result justifies the gravitational field used in the examples that follow and gives us a concrete setting in which to introduce work and potential. -->
 
 ## Example: gravity inside and outside a thick shell
 
