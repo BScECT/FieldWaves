@@ -16,16 +16,18 @@ parts:
     # - file: 1_gradient_divergence_curl/curl.md
   - caption: Potential Fields
     chapters:
-    - file: 2_potential_fields/intro.md
+    - file: 2_potential_fields/introduction/intro.md
       sections:
-      - file: 2_potential_fields/newtons_principia.md
-      - file: 2_potential_fields/spherical_shell_gravity.ipynb
-      - file: 2_potential_fields/fundamentals.md
-      - file: 2_potential_fields/work.md
-      - file: 2_potential_fields/conservative_fields.md
-      - file: 2_potential_fields/potential.md
-      - file: 2_potential_fields/earth_gravity_work.ipynb
-      - file: 2_potential_fields/helmholtz_decomposition.md
+      - file: 2_potential_fields/introduction/newtons_principia.md
+      - file: 2_potential_fields/introduction/spherical_shell_gravity.ipynb
+      - file: 2_potential_fields/introduction/fundamentals.md
+      - file: 2_potential_fields/introduction/work.md
+      - file: 2_potential_fields/introduction/conservative_fields.md
+      - file: 2_potential_fields/introduction/potential.md
+      - file: 2_potential_fields/introduction/earth_gravity_work.ipynb
+      - file: 2_potential_fields/introduction/helmholtz_decomposition.md
+    - file: 2_potential_fields/gravity_field/intro.md
+    - file: 2_potential_fields/magnetic_field/intro.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
