@@ -40,6 +40,22 @@ $$
 
 The force points downward, toward lower gravitational potential energy.
 
+As a further example, consider the gravitational field of a point mass $M$ at the origin. We will derive this result later; for now, we postulate that the gravitational potential per unit mass is
+
+$$
+  \Phi(\vec{r}) = -\frac{GM}{|\vec{r}|}.
+$$ (eq:point-mass-gravitational-potential)
+
+The corresponding gravity field is
+
+$$
+  \vec{g}(\vec{r})
+  = -\vec{\nabla}\Phi
+  = -GM\frac{\vec{r}}{|\vec{r}|^3}.
+$$ (eq:point-mass-gravity-field)
+
+The vector $\vec{r}/|\vec{r}|^3$ combines the outward radial direction with an inverse-square magnitude, while the minus sign makes the field point inward, toward the mass. For a test mass $m$, the potential energy is $m\Phi$ and the gravitational force is $m\vec{g}$.
+
 ## Equipotential surfaces
 
 An **equipotential surface** is a surface on which the potential has the same value everywhere:
