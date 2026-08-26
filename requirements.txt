@@ -5,3 +5,7 @@ teachbooks # depends on jupyter-book v1
 git+https://github.com/TeachBooks/TeachBooks-Favourites
 sphinx-tudelft-theme
 sphinx-apa-references
+numpy
+matplotlib
+ipywidgets
+ipympl
