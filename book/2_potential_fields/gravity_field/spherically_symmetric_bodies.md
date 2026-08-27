@@ -26,6 +26,33 @@ $$ (eq:spherical-interior-gravity-general)
 
 The minus sign indicates that the field points towards the centre.
 
+::::{admonition} Why does the gravitational field vanish inside a spherical shell?
+:class: tip
+
+Newton gave a geometric proof of Proposition 70 in the *Principia*. We will not reproduce the proof here, but its main idea gives useful physical intuition.
+
+Imagine an object at some point $P$ inside a thin spherical shell. If $P$ is not at the centre, the nearby part of the shell pulls more strongly than the more distant part, because gravitational attraction decreases as $1/r^2$. It might therefore seem that the object should be pulled toward the nearest wall of the shell.
+
+Now consider a very narrow cone passing through $P$ and extending in both directions until it intersects the shell. The cone selects a small patch of the shell on each side of $P$. The more distant patch is farther away and therefore pulls more weakly per unit mass. However, the cone also intercepts a larger area of the shell on that side. The area grows with the square of the distance in just the way needed to compensate for the $1/r^2$ decrease of the gravitational attraction.
+
+```{figure} figures/principia_book1_plate21_figure4.png
+:name: principia-book1-plate21-figure4
+:width: 48%
+
+Newton's construction for Proposition 70. Lines passing through the interior point $P$ select opposing elements of the spherical shell near $H,I$ and $K,L$. The geometrical construction is used to compare their areas, distances, and attractions. Book I, Plate 21, Figure 4 from Andrew Motte's 1729 English translation of the *Principia*. [Source: Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Principia_-_1729_-_Book_1,_Plate_21,_Figure_4.png), public domain.
+```
+
+The two patches therefore exert equal forces in opposite directions. Newton showed geometrically that the entire spherical shell can be considered as such pairs of opposing patches, so all their contributions cancel:
+
+$$
+\vec{g}=0.
+$$
+
+The exact cancellation is closely connected to the inverse-square nature of gravity: the same factor $r^2$ that makes a patch selected by a given angular extent grow with distance appears inversely in the gravitational force.
+
+This argument gives the intuition, but not a complete proof. Newton's geometric proof can be found in Book I, Section XII, Proposition 70 of the *Principia*.
+::::
+
 ## The exterior field
 
 Outside the body, every shell lies inside the observation radius. Equation {eq}`eq:spherical-enclosed-mass` then contains the total mass
