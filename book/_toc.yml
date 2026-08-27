@@ -30,6 +30,8 @@ parts:
       sections:
       - file: 2_potential_fields/gravity_field/the_gravity_field.md
       - file: 2_potential_fields/gravity_field/spherically_symmetric_bodies.md
+      - file: 2_potential_fields/gravity_field/poisson_laplace_equations.md
+      - file: 2_potential_fields/gravity_field/uniform_cylinder_laplacian.ipynb
     - file: 2_potential_fields/magnetic_field/intro.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
