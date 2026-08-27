@@ -27,6 +27,9 @@ parts:
       - file: 2_potential_fields/introduction/earth_gravity_work.ipynb
       - file: 2_potential_fields/introduction/helmholtz_decomposition.md
     - file: 2_potential_fields/gravity_field/intro.md
+      sections:
+      - file: 2_potential_fields/gravity_field/the_gravity_field.md
+      - file: 2_potential_fields/gravity_field/spherically_symmetric_bodies.md
     - file: 2_potential_fields/magnetic_field/intro.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
