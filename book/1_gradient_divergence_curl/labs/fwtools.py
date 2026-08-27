@@ -20,8 +20,9 @@ import plotly.graph_objects as go
 
 __all__ = [
     "make_grid_3d", "z0_index", "slice_z0",
+    "box_indices", "area_integral", "volume_integral",
     "show_isosurfaces", "show_cones", "show_scalar_slice", "show_field_slice",
-    "check", "check_shape", "check_close",
+    "check", "check_shape", "check_close", "check_scalar",
 ]
 
 # --------------------------------------------------------------------------
@@ -56,6 +57,53 @@ def z0_index(Z: np.ndarray) -> int:
 def slice_z0(F: np.ndarray, Z: np.ndarray) -> np.ndarray:
     """The z = 0 plane of a scalar field, as a 2-D (x, y) array."""
     return F[:, :, z0_index(Z)]
+
+
+# --------------------------------------------------------------------------
+# Integration over grid-aligned boxes and faces
+#
+# These evaluate the integrals in the definition of the divergence and in the
+# divergence theorem. They are quadrature boilerplate: the trapezoidal weights
+# below simply stop the end samples from being counted as full cells.
+# --------------------------------------------------------------------------
+
+def _trapezoid_weights(n: int) -> np.ndarray:
+    w = np.ones(n)
+    w[0] = w[-1] = 0.5
+    return w
+
+
+def box_indices(X: np.ndarray, half_width: float):
+    """Index range (i0, i1) of the sub-cube |x|, |y|, |z| <= ``half_width``.
+
+    The same pair works on all three axes because the grid is cubic. The
+    returned indices are snapped to the nearest grid planes, so ask for a
+    half-width that is a multiple of the spacing (0.6, 1.0 and 1.4 m are
+    exact on the default 61-point grid) if you want the box you asked for.
+    """
+    axis = X[:, 0, 0]
+    i0 = int(np.argmin(np.abs(axis + half_width)))
+    i1 = int(np.argmin(np.abs(axis - half_width)))
+    return i0, i1
+
+
+def area_integral(F2: np.ndarray, da: float, db: float) -> float:
+    """Integrate a 2-D array of samples over the rectangle it spans.
+
+    Use it on one face of a box to evaluate that face's contribution to a
+    surface integral.
+    """
+    F2 = np.asarray(F2, float)
+    wa, wb = _trapezoid_weights(F2.shape[0]), _trapezoid_weights(F2.shape[1])
+    return float(np.nansum(F2 * wa[:, None] * wb[None, :]) * da * db)
+
+
+def volume_integral(F3: np.ndarray, dx: float, dy: float, dz: float) -> float:
+    """Integrate a 3-D array of samples over the box it spans."""
+    F3 = np.asarray(F3, float)
+    wx, wy, wz = (_trapezoid_weights(m) for m in F3.shape)
+    w = wx[:, None, None] * wy[None, :, None] * wz[None, None, :]
+    return float(np.nansum(F3 * w) * dx * dy * dz)
 
 
 # --------------------------------------------------------------------------
@@ -226,3 +274,14 @@ def check_close(label: str, got, want, rtol=0.05, where=None) -> None:
     check(f"{label}: worst error {worst:.2%}", worst < rtol,
           f"worst relative error {worst:.2%} exceeds {rtol:.0%}. Check your "
           f"np.gradient call -- did you pass dx, dy, dz, and in that order?")
+
+
+def check_scalar(label: str, got: float, want: float, rtol: float = 0.01,
+                 unit: str = "") -> None:
+    """Compare two single numbers and report the relative discrepancy."""
+    got, want = float(got), float(want)
+    rel = abs(got - want) / max(abs(want), 1e-30)
+    check(f"{label}: {got:.4g}{unit} vs {want:.4g}{unit} ({rel:.2%} apart)",
+          rel < rtol,
+          f"these should agree to better than {rtol:.0%}. Check the sign of "
+          f"each face, and that every face uses its own outward normal.")
