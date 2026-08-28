@@ -19,35 +19,15 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 __all__ = [
-    "make_grid_3d", "z0_index", "slice_z0",
+    "z0_index", "slice_z0",
     "box_indices", "area_integral", "volume_integral",
     "show_isosurfaces", "show_cones", "show_scalar_slice", "show_field_slice",
     "check", "check_shape", "check_close", "check_scalar",
 ]
 
 # --------------------------------------------------------------------------
-# Grid
+# Grid helpers (the grid itself is built in the open, on the lab page)
 # --------------------------------------------------------------------------
-
-def make_grid_3d(n: int = 61, L: float = 2.0):
-    """A cube of sample points on [-L, L]^3 with n points per side.
-
-    Returns
-    -------
-    X, Y, Z : (n, n, n) float arrays
-        Coordinates, built with indexing='ij' so that X[i, j, k] = x[i],
-        Y[i, j, k] = y[j] and Z[i, j, k] = z[k].
-    dx, dy, dz : float
-        Uniform spacings. np.gradient needs these -- omit them and it assumes
-        a spacing of 1, making every derivative wrong by a constant factor.
-    """
-    if n % 2 == 0:
-        raise ValueError("use an odd n so that the grid contains the origin exactly")
-    a = np.linspace(-L, L, n)
-    X, Y, Z = np.meshgrid(a, a, a, indexing="ij")
-    h = a[1] - a[0]
-    return X, Y, Z, h, h, h
-
 
 def z0_index(Z: np.ndarray) -> int:
     """Index k of the z = 0 plane in an indexing='ij' grid."""
@@ -91,87 +71,294 @@ def area_integral(F2: np.ndarray, da: float, db: float) -> float:
     """Integrate a 2-D array of samples over the rectangle it spans.
 
     Use it on one face of a box to evaluate that face's contribution to a
-    surface integral.
+    surface integral. The rule is the trapezoidal one, second order in the
+    spacing: on the fields in this lab the flux error falls from 0.17% at
+    n = 21 to 0.018% at n = 61.
+
+    Raises if any sample is NaN. A masked sample silently integrated as zero
+    returns a plausible and wrong number -- which is what happens if you put
+    a face inside a region you have masked out.
     """
     F2 = np.asarray(F2, float)
+    _reject_masked(F2, "This face passes through masked samples")
     wa, wb = _trapezoid_weights(F2.shape[0]), _trapezoid_weights(F2.shape[1])
-    return float(np.nansum(F2 * wa[:, None] * wb[None, :]) * da * db)
+    return float(np.sum(F2 * wa[:, None] * wb[None, :]) * da * db)
 
 
 def volume_integral(F3: np.ndarray, dx: float, dy: float, dz: float) -> float:
-    """Integrate a 3-D array of samples over the box it spans."""
+    """Integrate a 3-D array of samples over the box it spans.
+
+    Trapezoidal, second order, and it raises on masked samples for the same
+    reason ``area_integral`` does.
+    """
     F3 = np.asarray(F3, float)
+    _reject_masked(F3, "This box contains masked samples")
     wx, wy, wz = (_trapezoid_weights(m) for m in F3.shape)
     w = wx[:, None, None] * wy[None, :, None] * wz[None, None, :]
-    return float(np.nansum(F3 * w) * dx * dy * dz)
+    return float(np.sum(F3 * w) * dx * dy * dz)
+
+
+def _reject_masked(F, what):
+    n = int(np.count_nonzero(~np.isfinite(F)))
+    if n:
+        raise ValueError(
+            f"{what} ({n} of {F.size} are NaN or infinite). Integrating them "
+            f"as zero would return a plausible but wrong number. Move the "
+            f"surface outside the masked region, or unmask the field.")
 
 
 # --------------------------------------------------------------------------
 # 3-D views (plotly)
 # --------------------------------------------------------------------------
 
-def show_isosurfaces(X, Y, Z, F, levels, *, title="", opacity=0.35,
-                     colorscale="Viridis", show_caps=False, size=620, step=2):
+# Directional shading. Without it plotly lights an isosurface almost flatly
+# and a nest of transparent spheres reads as a set of flat rings; the
+# specular highlight and limb darkening are what make it look like a ball.
+_LIGHTING = dict(ambient=0.35, diffuse=0.9, specular=0.5, roughness=0.4, fresnel=0.2)
+_LIGHTPOSITION = dict(x=100, y=200, z=200)
+
+
+def show_isosurfaces(X, Y, Z, F, levels, *, title="", label="", opacity=0.3,
+                     colorscale="Viridis", show_caps=False, size=620, step=2,
+                     opacity_slider=True, slice_z=None):
     """Draw one or more isosurfaces (level sets) of a scalar field F.
 
     An isosurface is the set of points where F takes one fixed value -- the
-    3-D analogue of a contour line. Transparency lets you see the inner
-    surfaces through the outer ones, so pass a list of levels and look at the
-    nesting.
+    3-D analogue of a contour line. Pass an **evenly spaced** list of levels
+    and look at the nesting; anything else is refused, because plotly draws
+    evenly spaced surfaces between the extremes and would quietly move them.
+
+    Parameters that matter for seeing the shape
+    -------------------------------------------
+    opacity_slider : bool
+        Adds a slider under the figure. Drag it up towards 1 and the outermost
+        surface becomes a solid, shaded ball; drag it down towards 0.1 and it
+        turns to glass so the inner surfaces show through. Sweeping it is the
+        quickest way to convince yourself these are shells and not discs.
+    label : str
+        Colorbar title. Give it the physical quantity and its unit.
+        **Plotly does not render LaTeX here.** Colorbar titles accept plain
+        text plus a small HTML subset (``<sub>``, ``<sup>``, ``<b>``), so
+        write ``"|\u2207r|  [-]"`` and ``"[m<sup>-2</sup>]"`` with Unicode
+        symbols -- a ``$...$`` label silently comes out as garbled glyphs.
+        The matplotlib helpers below are the opposite: mathtext works there.
+    slice_z : float or None
+        If given, also draw a filled cut plane at that value of z, exposing
+        the interior. A strong depth cue, at the cost of hiding part of the
+        nesting.
     """
-    levels = np.atleast_1d(np.asarray(levels, dtype=float))
+    levels = np.sort(np.atleast_1d(np.asarray(levels, dtype=float)))
+    # plotly draws surface_count EVENLY SPACED surfaces between isomin and
+    # isomax; it never sees the individual values. Unevenly spaced levels
+    # would therefore be silently redrawn at the wrong values, so refuse them
+    # rather than return a picture that lies.
+    if levels.size > 2:
+        gaps = np.diff(levels)
+        if not np.allclose(gaps, gaps[0], rtol=1e-6):
+            drawn = np.linspace(levels[0], levels[-1], levels.size)
+            raise ValueError(
+                f"levels must be evenly spaced: plotly would draw "
+                f"{np.round(drawn, 4).tolist()} instead of "
+                f"{np.round(levels, 4).tolist()}. Use an evenly spaced set, "
+                f"or call this once per level.")
     # Subsample before handing the volume to plotly. A full 61^3 grid embeds
     # ~12 MB of JSON per figure; every other point looks identical on screen.
     sl = (slice(None, None, step),) * 3
     X, Y, Z, F = X[sl], Y[sl], Z[sl], np.asarray(F)[sl]
-    fig = go.Figure(
-        go.Isosurface(
-            x=X.ravel(), y=Y.ravel(), z=Z.ravel(), value=np.asarray(F).ravel(),
-            isomin=float(levels.min()), isomax=float(levels.max()),
-            surface_count=int(levels.size), opacity=opacity,
-            colorscale=colorscale, showscale=True,
-            caps=dict(x_show=show_caps, y_show=show_caps, z_show=show_caps),
-        )
+    trace = go.Isosurface(
+        x=X.ravel(), y=Y.ravel(), z=Z.ravel(), value=np.asarray(F).ravel(),
+        isomin=float(levels.min()), isomax=float(levels.max()),
+        surface_count=int(levels.size), opacity=opacity,
+        colorscale=colorscale, showscale=True,
+        colorbar=dict(title=label, len=0.7),
+        lighting=_LIGHTING, lightposition=_LIGHTPOSITION,
+        caps=dict(x_show=show_caps, y_show=show_caps, z_show=show_caps),
     )
-    _style_3d(fig, title, size)
-    return fig
+    if slice_z is not None:
+        trace.slices = dict(z=dict(show=True, locations=[float(slice_z)]))
+    fig = go.Figure(trace)
+    _style_3d(fig, title, size, bottom_margin=55 if opacity_slider else 0)
+    if opacity_slider:
+        _add_opacity_slider(fig, opacity)
+    return _display(fig)
 
 
-def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", sizeref=0.6,
-               colorscale="Blues", size=620, normalise=False):
-    """Draw a 3-D vector field as a lattice of cones (arrows).
+def _add_opacity_slider(fig, current):
+    """A client-side opacity control: no kernel needed once the figure exists."""
+    values = [round(0.1 * i, 1) for i in range(1, 11)]
+    active = int(np.argmin([abs(v - current) for v in values]))
+    fig.update_layout(sliders=[dict(
+        active=active,
+        currentvalue=dict(prefix="opacity: ", font=dict(size=13)),
+        pad=dict(t=8, b=8), len=0.7, x=0.15, y=0,
+        steps=[dict(method="restyle", args=[{"opacity": v}], label=f"{v:.1f}")
+               for v in values],
+    )])
 
-    Only every ``step``-th sample in each direction is drawn -- a full grid of
-    cones is an unreadable haystack. Set ``normalise=True`` to show direction
-    only, with every cone the same length; this is often clearer for fields
-    whose magnitude varies over orders of magnitude.
+
+def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", label="", size=620,
+               normalise=False, length=None, head=0.35, colorscale="Viridis",
+               slider=True, width=4, log_colour=None):
+    """Draw a 3-D vector field as arrows: a shaft with a barbed head.
+
+    Every arrow is built from line segments -- a shaft, plus four barbs swept
+    back from the tip. plotly's ``go.Cone`` is not used: a cone takes both its
+    size and its colour from the norm of the vector it is given, so size and
+    colour cannot be set independently, and a field whose magnitudes are all
+    close to 1 comes out with heads larger than the box.
+
+    Only every ``step``-th sample in each direction is drawn; an arrow at every
+    grid point is an unreadable haystack.
+
+    Parameters
+    ----------
+    label : str
+        Colorbar title, e.g. ``"|<b>E</b>|  [V/m]"``. Defaults to a generic
+        ``|A|``; give it the real quantity and unit so the reader can tell
+        the tasks apart. Plotly renders no LaTeX here -- see the note in
+        ``show_isosurfaces``.
+    normalise : bool
+        Draw every arrow the same length, showing direction only. Use it for
+        fields whose magnitude spans orders of magnitude, where true-to-scale
+        arrows leave a few giants and a lot of invisible dust. The magnitude is
+        not lost -- it is still in the colour.
+    length : float or None
+        Length of the longest arrow, in metres. Defaults to 0.85 of the
+        spacing between drawn arrows, so a full-length arrow almost touches
+        its neighbour.
+    head : float
+        Fraction of an arrow taken up by its head.
+    slider : bool
+        Add a size slider under the figure, scaling whole arrows (head
+        included) between 0.5x and 2x.
+    log_colour : bool or None
+        Colour by log10|A| rather than |A|. ``None`` decides automatically and
+        switches over once the magnitude spans more than a factor of 50: on a
+        linear scale a $1/r^2$ field puts all but a handful of arrows into the
+        bottom percent of the colour range, where they are indistinguishable.
     """
     sl = (slice(None, None, step),) * 3
     x, y, z = X[sl].ravel(), Y[sl].ravel(), Z[sl].ravel()
-    u, v, w = np.asarray(Ax)[sl].ravel(), np.asarray(Ay)[sl].ravel(), np.asarray(Az)[sl].ravel()
+    u = np.asarray(Ax)[sl].ravel()
+    v = np.asarray(Ay)[sl].ravel()
+    w = np.asarray(Az)[sl].ravel()
 
     finite = np.isfinite(u) & np.isfinite(v) & np.isfinite(w)
     x, y, z, u, v, w = (a[finite] for a in (x, y, z, u, v, w))
 
-    if normalise:
-        mag = np.sqrt(u**2 + v**2 + w**2)
-        mag[mag == 0] = 1.0
-        u, v, w = u / mag, v / mag, w / mag
+    mag = np.sqrt(u**2 + v**2 + w**2)
+    safe = np.maximum(mag, 1e-30)
+    ux, uy, uz = u / safe, v / safe, w / safe          # unit direction
 
-    fig = go.Figure(
-        go.Cone(x=x, y=y, z=z, u=u, v=v, w=w,
-                sizemode="scaled", sizeref=sizeref, anchor="tail",
-                colorscale=colorscale, showscale=True,
-                colorbar=dict(title="|A|")),
+    spacing = float(abs(X[step, 0, 0] - X[0, 0, 0])) if X.shape[0] > step else 1.0
+    base = 0.85 * spacing if length is None else float(length)
+    rel = np.ones_like(mag) if normalise else mag / max(float(mag.max()), 1e-30)
+
+    positive = mag[mag > 0]
+    if log_colour is None:
+        log_colour = (positive.size > 0
+                      and float(positive.max()) > 50.0 * float(positive.min()))
+    name = label or "|A|"
+    if log_colour:
+        cval = np.log10(np.maximum(mag, float(positive.min())))
+        clabel = f"log<sub>10</sub> {name}"
+    else:
+        cval, clabel = mag, name
+
+    px, py, pz = _arrow_lines(x, y, z, ux, uy, uz, rel * base, head)
+    fig = go.Figure(go.Scatter3d(
+        x=px, y=py, z=pz, mode="lines", hoverinfo="skip", showlegend=False,
+        line=dict(color=np.tile(np.repeat(cval, 3), _SEGMENTS_PER_ARROW),
+                  colorscale=colorscale, width=width,
+                  cmin=float(cval.min()), cmax=float(cval.max()),
+                  showscale=True, colorbar=dict(title=clabel, len=0.7)),
+    ))
+    _style_3d(fig, title, size, bottom_margin=75 if slider else 0)
+    # Pin the box to the sampled volume; without this the arrows themselves
+    # drive the autorange and the domain silently grows.
+    fig.update_scenes(
+        xaxis=dict(range=[float(X.min()), float(X.max())], title="x [m]"),
+        yaxis=dict(range=[float(Y.min()), float(Y.max())], title="y [m]"),
+        zaxis=dict(range=[float(Z.min()), float(Z.max())], title="z [m]"),
     )
-    _style_3d(fig, title, size)
-    return fig
+    if slider:
+        _add_arrow_slider(fig, x, y, z, ux, uy, uz, rel, base, head)
+    return _display(fig)
 
 
-def _style_3d(fig, title, size):
+_SEGMENTS_PER_ARROW = 5          # one shaft, four barbs
+
+
+def _arrow_lines(x, y, z, ux, uy, uz, lengths, head):
+    """One polyline per segment, all arrows in one flat pair of arrays.
+
+    Segments are separated by NaN, which plotly renders as a break. The four
+    barbs are swept back from the tip in two mutually perpendicular planes, so
+    the head reads as a head from any viewing angle.
+    """
+    n = x.size
+    tx, ty, tz = x + ux * lengths, y + uy * lengths, z + uz * lengths
+
+    d = np.stack([ux, uy, uz], axis=1)
+    # A reference direction not parallel to d, so the cross product is stable.
+    ref = np.where(np.abs(uz)[:, None] < 0.9,
+                   np.array([0.0, 0.0, 1.0]), np.array([1.0, 0.0, 0.0]))
+    p = np.cross(d, ref)
+    p /= np.maximum(np.linalg.norm(p, axis=1, keepdims=True), 1e-30)
+    q = np.cross(d, p)
+
+    barb = lengths * head
+    spread = 0.45
+    xs, ys, zs = [], [], []
+
+    def add(x0, y0, z0, x1, y1, z1):
+        for a, b, out in ((x0, x1, xs), (y0, y1, ys), (z0, z1, zs)):
+            seg = np.empty(3 * n)
+            seg[0::3], seg[1::3], seg[2::3] = a, b, np.nan
+            out.append(seg)
+
+    add(x, y, z, tx, ty, tz)                                  # the shaft
+    for side in (p, -p, q, -q):                               # the four barbs
+        add(tx, ty, tz,
+            tx - ux * barb + side[:, 0] * barb * spread,
+            ty - uy * barb + side[:, 1] * barb * spread,
+            tz - uz * barb + side[:, 2] * barb * spread)
+    return (np.concatenate(xs).astype(np.float32),
+            np.concatenate(ys).astype(np.float32),
+            np.concatenate(zs).astype(np.float32))
+
+
+def _add_arrow_slider(fig, x, y, z, ux, uy, uz, rel, base, head):
+    """One client-side control scaling whole arrows, head included."""
+    scales = [0.5, 0.75, 1.0, 1.5, 2.0]
+    steps = []
+    for sc in scales:
+        px, py, pz = _arrow_lines(x, y, z, ux, uy, uz, rel * base * sc, head)
+        steps.append(dict(method="restyle", label=f"{sc:g}x",
+                          args=[{"x": [px], "y": [py], "z": [pz]}, [0]]))
+    fig.update_layout(sliders=[dict(
+        active=scales.index(1.0), steps=steps, len=0.7, x=0.15, y=0,
+        pad=dict(t=8, b=8),
+        currentvalue=dict(prefix="arrow size: ", font=dict(size=13)),
+    )])
+
+
+def _display(fig):
+    """Show the figure and return nothing.
+
+    Jupyter renders only the value of a cell's LAST expression, so a plotting
+    call followed by a self-check would otherwise draw nothing at all. Showing
+    it here makes the call work wherever it sits; returning None keeps it from
+    being drawn a second time when it does happen to come last.
+    """
+    fig.show()
+    return None
+
+
+def _style_3d(fig, title, size, bottom_margin=0):
     fig.update_layout(
         title=title, width=size, height=size,
-        margin=dict(l=0, r=0, t=40 if title else 0, b=0),
+        margin=dict(l=0, r=0, t=40 if title else 0, b=bottom_margin),
         scene=dict(
             xaxis_title="x [m]", yaxis_title="y [m]", zaxis_title="z [m]",
             aspectmode="cube",          # equal aspect: never distort a field
@@ -184,14 +371,35 @@ def _style_3d(fig, title, size):
 # 2-D views of the z = 0 plane (matplotlib)
 # --------------------------------------------------------------------------
 
-def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap="RdYlBu_r",
-                      levels=25, symmetric=False, percentile=99, ax=None):
-    """Filled contours of a scalar field in the z = 0 plane."""
+def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
+                      levels=25, symmetric=False, percentile=99, ax=None,
+                      colorbar=True, vmin=None, vmax=None):
+    """Filled contours of a scalar field in the z = 0 plane.
+
+    ``colorbar`` is drawn whether or not the axes was supplied by the caller;
+    a panel in a side-by-side comparison needs its scale just as much as a
+    standalone figure does. ``show_field_slice`` passes ``colorbar=False``
+    because it adds its own.
+
+    Pass ``vmin``/``vmax`` to pin the colour limits. Without them the limits
+    come from percentiles of *this* panel, so two panels of a comparison end
+    up on different scales and the extremes are clipped -- give both panels
+    the same explicit pair whenever the point is that they match.
+
+    ``cmap`` defaults to a diverging map when ``symmetric=True`` and a
+    sequential one otherwise, so a one-signed field never gets a colour scale
+    implying a meaningful zero crossing.
+    """
     k = z0_index(Z)
     x2, y2, f2 = X[:, :, k], Y[:, :, k], np.asarray(F)[:, :, k]
 
-    hi = np.nanpercentile(np.abs(f2) if symmetric else f2, percentile)
-    lo = -hi if symmetric else np.nanpercentile(f2, 100 - percentile)
+    if cmap is None:
+        cmap = "RdBu_r" if symmetric else "viridis"
+    if vmax is None:
+        vmax = np.nanpercentile(np.abs(f2) if symmetric else f2, percentile)
+    if vmin is None:
+        vmin = -vmax if symmetric else np.nanpercentile(f2, 100 - percentile)
+    hi, lo = float(vmax), float(vmin)
     lv = np.linspace(lo, hi, levels)
 
     created = ax is None
@@ -202,14 +410,14 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap="RdYlBu_r",
     ax.set_xlabel("$x$ [m]")
     ax.set_ylabel("$y$ [m]")
     ax.set_title(title)
-    if created:
+    if colorbar:
         ax.figure.colorbar(cf, ax=ax, label=label)
     return ax, cf
 
 
 def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
                      cmap="RdBu_r", density=1.3, symmetric=True, ax=None,
-                     percentile=98):
+                     percentile=98, colorbar=True, vmin=None, vmax=None):
     """Streamlines of a vector field in the z = 0 plane, over an optional
     scalar background (typically the potential that generated it)."""
     k = z0_index(Z)
@@ -220,7 +428,8 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     cf = None
     if background is not None:
         _, cf = show_scalar_slice(X, Y, Z, background, cmap=cmap, symmetric=symmetric,
-                                  percentile=percentile, ax=ax)
+                                  percentile=percentile, ax=ax, colorbar=False,
+                                  vmin=vmin, vmax=vmax)
 
     # streamplot needs 1-D increasing axes and arrays shaped (ny, nx); our
     # indexing='ij' arrays are (nx, ny), hence the transposes.
@@ -237,7 +446,7 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     ax.set_xlabel("$x$ [m]")
     ax.set_ylabel("$y$ [m]")
     ax.set_title(title)
-    if created and cf is not None:
+    if colorbar and cf is not None:
         ax.figure.colorbar(cf, ax=ax, label=label)
     return ax
 
