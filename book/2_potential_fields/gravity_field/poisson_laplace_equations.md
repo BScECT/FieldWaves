@@ -7,11 +7,11 @@ $$
 =-G\int_V\frac{\rho(\vec{r'})}{|\vec{r}-\vec{r'}|}\,\mathrm{d}V'
 $$
 
-relates the gravitational potential at one point to the mass distribution throughout space. There is also a **local** relation between the potential and the density. This relation is Poisson's equation.
+relates the gravitational potential at one point to the mass distribution throughout space. If we were merely interested in Earth's gravity field, we could now make the problem harder by considering a non-spherical. We could start with an ellipsoid, use some trigonometric relations and use series expansions and patiently develop a fairly complex and accurate model of the gravity field. Instead of that, what we will do now is do introduce mathematical tools that allow us to set up the equations from which we can solve a general gravity (or another conservative potential fiedl): the Poisson's and Laplace's equations. The Poisson equation gives us the set of Partial Differential Equations (PDEs) describing the **local** relation between the potential and the mass-density. The Laplace equation describes the special case at points where the mass density is zero.
 
 ## The Laplacian
 
-The Laplacian of a scalar field is the divergence of its gradient:
+The Laplacian of a scalar field is, by definition, the divergence of its gradient:
 
 $$
 \nabla^2\Phi
@@ -27,6 +27,51 @@ $$
 +\frac{\partial^2\Phi}{\partial z^2}.
 $$ (eq:scalar-laplacian-cartesian)
 
+```{admonition} Laplacian in spherical and cylindrical coordinates
+:class: note
+
+In spherical coordinates $(r,\theta,\varphi)$, where $\theta$ is the polar angle measured from the positive $z$-axis and $\varphi$ is the azimuthal angle,
+
+$$
+\begin{aligned}
+\nabla^2\Phi
+={}&\frac{1}{r^2}\frac{\partial}{\partial r}
+\left(r^2\frac{\partial\Phi}{\partial r}\right)\\
+&+\frac{1}{r^2\sin\theta}\frac{\partial}{\partial\theta}
+\left(\sin\theta\frac{\partial\Phi}{\partial\theta}\right)
++\frac{1}{r^2\sin^2\theta}\frac{\partial^2\Phi}{\partial\varphi^2}.
+\end{aligned}
+$$
+
+For a spherically symmetric potential, $\Phi=\Phi(r)$, the angular derivatives vanish and only the radial term remains:
+
+$$
+\nabla^2\Phi
+=\frac{1}{r^2}\frac{\mathrm{d}}{\mathrm{d}r}
+\left(r^2\frac{\mathrm{d}\Phi}{\mathrm{d}r}\right).
+$$
+
+In cylindrical coordinates $(s,\varphi,z)$, where $s$ is the perpendicular distance from the $z$-axis,
+
+$$
+\nabla^2\Phi
+=\frac{1}{s}\frac{\partial}{\partial s}
+\left(s\frac{\partial\Phi}{\partial s}\right)
++\frac{1}{s^2}\frac{\partial^2\Phi}{\partial\varphi^2}
++\frac{\partial^2\Phi}{\partial z^2}.
+$$
+
+If the potential is rotationally symmetric and does not vary along the axis, as for the infinite-cylinder example, $\Phi=\Phi(s)$ and
+
+$$
+\nabla^2\Phi
+=\frac{1}{s}\frac{\mathrm{d}}{\mathrm{d}s}
+\left(s\frac{\mathrm{d}\Phi}{\mathrm{d}s}\right).
+$$
+
+The symbol $s$ is used here for cylindrical radius to avoid confusing it with the mass density $\rho$.
+```
+
 The gradient measures how the potential changes in space. Taking its divergence asks whether those changes produce a net outward or inward flux around a point. The Laplacian therefore measures the local curvature of the potential field.
 
 ## A physical two-dimensional example
@@ -37,7 +82,7 @@ $$
 \lambda=\pi R^2\rho_0.
 $$
 
-Because the source does not change along $z$, neither the potential nor the gravity field depends on $z$. The three-dimensional Laplacian therefore reduces exactly to
+Because the source does not change along $z$, neither the potential nor the gravity field depends on $z$, which implies that al partial derivatives with respect to $z$ are zero. The three-dimensional Laplacian therefore reduces  to
 
 $$
 \nabla^2\Phi
@@ -84,14 +129,119 @@ whereas outside, where $\rho=0$, the positive and negative curvatures in differe
 
 ## From gravitational flux to Poisson's equation
 
-For any closed surface $S$, the gravitational flux depends on the mass enclosed by that surface:
+Let us first return to the exterior of a spherically symmetric body. On a spherical surface $S_r$ of radius $r>R$, the gravity field is
+
+$$
+\vec{g}=-\frac{GM}{r^2}\hat{r}.
+$$
+
+To picture the flux, imagine covering the spherical surface with a mosaic of very small patches. Attach an arrow to each patch that points perpendicular to the surface and out of the sphere. This is the area vector
+
+$$
+\mathrm{d}\vec{A}=\hat{r}\,\mathrm{d}A.
+$$
+
+Its direction describes the orientation of the patch, while its length represents the patch area. The dot product $\vec{g}\cdot\mathrm{d}\vec{A}$ measures how much of the gravity field passes through that patch. A field pointing straight out gives positive flux, a field pointing straight in gives negative flux, and a field tangent to the surface gives no flux because it does not cross the surface.
+
+```{figure} figures/gravitational_flux_surface_patch.svg
+:name: gravitational-flux-surface-patch
+:width: 92%
+
+A two-dimensional slice through the spherical surface. The highlighted arc represents a small surface patch. Its area vector $\mathrm{d}\vec{A}$ is perpendicular to the surface and points outwards, while the gravity field $\vec{g}$ points inwards towards the mass. The vectors are antiparallel, so $\vec{g}\cdot\mathrm{d}\vec{A}<0$: gravity enters rather than leaves the enclosed volume.
+```
+
+For the spherical surface, every area arrow points outwards and every gravity arrow points directly inwards. The two vectors are antiparallel at every patch, so
+
+$$
+\vec{g}\cdot\mathrm{d}\vec{A}
+=-\frac{GM}{r^2}\,\mathrm{d}A.
+$$
+
+The total flux is obtained by adding the contributions from all the small patches:
+
+$$
+\begin{aligned}
+\oint_{S_r}\vec{g}\cdot\mathrm{d}\vec{A}
+&=-\frac{GM}{r^2}\oint_{S_r}\mathrm{d}A\\
+&=-\frac{GM}{r^2}\left(4\pi r^2\right)\\
+&=-4\pi GM.
+\end{aligned}
+$$ (eq:spherical-gravitational-flux)
+
+```{admonition} Visualizing the cancellation
+:class: tip
+
+Imagine inflating the spherical surface like a transparent balloon while leaving the mass at its centre. As the radius increases, each gravity arrow becomes shorter as $1/r^2$. At the same time, a fixed cone drawn from the centre intercepts a patch whose area grows as $r^2$.
+
+If the cone subtends a small solid angle $\mathrm{d}\Omega$, the patch area is
+
+$$
+\mathrm{d}A=r^2\,\mathrm{d}\Omega.
+$$
+
+The flux through that patch is therefore
+
+$$
+\mathrm{d}\mathcal{F}
+=-\frac{GM}{r^2}\mathrm{d}A
+=-GM\,\mathrm{d}\Omega.
+$$
+
+The field has become weaker, but it acts across a proportionally larger patch. Each cone carries the same flux through every concentric sphere. The complete sphere contains a total solid angle of $4\pi$, giving $\mathcal{F}=-4\pi GM$.
+```
+
+The flux is consequently independent of the radius of the spherical surface. For a concentric surface inside a spherically symmetric body, the same calculation applies with $M$ replaced by the enclosed mass $M_{\mathrm{enc}}(r)$.
+
+This result is more general than the spherical calculation suggests. For any closed surface $S$, of any shape, the net gravitational flux depends only on the total mass enclosed by that surface:
 
 $$
 \oint_S \vec{g}\cdot\mathrm{d}\vec{A}
 =-4\pi G M_{\mathrm{enc}}.
 $$ (eq:gauss-law-gravity-integral)
 
-The area vector $\mathrm{d}\vec{A}$ points outwards. Since gravity points towards positive mass, the flux is negative. Writing the enclosed mass as a volume integral and applying the divergence theorem gives
+This is **Gauss's law for gravity**. One way to visualize the generalization is to imagine deforming the transparent spherical balloon into an irregular closed shape without moving it across the mass. The gravity arrows are no longer perpendicular to every patch, and their strengths vary across the surface. However, the dot product automatically counts only the component crossing each patch. The same cones from the mass now meet tilted patches at different distances, but their total solid angle remains $4\pi$, so the total flux does not change.
+
+Mass inside the surface therefore contributes a net inward flux. A mass outside the surface produces no net flux: its field enters the volume through some patches and leaves through others, and those contributions cancel. Because gravitational fields obey superposition, the result extends from individual point masses to arbitrary mass distributions. The area vector $\mathrm{d}\vec{A}$ always points outwards, so the inward flux produced by positive mass is negative.
+
+### The divergence theorem
+
+Before writing another equation, let us start with the physical idea. Imagine surrounding a region with a closed, transparent boundary and observing a net flux passing out through it. That flux cannot simply appear at the boundary: it must emerge from somewhere inside the enclosed volume. Conversely, if more field enters than leaves, something inside behaves as a sink.
+
+Recall from the earlier chapter on [gradient, divergence, and curl](../../1_gradient_divergence_curl/intro.md) that the divergence $\vec{\nabla}\cdot\vec{u}$ measures this local balance for a vector field $\vec{u}$:
+
+- positive divergence means that, locally, more field leaves than enters, like a source;
+- negative divergence means that more field enters than leaves, like a sink;
+- zero divergence means that there is no net production or absorption at that point.
+
+Now imagine dividing the complete volume into many tiny cells. The divergence in each cell tells us its small net outward flux. When we add the fluxes from all cells, every shared internal face appears twice: flux leaving one cell enters its neighbour through the same face. These internal contributions cancel pair by pair. Only the flux through the outer boundary remains.
+
+This is the idea expressed mathematically by the **divergence theorem**. For any sufficiently smooth vector field $\vec{u}$ in a volume $V$ bounded by the closed surface $S=\partial V$,
+
+$$
+\boxed{
+\oint_{\partial V}\vec{u}\cdot\mathrm{d}\vec{A}
+=\int_V\vec{\nabla}\cdot\vec{u}\,\mathrm{d}V.
+}
+$$ (eq:divergence-theorem)
+
+The left-hand side measures the net outward flux through the boundary. The right-hand side adds up all the local sources and sinks inside the volume. The equality follows from the cancellation of the internal faces: all net flux crossing the outer boundary must be accounted for by the divergence somewhere inside.
+
+For gravity, positive mass behaves as a **sink** of the gravity field rather than a source: the field arrows converge towards the mass. We should therefore expect $\vec{\nabla}\cdot\vec{g}$ to be negative wherever positive mass density is present.
+
+Applying the divergence theorem to the gravity field gives
+
+$$
+\oint_{\partial V}\vec{g}\cdot\mathrm{d}\vec{A}
+=\int_V\vec{\nabla}\cdot\vec{g}\,\mathrm{d}V.
+$$
+
+Gauss's law supplies the value of the surface integral, while the enclosed mass can be written as
+
+$$
+M_{\mathrm{enc}}=\int_V\rho\,\mathrm{d}V.
+$$
+
+Combining these relations gives
 
 $$
 \int_V \left(\vec{\nabla}\cdot\vec{g}\right)\mathrm{d}V
@@ -143,13 +293,13 @@ $$ (eq:gravitational-laplace-equation)
 
 This is **Laplace's equation**. A field satisfying Laplace's equation is called **harmonic**. The equation applies in any source-free region, even if masses outside that region produce a non-zero potential and gravity field within it.
 
-For example, the potential outside a spherical body is
+For example, the potential outside a spherically symmetric body is
 
 $$
 \Phi(r)=-\frac{GM}{r}.
 $$
 
-For a spherically symmetric scalar field, the Laplacian is
+Because of the spherical symmetry it is natural to evaluate its Laplacian in spherical coordinates, which reduces to
 
 $$
 \nabla^2\Phi
