@@ -22,7 +22,7 @@ __all__ = [
     "z0_index", "slice_z0",
     "box_indices", "area_integral", "volume_integral",
     "show_isosurfaces", "show_cones", "show_scalar_slice", "show_field_slice",
-    "check", "check_shape", "check_close", "check_scalar",
+    "check", "check_shape", "check_close", "check_abs", "check_scalar",
 ]
 
 # --------------------------------------------------------------------------
@@ -119,8 +119,8 @@ _LIGHTPOSITION = dict(x=100, y=200, z=200)
 
 
 def show_isosurfaces(X, Y, Z, F, levels, *, title="", label="", opacity=0.3,
-                     colorscale="Viridis", show_caps=False, size=620, step=2,
-                     opacity_slider=True, slice_z=None):
+                     colorscale="Viridis", reversescale=False, show_caps=False,
+                     size=620, step=2, opacity_slider=True, slice_z=None):
     """Draw one or more isosurfaces (level sets) of a scalar field F.
 
     An isosurface is the set of points where F takes one fixed value -- the
@@ -142,6 +142,12 @@ def show_isosurfaces(X, Y, Z, F, levels, *, title="", label="", opacity=0.3,
         write ``"|\u2207r|  [-]"`` and ``"[m<sup>-2</sup>]"`` with Unicode
         symbols -- a ``$...$`` label silently comes out as garbled glyphs.
         The matplotlib helpers below are the opposite: mathtext works there.
+    reversescale : bool
+        Flip the colorscale. Needed for a signed field on ``"RdBu"``: plotly
+        runs that scale dark *red* at the low end and dark *blue* at the high
+        end, the opposite of matplotlib's ``"RdBu_r"`` used by the 2-D
+        helpers below. Without this flag a positive lobe drawn in 3-D comes
+        out blue while the same lobe in the slice beside it is red.
     slice_z : float or None
         If given, also draw a filled cut plane at that value of z, exposing
         the interior. A strong depth cue, at the cost of hiding part of the
@@ -169,7 +175,7 @@ def show_isosurfaces(X, Y, Z, F, levels, *, title="", label="", opacity=0.3,
         x=X.ravel(), y=Y.ravel(), z=Z.ravel(), value=np.asarray(F).ravel(),
         isomin=float(levels.min()), isomax=float(levels.max()),
         surface_count=int(levels.size), opacity=opacity,
-        colorscale=colorscale, showscale=True,
+        colorscale=colorscale, reversescale=reversescale, showscale=True,
         colorbar=dict(title=label, len=0.7),
         lighting=_LIGHTING, lightposition=_LIGHTPOSITION,
         caps=dict(x_show=show_caps, y_show=show_caps, z_show=show_caps),
@@ -196,7 +202,8 @@ def _add_opacity_slider(fig, current):
     )])
 
 
-def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", label="", size=620,
+def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", label="", unit="",
+               size=620,
                normalise=False, length=None, head=0.35, colorscale="Viridis",
                slider=True, width=4, log_colour=None):
     """Draw a 3-D vector field as arrows: a shaft with a barbed head.
@@ -212,11 +219,13 @@ def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", label="", size=620,
 
     Parameters
     ----------
-    label : str
-        Colorbar title, e.g. ``"|<b>E</b>|  [V/m]"``. Defaults to a generic
-        ``|A|``; give it the real quantity and unit so the reader can tell
-        the tasks apart. Plotly renders no LaTeX here -- see the note in
-        ``show_isosurfaces``.
+    label, unit : str
+        The plotted quantity and its unit, kept apart, e.g.
+        ``label="|<b>E</b>|", unit="V/m"``. A linear colorbar is then titled
+        ``|<b>E</b>|  [V/m]``; a log one ``log<sub>10</sub>(|<b>E</b>| /
+        (V/m))``, because the logarithm of a dimensional quantity does not
+        carry that quantity's unit. Plotly renders no LaTeX here -- see the
+        note in ``show_isosurfaces``.
     normalise : bool
         Draw every arrow the same length, showing direction only. Use it for
         fields whose magnitude spans orders of magnitude, where true-to-scale
@@ -261,9 +270,13 @@ def show_cones(X, Y, Z, Ax, Ay, Az, *, step=8, title="", label="", size=620,
     name = label or "|A|"
     if log_colour:
         cval = np.log10(np.maximum(mag, float(positive.min())))
-        clabel = f"log<sub>10</sub> {name}"
+        # log10 of a dimensional quantity is dimensionless: the unit belongs
+        # inside the logarithm, as a divisor, never appended in brackets.
+        clabel = (f"log<sub>10</sub>({name} / {unit})" if unit
+                  else f"log<sub>10</sub> {name}")
     else:
-        cval, clabel = mag, name
+        cval = mag
+        clabel = f"{name}  [{unit}]" if unit else name
 
     px, py, pz = _arrow_lines(x, y, z, ux, uy, uz, rel * base, head)
     fig = go.Figure(go.Scatter3d(
@@ -445,6 +458,11 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
 
     ``plane="z"`` cuts z = 0 and expects the (x, y) components; ``plane="y"``
     cuts y = 0 and expects the (x, z) components -- pass ``Ax, Az`` there.
+
+    Returns ``(ax, cf)``. ``cf`` is the filled-contour mappable, or ``None``
+    if no background was given; pass ``colorbar=False`` on every panel of a
+    multi-panel figure and hand ``cf`` to ``fig.colorbar(cf, ax=axes, ...)``
+    to draw a single bar spanning the lot.
     """
     created = ax is None
     if created:
@@ -473,7 +491,7 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     ax.set_title(title)
     if colorbar and cf is not None:
         ax.figure.colorbar(cf, ax=ax, label=label)
-    return ax
+    return ax, cf
 
 
 # --------------------------------------------------------------------------
@@ -508,6 +526,27 @@ def check_close(label: str, got, want, rtol=0.05, where=None) -> None:
     check(f"{label}: worst error {worst:.2%}", worst < rtol,
           f"worst relative error {worst:.2%} exceeds {rtol:.0%}. Check your "
           f"np.gradient call -- did you pass dx, dy, dz, and in that order?")
+
+
+def check_abs(label: str, got, atol, where=None, hint: str = "") -> None:
+    """Compare an array against **zero**, on an absolute scale.
+
+    ``check_close`` divides by the expected value, so it cannot be pointed at
+    a quantity whose answer is exactly zero -- a solenoidal field, say. Give
+    this one a tolerance in the field's own units instead. ``atol`` is usually
+    a small fraction of the scale the field could have had: for a divergence
+    built from ``A ~ r`` on a grid of spacing ``dx``, anything below about
+    ``1e-9`` is round-off.
+    """
+    got = np.asarray(got, float)
+    m = np.isfinite(got)
+    if where is not None:
+        m = m & where
+    if not m.any():
+        raise AssertionError(f"{label} -- nothing left to compare")
+    worst = float(np.max(np.abs(got[m])))
+    check(f"{label}: worst |value| {worst:.2e}", worst < atol,
+          hint or f"worst deviation from zero, {worst:.2e}, exceeds {atol:.1e}")
 
 
 def check_scalar(label: str, got: float, want: float, rtol: float = 0.01,
