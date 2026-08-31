@@ -368,13 +368,32 @@ def _style_3d(fig, title, size, bottom_margin=0):
 
 
 # --------------------------------------------------------------------------
-# 2-D views of the z = 0 plane (matplotlib)
+# 2-D views of a coordinate plane (matplotlib)
 # --------------------------------------------------------------------------
+
+def _plane_slice(X, Y, Z, F, plane):
+    """Cut a 3-D field on a coordinate plane through the origin.
+
+    ``plane="z"`` gives the z = 0 plane in (x, y); ``plane="y"`` gives the
+    y = 0 plane in (x, z) -- the vertical cross-section a geophysical survey
+    is usually drawn on. Returns the two 1-D axes, the 2-D field, and the two
+    axis labels.
+    """
+    F = None if F is None else np.asarray(F)
+    if plane == "z":
+        k = z0_index(Z)
+        return (X[:, 0, k], Y[0, :, k], None if F is None else F[:, :, k],
+                "$x$ [m]", "$y$ [m]")
+    if plane == "y":
+        j = int(np.argmin(np.abs(Y[0, :, 0])))
+        return (X[:, j, 0], Z[0, j, :], None if F is None else F[:, j, :],
+                "$x$ [m]", "$z$ [m]")
+    raise ValueError(f"plane must be 'z' or 'y', not {plane!r}")
 
 def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
                       levels=25, symmetric=False, percentile=99, ax=None,
-                      colorbar=True, vmin=None, vmax=None):
-    """Filled contours of a scalar field in the z = 0 plane.
+                      colorbar=True, vmin=None, vmax=None, plane="z"):
+    """Filled contours of a scalar field on a coordinate plane.
 
     ``colorbar`` is drawn whether or not the axes was supplied by the caller;
     a panel in a side-by-side comparison needs its scale just as much as a
@@ -389,9 +408,11 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
     ``cmap`` defaults to a diverging map when ``symmetric=True`` and a
     sequential one otherwise, so a one-signed field never gets a colour scale
     implying a meaningful zero crossing.
+
+    ``plane="z"`` cuts z = 0, ``plane="y"`` cuts y = 0 for a vertical section.
     """
-    k = z0_index(Z)
-    x2, y2, f2 = X[:, :, k], Y[:, :, k], np.asarray(F)[:, :, k]
+    a1, b1, f2, alab, blab = _plane_slice(X, Y, Z, F, plane)
+    x2, y2 = np.meshgrid(a1, b1, indexing="ij")
 
     if cmap is None:
         cmap = "RdBu_r" if symmetric else "viridis"
@@ -407,8 +428,8 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
         _, ax = plt.subplots(figsize=(5.4, 4.5))
     cf = ax.contourf(x2, y2, np.clip(f2, lo, hi), levels=lv, cmap=cmap, extend="both")
     ax.set_aspect("equal")                 # course rule: never distort a field plot
-    ax.set_xlabel("$x$ [m]")
-    ax.set_ylabel("$y$ [m]")
+    ax.set_xlabel(alab)
+    ax.set_ylabel(blab)
     ax.set_title(title)
     if colorbar:
         ax.figure.colorbar(cf, ax=ax, label=label)
@@ -417,10 +438,14 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
 
 def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
                      cmap="RdBu_r", density=1.3, symmetric=True, ax=None,
-                     percentile=98, colorbar=True, vmin=None, vmax=None):
-    """Streamlines of a vector field in the z = 0 plane, over an optional
-    scalar background (typically the potential that generated it)."""
-    k = z0_index(Z)
+                     percentile=98, colorbar=True, vmin=None, vmax=None,
+                     plane="z"):
+    """Streamlines of a vector field on a coordinate plane, over an optional
+    scalar background (typically the potential that generated it).
+
+    ``plane="z"`` cuts z = 0 and expects the (x, y) components; ``plane="y"``
+    cuts y = 0 and expects the (x, z) components -- pass ``Ax, Az`` there.
+    """
     created = ax is None
     if created:
         _, ax = plt.subplots(figsize=(5.8, 4.8))
@@ -429,22 +454,22 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     if background is not None:
         _, cf = show_scalar_slice(X, Y, Z, background, cmap=cmap, symmetric=symmetric,
                                   percentile=percentile, ax=ax, colorbar=False,
-                                  vmin=vmin, vmax=vmax)
+                                  vmin=vmin, vmax=vmax, plane=plane)
 
-    # streamplot needs 1-D increasing axes and arrays shaped (ny, nx); our
-    # indexing='ij' arrays are (nx, ny), hence the transposes.
-    x1 = X[:, 0, k]
-    y1 = Y[0, :, k]
-    u = np.nan_to_num(np.asarray(Ax)[:, :, k]).T
-    v = np.nan_to_num(np.asarray(Ay)[:, :, k]).T
+    # streamplot needs 1-D increasing axes and arrays shaped (nb, na); our
+    # indexing='ij' arrays are (na, nb), hence the transposes.
+    x1, y1, u2, alab, blab = _plane_slice(X, Y, Z, Ax, plane)
+    _, _, v2, _, _ = _plane_slice(X, Y, Z, Ay, plane)
+    u = np.nan_to_num(u2).T
+    v = np.nan_to_num(v2).T
     ax.streamplot(x1, y1, u, v, color="k", linewidth=0.7,
                   density=density, arrowsize=0.9)
 
     ax.set_aspect("equal")
     ax.set_xlim(x1.min(), x1.max())
     ax.set_ylim(y1.min(), y1.max())
-    ax.set_xlabel("$x$ [m]")
-    ax.set_ylabel("$y$ [m]")
+    ax.set_xlabel(alab)
+    ax.set_ylabel(blab)
     ax.set_title(title)
     if colorbar and cf is not None:
         ax.figure.colorbar(cf, ax=ax, label=label)

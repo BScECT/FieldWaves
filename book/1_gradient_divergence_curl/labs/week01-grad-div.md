@@ -24,16 +24,25 @@ A practical companion to the lectures on the gradient and the divergence. Each t
 
 ## Learning objectives
 
-By the end of this session you should be able to:
+By the end of this lab you should be able to:
 
-- **Read a gradient off a picture.** Explain why $\nabla f$ is perpendicular to the level surfaces of $f$, and why the single minus sign in $\mathbf{E} = -\nabla V$ is the step from geometry to physics.
-- **Distinguish "arrows spreading apart" from divergence.** Compute $\nabla\cdot\mathbf{A}$ for fields, and justify the answer with a flux argument rather than with algebra.
-- **Use Gauss's law as a measurement.** Verify $\nabla\cdot\mathbf{E} = \rho/\varepsilon_0$ pointwise, verify the divergence theorem $\oint_S\mathbf{E}\cdot d\mathbf{s} = \int_v \nabla\cdot\mathbf{E}\,dv$ numerically, and explain what happens to both when the source shrinks to a point.
+- **Truncate a series and know what you lost.** Sum a geometric series, approximate it by its leading term, and say how many terms buy a given accuracy — and where a Taylor series stops working altogether.
+- **Read a gradient off a picture.** Show that $\nabla r = \hat{\boldsymbol{r}}$, that $\nabla f$ is perpendicular to the level surfaces of $f$, and that $dp/dl = \lvert\nabla p\rvert\cos\psi$ — so the gradient's magnitude *is* the maximum rate of change.
+- **Turn a potential into a field, and a field into a survey.** Apply $\boldsymbol{E} = -\nabla V$ and Ohm's law $\boldsymbol{J} = -\rho^{-1}\nabla V$, and map the potential and current density of a two-electrode DC resistivity measurement.
+- **Distinguish "arrows spreading apart" from divergence.** Compute $\nabla\cdot\boldsymbol{v}$, justify the answer by flux rather than algebra, and find the only radial flow that is incompressible.
+- **Use the divergence theorem as a measurement.** Verify $\oint_S\boldsymbol{v}\cdot\hat{\boldsymbol{n}}\,dS = \int_D \nabla\cdot\boldsymbol{v}\,dV$ numerically, and explain what happens when the source shrinks to a point.
 
+:::{admonition} Two sessions
+:class: note
+
+**Session 1** runs to the end of Part 4, covering the gradient. **Part 5 onwards is the following session**, once the divergence has been lectured. Everything is in one page so you can work ahead if you want to.
+:::
 
 ---
 
 ## Part 0 — Setup
+
+Run this once. Nothing in it is physics: it fetches two packages the browser lacks, finds `fwtools`, and defines the Coulomb constant for later.
 
 ```{code-cell} ipython3
 # Nothing above the K = ... line near the bottom is physics; skip to there.
@@ -85,7 +94,178 @@ print(f"epsilon_0 = {epsilon_0:.4e} F/m")
 print(f"k_e       = {k_e:.4e} V*m/C")
 ```
 
-First make a cube grid:
+---
+
+## Part 1 — Series, and what you lose by truncating
+
+Before any fields, one point that runs through the whole course: a physical quantity is often an infinite sum, and we almost always keep only the first few terms. This part is about what that costs.
+
+### Task 1 — the bouncing ball
+
+A ball leaves the ground at $z=0$ with upward velocity $v_0$. Between bounces it is in free fall,
+
+$$ z(t) = v_0 t - \tfrac{1}{2}g t^2, $$
+
+so it returns to the ground after $T_0 = 2v_0/g$ having reached a height $H = v_0^2/2g$. At each bounce it loses a fraction $\gamma$ of its energy, so $v_n = \sqrt{1-\gamma}\;v_{n-1}$, and since flight time is proportional to launch speed,
+
+$$ T_n = (1-\gamma)^{n/2}\,T_0, \qquad T_0 = \sqrt{8H/g}. $$
+
+Fill in the three physical lines. The plotting is written for you.
+
+```{code-cell} ipython3
+g, v0, gamma = 9.81, 5.0, 0.1
+N = 12                                    # bounces to draw
+
+H  = ___                                  # peak height of the first flight
+T0 = ___                                  # duration of the first flight
+T  = T0 * ___                             # durations of bounces 0 .. N-1
+
+# --- given: draw one parabola per bounce ---
+t_start = np.concatenate(([0.0], np.cumsum(T)[:-1]))
+plt.figure(figsize=(9, 3.4))
+for Tn, t0 in zip(T, t_start):
+    tau = np.linspace(0, Tn, 200)
+    plt.plot(t0 + tau, (g*Tn/2)*tau - g*tau**2/2, "C0")
+plt.xlabel("$t$ [s]"); plt.ylabel("$z$ [m]"); plt.grid(alpha=0.3)
+plt.title(f"bouncing ball, $\\gamma$ = {gamma}")
+plt.show()
+
+# --- self-check (leave this alone) ---
+fw.check(f"H = {H:.4f} m", np.isclose(H, v0**2/(2*g)), "H = v0^2 / 2g")
+fw.check(f"T0 = {T0:.4f} s", np.isclose(T0, 2*v0/g), "T0 = 2 v0 / g")
+fw.check("T0 = sqrt(8H/g) too", np.isclose(T0, np.sqrt(8*H/g)))
+fw.check(f"{N} bounce durations, shrinking", len(T) == N and T[-1] < T[0])
+```
+
+:::{admonition} Solution — Task 1
+:class: dropdown
+
+```python
+H  = v0**2 / (2*g)
+T0 = 2*v0 / g
+T  = T0 * (1 - gamma)**(np.arange(N)/2)
+```
+:::
+
+Now the series. The ball bounces for a total time
+
+$$ T_\infty = \sum_{m=0}^{\infty} T_m = T_0\sum_{m=0}^{\infty}\left(\sqrt{1-\gamma}\right)^{m} = \frac{\sqrt{8H/g}}{1-\sqrt{1-\gamma}}, $$
+
+which is a geometric series and therefore **finite** — infinitely many bounces, over in about twenty seconds. For small $\gamma$ the expansion $\sqrt{1-\gamma}\approx 1-\gamma/2$ collapses that to something much simpler,
+
+$$ T_\infty \approx \sqrt{8H/g}\;\frac{2}{\gamma}. $$
+
+Two questions follow, and both are worth answering by measurement rather than by intuition: **how good is that approximation**, and **how many bounces must you actually add up** before the running total gets there?
+
+```{code-cell} ipython3
+print(f"{'gamma':>7} {'T_inf':>9} {'approx':>9} {'error':>7} {'n for 99%':>10}")
+for gam in (0.5, 0.2, 0.1, 0.02):
+    T_inf  = ___                          # the exact sum, from the formula above
+    T_appr = ___                          # the small-gamma approximation
+
+    # --- given: how many bounces to reach 99% of T_inf ---
+    cum = np.cumsum(T0 * (1 - gam)**(np.arange(4000)/2))
+    n99 = int(np.argmax(cum >= 0.99*T_inf)) + 1
+    print(f"{gam:>7.2f} {T_inf:>8.3f}s {T_appr:>8.3f}s "
+          f"{abs(T_appr-T_inf)/T_inf:>6.1%} {n99:>10}")
+
+# --- self-check (leave this alone) ---
+_exact = np.sqrt(8*H/g) / (1 - np.sqrt(1 - 0.1))
+_summed = np.sum(T0 * (1 - 0.1)**(np.arange(5000)/2))
+fw.check(f"the closed form ({_exact:.3f} s) equals the brute-force sum ({_summed:.3f} s)",
+         np.isclose(_exact, _summed, rtol=1e-6))
+```
+
+:::{admonition} Solution — Task 1, continued
+:class: dropdown
+
+```python
+    T_inf  = np.sqrt(8*H/g) / (1 - np.sqrt(1 - gam))
+    T_appr = np.sqrt(8*H/g) * 2 / gam
+```
+:::
+
+:::{admonition} What the table says
+:class: important
+
+At $\gamma = 0.5$ the leading-term approximation is 17% wrong; at $\gamma = 0.02$ it is 0.5%. "Keep only the first term" is not a statement about algebra — it is a statement about the *regime*, and it has to be earned.
+
+The term count runs the other way. The more nearly elastic the ball, the more bounces you must sum for the same accuracy: 14 at $\gamma = 0.5$, 456 at $\gamma = 0.02$. Cheap approximation, expensive summation — and the two get cheap and expensive at opposite ends. You will meet that trade in every numerical method this course touches.
+:::
+
+### Task 2 — where a Taylor series stops working
+
+Any smooth function can be written as a Taylor series about $x=0$,
+
+$$ f(x) = f(0) + x f'(0) + \tfrac{1}{2}x^2 f''(0) + \cdots, $$
+
+and in practice we truncate it after a few terms. Take two:
+
+$$ \sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots, \qquad\qquad \frac{1}{1+x} = 1 - x + x^2 - x^3 + \cdots $$
+
+Both look equally harmless. Add terms to each and watch what happens.
+
+```{code-cell} ipython3
+x = np.linspace(-3, 3, 600)
+
+# term m of each series, as a function of x
+def sin_term(m, x):
+    return 0.0 if m % 2 == 0 else ___     # (-1)^((m-1)/2) x^m / m!   [math.factorial]
+
+def geo_term(m, x):
+    return ___                            # term m of 1 - x + x^2 - ...
+
+# --- given: exact curve plus four truncations, side by side ---
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+for ax, (name, exact, term) in zip(axes, [
+        (r"$\sin x$",   np.sin,            sin_term),
+        (r"$1/(1+x)$",  lambda x: 1/(1+x), geo_term)]):
+    ax.plot(x, exact(x), "k", lw=2, label="exact")
+    for M in (2, 4, 8, 16):
+        ax.plot(x, sum(term(m, x) for m in range(M + 1)), lw=1, label=f"M = {M}")
+    ax.set_ylim(-3, 3); ax.set_xlabel("$x$"); ax.set_title(name)
+    ax.grid(alpha=0.3); ax.legend(fontsize=8)
+plt.tight_layout()
+plt.show()
+
+# --- self-check (leave this alone) ---
+_s20 = sum(sin_term(m, x) for m in range(21))
+_g_in  = sum(geo_term(m, 0.5) for m in range(40))
+_g_out = sum(geo_term(m, 1.5) for m in range(40))
+fw.check("20 terms reproduce sin(x) on -3 < x < 3", np.max(np.abs(_s20 - np.sin(x))) < 1e-6)
+fw.check(f"1/(1+x) converges at x = 0.5 ({_g_in:.4f} vs {1/1.5:.4f})", np.isclose(_g_in, 1/1.5))
+fw.check(f"1/(1+x) diverges at x = 1.5 (partial sum {_g_out:.2e})", abs(_g_out) > 1e3)
+```
+
+:::{admonition} Solution — Task 2
+:class: dropdown
+
+```python
+import math
+
+def sin_term(m, x):
+    return 0.0 if m % 2 == 0 else (-1)**((m-1)//2) * x**m / math.factorial(m)
+
+def geo_term(m, x):
+    return (-x)**m
+```
+:::
+
+:::{admonition} Radius of convergence
+:class: important
+
+$\sin x$ improves everywhere as you add terms. $1/(1+x)$ improves only inside $\lvert x\rvert < 1$; outside it, each extra term makes the partial sum *worse*, without limit — at $x = 1.5$ the 40-term "approximation" is off by millions.
+
+The series has a **radius of convergence** of 1, fixed by the blow-up of $1/(1+x)$ at $x = -1$, and no amount of computing power moves it. Notice that the failure is invisible at $x = 0$: the function is perfectly smooth there, and the first few terms behave well. The limit is a property of the series, not of the point you expanded about.
+
+Keep that beside Task 1. There, more terms always helped and the only question was how many. Here, more terms are useless past a certain point. Knowing which situation you are in is the whole skill.
+:::
+
+---
+
+## Part 2 — The distance function, and what its gradient is
+
+Everything from here on lives on one cube of sample points.
 
 ```{code-cell} ipython3
 n, L = 61, 2.0                          # odd n, so the origin is a sample point
@@ -109,16 +289,16 @@ print(f"X[i,j,k] = x[i]   ->   X[-1, 0, 0] = {X[-1, 0, 0]:.1f} m")
 
 **Resolution.** Every derivative on this page is a centred difference, so its error falls as $\Delta x^{2}$. Measured worst-case error against the analytic answer:
 
-| $n$ | $\Delta x$ [m] | $\lvert\nabla R\rvert$ | $\nabla(1/R)$ | $\nabla\cdot\mathbf{E}$ |
+| $n$ | $\Delta x$ [m] | $\lvert\nabla r\rvert$ | $\nabla(1/r)$ | $\nabla\cdot\boldsymbol{E}$ |
 | ---: | ---: | ---: | ---: | ---: |
 | 21 | 0.200 | 4.1% | 12.5% | 9.1% |
 | 41 | 0.100 | 1.8% | 3.3% | 2.4% |
 | **61** | **0.067** | **0.8%** | **1.6%** | **1.1%** |
 | 81 | 0.050 | 0.5% | 1.0% | 0.6% |
 
-Halving $\Delta x$ quarters the error, as second order requires. $n = 61$ was chosen by that measurement: it is the coarsest grid that keeps every task under 2%, and each 3-D figure it produces weighs about 1.5 MB. **If you change `n`, keep it at 41 or above** — the self-checks below allow 5%, and $n = 31$ already fails Task 3.
+Halving $\Delta x$ quarters the error, as second order requires. $n = 61$ was chosen by that measurement: it is the coarsest grid that keeps every task under 2%, and each 3-D figure it produces weighs about 1.5 MB. **If you change `n`, keep it at 41 or above** — the self-checks below allow 5%, and $n = 31$ already fails Task 6.
 
-Note also that the box is a finite window on fields that extend to infinity: the largest closed surface in Part 5 sits only 0.6 m inside the outer face.
+Note also that the box is a finite window on fields that extend to infinity: the largest closed surface in Part 6 sits only 0.6 m inside the outer face.
 
 
 The grid is built with `indexing='ij'`, so axis 0 is $x$, axis 1 is $y$, axis 2 is $z$.
@@ -129,22 +309,18 @@ The grid is built with `indexing='ij'`, so axis 0 is $x$, axis 1 is $y$, axis 2 
 Numpy's default is `indexing='xy'`, which returns the $y$-derivative first. That one fact is the origin of a large fraction of all numerical field bugs.
 :::
 
----
+Now the geometry. The simplest scalar field there is:
 
-## Part 1 — The distance function, and what its gradient is
-
-Before any physics, one piece of pure geometry. The simplest scalar field there is:
-
-$$ R(x,y,z) = \sqrt{(x-x_0)^2 + (y-y_0)^2 + (z-z_0)^2} $$
+$$ r(x,y,z) = \sqrt{(x-x_0)^2 + (y-y_0)^2 + (z-z_0)^2} $$
 
 *How far am I from that point?* One number at every location in space. No charge, no potential, no units of anything — just distance.
 
-This is the **spherical** radial coordinate $R$ — distance from a point. The cylindrical $r$, distance from an axis, is a different quantity, and Part 4 returns to the distinction. The equations on this page use $R$; the code calls it `r`, because it is the only radius in the lab.
+This is the **spherical** radial coordinate $r$ — distance from a point. The cylindrical $r$, distance from an axis, is a different quantity, and Part 4 returns to the distinction. The equations on this page use $r$; the code calls it `r`, because it is the only radius in the lab.
 
-### Task 1 — build the distance field
+### Task 3 — build the distance field
 
 ```{code-cell} ipython3
-# Task 1 -- distance from a source at (x0, y0, z0) to every point of the grid.
+# Task 3 -- distance from a source at (x0, y0, z0) to every point of the grid.
 
 def distance_to(X, Y, Z, x0=0.0, y0=0.0, z0=0.0):
     return np.sqrt(___ + ___ + ___)
@@ -159,7 +335,7 @@ fw.check("r = 2 m at (2,0,0)", np.isclose(r[-1, c, c], 2.0))
 fw.check("r = 2 m at (0,2,0)", np.isclose(r[c, -1, c], 2.0))
 ```
 
-:::{admonition} Solution — Task 1
+:::{admonition} Solution — Task 3
 :class: dropdown
 
 ```python
@@ -171,7 +347,7 @@ r = distance_to(X, Y, Z)
 ```
 :::
 
-A surface on which $R$ takes one fixed value is an **isosurface**, or level set — the three-dimensional version of a contour line on a map. 
+A surface on which $r$ takes one fixed value is an **isosurface**, or level set — the three-dimensional version of a contour line on a map. 
 
 ```{code-cell} ipython3
 fw.show_isosurfaces(X, Y, Z, r, levels=[0.5, 1.0, 1.5], label="r  [m]",
@@ -179,21 +355,29 @@ fw.show_isosurfaces(X, Y, Z, r, levels=[0.5, 1.0, 1.5], label="r  [m]",
 ```
 
 
-### Task 2 — the gradient of the distance
+### Task 4 — the gradient of the distance
 
-Compute $\nabla R$. Before you run anything, predict two things and write them down: **which way** the arrows point, and **how long** they are.
+Do this one on paper first. Differentiating $r = \sqrt{x^2+y^2+z^2}$ by the chain rule,
 
-Then test the prediction quantitatively. The outward unit radial vector is $\hat{\mathbf{a}}_R = (x\,\hat{\mathbf{a}}_x + y\,\hat{\mathbf{a}}_y + z\,\hat{\mathbf{a}}_z)/R$, so the radial part of any vector field $\mathbf{A}$ is $\mathbf{A}\cdot\hat{\mathbf{a}}_R$. If $\nabla R$ is *purely* radial, that projection recovers its full magnitude.
+$$ \frac{\partial r}{\partial x} = \frac{x}{r}, \qquad \frac{\partial r}{\partial y} = \frac{y}{r}, \qquad \frac{\partial r}{\partial z} = \frac{z}{r} $$
+
+so, collecting the three components,
+
+$$ \nabla r \;=\; \frac{\partial r}{\partial x}\hat{\boldsymbol{x}} + \frac{\partial r}{\partial y}\hat{\boldsymbol{y}} + \frac{\partial r}{\partial z}\hat{\boldsymbol{z}} \;=\; \frac{x\,\hat{\boldsymbol{x}} + y\,\hat{\boldsymbol{y}} + z\,\hat{\boldsymbol{z}}}{r} \;=\; \hat{\boldsymbol{r}} $$
+
+The last step is the definition of the outward unit radial vector: $\hat{\boldsymbol{r}}$ is exactly the position vector divided by its own length. So $\nabla r$ is a **unit** vector pointing **away** from the source — a direction and a magnitude you now know in advance.
+
+The code below checks whether a finite-difference gradient on a grid reproduces that. Two measurements: the magnitude, which should be 1; and the projection $\nabla r \cdot \hat{\boldsymbol{r}}$, which recovers the full magnitude only if the gradient is *purely* radial, with nothing left over along the sphere.
 
 ```{code-cell} ipython3
 # The outward unit radial vector, used again later.
-Rs = np.maximum(r, 1e-12)                 # 0/0 at the source is not a lesson
-aRx, aRy, aRz = X / Rs, Y / Rs, Z / Rs
+rs = np.maximum(r, 1e-12)                 # 0/0 at the source is not a lesson
+rhx, rhy, rhz = X / rs, Y / rs, Z / rs
 
-# Task 2
+# Task 4
 #   1. grad r, as three components.
 #   2. Its magnitude.
-#   3. Its projection onto a_R.
+#   3. Its projection onto r-hat.
 #   4. Draw it, then rotate the figure and compare with the spheres above.
 
 grx, gry, grz = np.gradient(___, ___, ___, ___)
@@ -212,42 +396,120 @@ fw.check_close("|grad r| = 1 everywhere", grad_r_mag, 1.0, rtol=0.05, where=band
 fw.check_close("grad r is purely radial", radial_part, 1.0, rtol=0.05, where=band)
 ```
 
-:::{admonition} Solution — Task 2
+:::{admonition} Solution — Task 4
 :class: dropdown
 
 ```python
 grx, gry, grz = np.gradient(r, dx, dy, dz)
 grad_r_mag = np.sqrt(grx**2 + gry**2 + grz**2)
-radial_part = grx * aRx + gry * aRy + grz * aRz
+radial_part = grx * rhx + gry * rhy + grz * rhz
 
 print(f"|grad r| median in 0.4 < r < 1.6 m : "
       f"{np.median(grad_r_mag[(r > 0.4) & (r < 1.6)]):.4f}")
 ```
 :::
 
-:::{admonition} The magnitude is 1. Everywhere.
+:::{admonition} What the algebra means
 :class: important
 
-Walk one metre directly away from the source and your distance from it grows by exactly one metre. The steepest rate of change of $R$ is 1 m/m, wherever you stand:
+$\lvert\nabla r\rvert = 1$ needs no calculus to see: walk one metre directly away from the source and your distance from it grows by exactly one metre, so the steepest rate of change of $r$ is 1 m/m wherever you stand. A gradient carries the direction of steepest increase and a length equal to that rate — here, "away" and 1.
 
-$$ \nabla R = \hat{\mathbf{a}}_R $$
+The radial check fixes the other half: moving *along* a sphere does not change $r$, so the gradient has no component there. **$\nabla f$ is normal to the level surfaces of $f$** — for every scalar field, not just this one.
 
-The second check fixes the direction: moving *along* a sphere does not change $R$, so the gradient has no component there. **$\nabla f$ is normal to the level surfaces of $f$** — for every scalar field, not just this one.
+The same chain rule settles the next two tasks in advance: $\nabla g(r) = \dfrac{dg}{dr}\,\hat{\boldsymbol{r}}$ for any $g$ depending on position only through $r$. Derive before you run.
+:::
 
-The chain rule now settles the next two tasks in advance: $\nabla g(R) = \dfrac{dg}{dR}\,\hat{\mathbf{a}}_R$ for any $g$ depending on position only through $R$. Predict before you run.
+### Task 5 — how fast does it change *that* way?
+
+The gradient's *direction* is settled: steepest increase, normal to the level surface. Its *magnitude* is the claim we have not tested. It follows from
+
+$$ dp = (\nabla p)\cdot d\boldsymbol{l} = \lvert\nabla p\rvert\,\lvert d\boldsymbol{l}\rvert\cos\psi
+\qquad\Longrightarrow\qquad
+\frac{dp}{dl} = \lvert\nabla p\rvert\cos\psi, $$
+
+where $d\boldsymbol{l}$ is a small step in whatever direction you choose, $dl = \lvert d\boldsymbol{l}\rvert$ is its length, and $\psi$ is the angle between that step and the gradient. (The step is written $d\boldsymbol{l}$ rather than $d\boldsymbol{r}$ only because $r$ already means the distance from the origin on this page.)
+
+Two things follow, and both are testable: the rate of change in *any* direction is $\lvert\nabla p\rvert\cos\psi$, and it can never exceed $\lvert\nabla p\rvert$ — reached only at $\psi = 0$.
+
+Measure it. Pick one point, walk a short distance $\varepsilon$ along many different unit vectors $\hat{\boldsymbol{u}}$, and compare the measured rate against the prediction.
+
+```{code-cell} ipython3
+p_field = 1.0 / np.maximum(r, 0.25)       # any scalar field will do
+gpx, gpy, gpz = np.gradient(p_field, dx, dy, dz)
+
+ip, jp, kp = 40, 36, 34                   # one sample point, off-axis
+gvec = np.array([gpx[ip, jp, kp], gpy[ip, jp, kp], gpz[ip, jp, kp]])
+point = np.array([axis[ip], axis[jp], axis[kp]])
+
+def p_exact(q):
+    return 1.0 / np.linalg.norm(q)        # the same field, evaluated anywhere
+
+# Task 5 -- fill in the four blanks; the plotting is given.
+grad_mag = ___                            # |grad p| at the point, from gvec
+
+rng = np.random.default_rng(0)
+eps = 1e-4
+cosines, rates = [], []
+for _ in range(200):
+    u = rng.normal(size=3)
+    u = ___                               # make it a UNIT vector
+    cosines.append(___)                   # cos(psi) = u . gvec / |grad p|
+    rates.append(___)                     # centred difference of p_exact
+                                          # along u, step eps, over 2*eps
+cosines, rates = np.asarray(cosines), np.asarray(rates)
+
+# --- given: measurements against the predicted straight line ---
+plt.figure(figsize=(5.6, 4.4))
+plt.scatter(cosines, rates, s=12, alpha=0.6, label="measured")
+cs = np.linspace(-1, 1, 50)
+plt.plot(cs, grad_mag*cs, "k", lw=1.5, label=r"$|\nabla p|\cos\psi$")
+plt.xlabel(r"$\cos\psi$")
+plt.ylabel(r"$dp/dl$  [m$^{-2}$]")
+plt.legend(); plt.grid(alpha=0.3)
+plt.show()
+
+# --- self-check (leave this alone) ---
+slope = float(np.polyfit(cosines, rates, 1)[0])
+fw.check_scalar("fitted slope = |grad p|", slope, grad_mag, rtol=0.01)
+fw.check("no direction beats |grad p|", np.max(np.abs(rates)) <= grad_mag * 1.001)
+```
+
+:::{admonition} Solution — Task 5
+:class: dropdown
+
+```python
+grad_mag = float(np.linalg.norm(gvec))
+
+# ... and inside the loop:
+    u = u / np.linalg.norm(u)
+    cosines.append(float(u @ gvec) / grad_mag)
+    rates.append((p_exact(point + eps*u) - p_exact(point - eps*u)) / (2*eps))
+```
+:::
+
+:::{admonition} The magnitude, earned
+:class: important
+
+Every measured rate lies on the line. Three readings of the same picture:
+
+- **At $\cos\psi = 1$** you are walking straight up the gradient, and the rate equals $\lvert\nabla p\rvert$ exactly. Nothing beats it — that is what "steepest" means, now measured rather than asserted.
+- **At $\cos\psi = 0$** you are moving along the level surface and $p$ does not change at all. This is the normality result of Task 4, arriving a second time by a different route.
+- **At $\cos\psi = -1$** you get $-\lvert\nabla p\rvert$: the steepest *descent*, which is the direction $\boldsymbol{E} = -\nabla V$ will pick out in Part 2.
+
+One vector carries a direction *and* a rate, and the cosine tells you what you get for walking at an angle to it.
 :::
 
 ---
 
-## Part 2 — Invert it, and watch the arrows turn round
+## Part 3 — Invert it, and watch the arrows turn round
 
 Now the function the physics actually uses: not the distance, but **one over** the distance,
 
-$$ f(R) = \frac{1}{R}, \qquad\text{so}\qquad \nabla f = \frac{d}{dR}\!\left(\frac{1}{R}\right)\hat{\mathbf{a}}_R = -\frac{1}{R^{2}}\,\hat{\mathbf{a}}_R $$
+$$ f(r) = \frac{1}{r}, \qquad\text{so}\qquad \nabla f = \frac{d}{dr}\!\left(\frac{1}{r}\right)\hat{\boldsymbol{r}} = -\frac{1}{r^{2}}\,\hat{\boldsymbol{r}} $$
 
-Same spheres as isosurfaces — $f$ is constant wherever $R$ is constant. But the *ordering* has been turned inside out: $f$ is now largest near the source and decays to nothing far away. Predict what that does to the arrows, then check the prediction against the formula above, then measure it.
+Same spheres as isosurfaces — $f$ is constant wherever $r$ is constant. But the *ordering* has been turned inside out: $f$ is now largest near the source and decays to nothing far away. Predict what that does to the arrows, then check the prediction against the formula above, then measure it.
 
-### Task 3 — the gradient of the inverse distance
+### Task 6 — the gradient of the inverse distance
 
 ```{code-cell} ipython3
 # The mask keeps the singularity at r = 0 off the grid. Everything within
@@ -255,14 +517,14 @@ Same spheres as isosurfaces — $f$ is constant wherever $R$ is constant. But th
 r_masked = np.where(r < 0.25, np.nan, r)
 f = 1.0 / r_masked
 
-# Task 3
+# Task 6
 #   1. grad f, as components fx, fy, fz; then its magnitude f_mag. The
-#      self-check compares it against the predicted 1/R^2.
+#      self-check compares it against the predicted 1/r^2.
 #   2. Draw it with normalise=True: every arrow the same length, so the
 #      picture shows direction only. The magnitude is not lost -- it moves
 #      into the colour, on a log scale (it spans three decades here). Pass
 #      a label so the colorbar names the quantity, e.g.
-#      label="|∇(1/R)|  [m<sup>-2</sup>]" -- plotly colorbars take
+#      label="|∇(1/r)|  [m<sup>-2</sup>]" -- plotly colorbars take
 #      Unicode and a little HTML, not LaTeX.
 
 fx, fy, fz = ___
@@ -276,7 +538,7 @@ fw.check_close("|grad(1/r)| = 1/r^2", f_mag, 1.0 / r_masked**2, rtol=0.05, where
 fw.check("grad(1/r) points inward at (1,0,0)", fx[-1 - 15, c, c] < 0)
 ```
 
-:::{admonition} Solution — Task 3
+:::{admonition} Solution — Task 6
 :class: dropdown
 
 ```python
@@ -298,31 +560,31 @@ fw.show_cones(X, Y, Z, fx, fy, fz, step=8, normalise=True,
 
 The arrows have reversed. Same spheres, same source, opposite direction:
 
-$$ \nabla R = +\hat{\mathbf{a}}_R, \qquad\qquad \nabla\!\left(\frac{1}{R}\right) = -\frac{1}{R^{2}}\,\hat{\mathbf{a}}_R $$
+$$ \nabla r = +\hat{\boldsymbol{r}}, \qquad\qquad \nabla\!\left(\frac{1}{r}\right) = -\frac{1}{r^{2}}\,\hat{\boldsymbol{r}} $$
 
-Nothing about space changed. What changed is **which way the function climbs**. And the steepness changed too: $1/R$ climbs ever faster as you approach the source, so its gradient grows as $1/R^2$ rather than staying at 1.
+Nothing about space changed. What changed is **which way the function climbs**. And the steepness changed too: $1/r$ climbs ever faster as you approach the source, so its gradient grows as $1/r^2$ rather than staying at 1.
 
 A gradient knows nothing about sources, sinks, charges or fields. It only knows uphill.
 :::
 
-### Task 4 — from geometry to physics
+### Task 7 — from geometry to physics
 
 Here the physics enters, and it enters as a single minus sign. The electric potential of a point charge $Q$ is the inverse-distance function with a constant in front,
 
-$$ V(R) = \frac{1}{4\pi\varepsilon_0}\frac{Q}{R}\quad[\text{V}], $$
+$$ V(r) = \frac{1}{4\pi\varepsilon_0}\frac{Q}{r}\quad[\text{V}], $$
 
 and the electric field is *defined* as
 
-$$ \mathbf{E} = -\nabla V \quad[\text{V/m}]. $$
+$$ \boldsymbol{E} = -\nabla V \quad[\text{V/m}]. $$
 
 You already know what $\nabla V$ does: it points inward, uphill towards the charge. The minus sign turns it round, so **the field points downhill** — which is exactly the way a positive test charge released from rest would move, losing potential energy as it goes.
 
 ```{code-cell} ipython3
 V = k_e * Q / r_masked
 
-# Task 4
+# Task 7
 #   1. E = -grad V, as components Ex, Ey, Ez; then E_mag.
-#   2. Compare E_mag against the analytic k_e*Q/R^2 at a few radii, in V/m.
+#   2. Compare E_mag against the analytic k_e*Q/r^2 at a few radii, in V/m.
 #   3. Draw it with normalise=True and confirm it points OUTWARD for Q > 0.
 
 Ex, Ey, Ez = ___
@@ -331,12 +593,12 @@ E_mag = ___
 
 
 # --- self-check (leave this alone) ---
-fw.check_close("|E| = Q/(4 pi eps0 R^2)", E_mag, k_e * Q / r_masked**2,
+fw.check_close("|E| = Q/(4 pi eps0 r^2)", E_mag, k_e * Q / r_masked**2,
                rtol=0.05, where=outside)
 fw.check("E points outward at (1,0,0)", Ex[-1 - 15, c, c] > 0)
 ```
 
-:::{admonition} Solution — Task 4
+:::{admonition} Solution — Task 7
 :class: dropdown
 
 ```python
@@ -358,24 +620,24 @@ fw.show_cones(X, Y, Z, Ex, Ey, Ez, step=8, normalise=True,
 :::{admonition} Why bother with $V$ at all?
 :class: tip
 
-$V$ is a scalar: one number per point, no direction to keep track of. $\mathbf{E}$ is a vector: three. Anything you can do once on $V$ and then differentiate is cheaper — in arithmetic and in bookkeeping — than doing it three times on $\mathbf{E}$.
+$V$ is a scalar: one number per point, no direction to keep track of. $\boldsymbol{E}$ is a vector: three. Anything you can do once on $V$ and then differentiate is cheaper — in arithmetic and in bookkeeping — than doing it three times on $\boldsymbol{E}$.
 
 Part 3 is the first payoff, and it is the reason the potential is worth defining in the first place.
 :::
 
 ---
 
-## Part 3 — Two sources: superposition
+## Part 4 — Two sources: superposition
 
 One charge is symmetric enough to be boring. Put down two:
 
-$$ V_{\text{total}} = \frac{1}{4\pi\varepsilon_0}\left(\frac{Q_1}{R_1} + \frac{Q_2}{R_2}\right) $$
+$$ V_{\text{total}} = \frac{1}{4\pi\varepsilon_0}\left(\frac{Q_1}{r_1} + \frac{Q_2}{r_2}\right) $$
 
 **Superposition** for the potential is nothing more than adding two numbers at every point, because $V$ is a scalar. Adding the two *fields* instead would mean a vector sum at every point in the cube.
 
-Since $\nabla$ is a linear operator, $-\nabla(V_1 + V_2) = \mathbf{E}_1 + \mathbf{E}_2$ exactly. So the efficient route is: **add the potentials, then take one gradient at the very end.** Nothing is lost.
+Since $\nabla$ is a linear operator, $-\nabla(V_1 + V_2) = \boldsymbol{E}_1 + \boldsymbol{E}_2$ exactly. So the efficient route is: **add the potentials, then take one gradient at the very end.** Nothing is lost.
 
-### Task 5 — build a dipole
+### Task 8 — build a dipole
 
 ```{code-cell} ipython3
 # Distances to two sources on the x-axis. The guard only trips if a grid
@@ -386,7 +648,7 @@ r_plus = np.where(distance_to(X, Y, Z, -0.5, 0.0, 0.0) < 0.01, np.nan,
 r_minus = np.where(distance_to(X, Y, Z, +0.5, 0.0, 0.0) < 0.01, np.nan,
                    distance_to(X, Y, Z, +0.5, 0.0, 0.0))
 
-# Task 5
+# Task 8
 #   1. Superpose the potentials of +Q at (-0.5, 0, 0) and -Q at (+0.5, 0, 0)
 #      into V_dip. Scalar addition -- just a sum.
 #   2. Take ONE gradient, negate it: Ex_d, Ey_d, Ez_d.
@@ -409,7 +671,7 @@ fw.check("V = 0 on the mid-plane",
 fw.check("E on the mid-plane points from + to -", np.nanmean(Ex_d[mid]) > 0)
 ```
 
-:::{admonition} Solution — Task 5
+:::{admonition} Solution — Task 8
 :class: dropdown
 
 ```python
@@ -428,9 +690,9 @@ plt.show()
 :::{admonition} Look at the mid-plane before you move on
 :class: tip
 
-Halfway between the two charges, at $x = 0$, the potential is **exactly zero** — the two contributions cancel. Yet the field there is not zero at all: it is at its strongest, pointing straight from the positive charge to the negative one.
+At $x = 0$, the potential is **exactly zero**. Yet the field there is not zero at all: it is at its strongest, pointing straight from the positive charge to the negative one.
 
-The field is the *slope* of the potential, not its value. A landscape can be at sea level and still be steep. Notice also what the picture shows about direction: the streamlines cross the coloured contours at right angles everywhere, which is Task 2's normality result showing up in a field you did not construct radially.
+The field is the *slope* of the potential, not its value. A landscape can be at sea level and still be steep. Notice also what the picture shows about direction: the streamlines cross the coloured contours at right angles everywhere, which is Task 4's normality result showing up in a field you did not construct radially.
 :::
 
 The same object in three dimensions — positive and negative equipotential surfaces together, drawn transparent:
@@ -442,26 +704,155 @@ fw.show_isosurfaces(X, Y, Z, np.nan_to_num(V_dip), levels=[-lobe, -lobe/3, lobe/
                     title="Equipotential surfaces of a dipole")
 ```
 
+### Task 9 — the same mathematics, as a geophysical survey
+
+Everything you just built was two charges in vacuum. Now change nothing about the mathematics and everything about the physics.
+
+Drive a current $I$ into the ground through one electrode and take it out through another, a distance $a$ apart. In ground of resistivity $\rho$ the current spreads through the **lower half-space only** — air does not conduct — so each electrode contributes $\rho I/2\pi r$ rather than $\rho I / 4\pi r$, and superposition gives
+
+$$ V(x,y,z) = \frac{\rho I}{2\pi}\left(\frac{1}{\lvert\boldsymbol{r}-\boldsymbol{a}/2\rvert} - \frac{1}{\lvert\boldsymbol{r}+\boldsymbol{a}/2\rvert}\right), \qquad z \ge 0 \ \text{(down into the ground)}. $$
+
+The field follows as before, $\boldsymbol{E} = -\nabla V$, and Ohm's law in local form turns it into a **current density**:
+
+$$ \boldsymbol{J} = \rho^{-1}\boldsymbol{E} = -\rho^{-1}\nabla V \quad [\text{A}/\text{m}^2]. $$
+
+This is a real measurement — a DC resistivity survey, the workhorse of near-surface geophysics. Map it two ways: on the ground surface, where the electrodes are planted, and on a vertical section cut down between them.
+
+:::{admonition} Careful — $\rho$ means something else here
+:class: warning
+
+In this task $\rho$ is the **electrical resistivity** in Ω·m. In Task 13 it will be a charge density in C/m³, written $\rho_v$ to keep them apart. The symbol is overloaded across the whole subject; the units tell you which is which.
+:::
+
+The ground is a half-space, so this needs its own grid: $x$ and $y$ still run $-L$ to $L$, but $z$ runs from $0$ (the surface) downwards.
+
+```{code-cell} ipython3
+rho, I, a_sep = 100.0, 1.0, 1.0           # ohm.m, ampere, electrode spacing [m]
+
+axis_g = np.linspace(-2.0, 2.0, 81)       # x and y
+depth  = np.linspace(0.0, 2.0, 41)        # z, into the ground
+Xg, Yg, Zg = np.meshgrid(axis_g, axis_g, depth, indexing="ij")
+dxg = axis_g[1] - axis_g[0]
+dzg = depth[1] - depth[0]
+
+def dist_to(x0):
+    return np.sqrt((Xg - x0)**2 + Yg**2 + Zg**2)
+
+# Task 9
+#   1. V from the formula above: source at x = +a_sep/2, sink at x = -a_sep/2.
+#      Mask each distance below 0.12 m -- the electrodes are singular points.
+#   2. J = -grad(V)/rho, as Jx, Jy, Jz. Pass dxg, dxg, dzg -- z is spaced
+#      differently from x and y on this grid.
+#   3. Two panels, stacked:
+#          fig, axes = plt.subplots(2, 1, figsize=(7.5, 9))
+#          fw.show_field_slice(Xg, Yg, Zg, Jx, Jy, background=V_dc, ax=axes[0],
+#                              plane="z", label="$V$ [V]", title=...)
+#          fw.show_field_slice(Xg, Yg, Zg, Jx, Jz, background=V_dc, ax=axes[1],
+#                              plane="y", label="$V$ [V]", title=...)
+#      plane="z" is the ground surface; plane="y" is the vertical section,
+#      and there the in-plane components are (Jx, Jz), not (Jx, Jy).
+#      Finish with axes[1].invert_yaxis() so depth runs downwards.
+
+V_dc = ___
+Jx, Jy, Jz = ___
+
+
+
+# --- self-check (leave this alone) ---
+mid_dc = np.abs(Xg) < 1e-9
+fw.check("V = 0 on the mid-plane between the electrodes",
+         np.nanmax(np.abs(V_dc[mid_dc])) < 1e-6 * np.nanmax(np.abs(V_dc)))
+fw.check("current flows from the source towards the sink at the surface",
+         np.nanmean(Jx[mid_dc]) < 0)
+```
+
+:::{admonition} Solution — Task 9
+:class: dropdown
+
+```python
+guard = 0.12
+d_src = np.where(dist_to(+a_sep/2) < guard, np.nan, dist_to(+a_sep/2))
+d_snk = np.where(dist_to(-a_sep/2) < guard, np.nan, dist_to(-a_sep/2))
+V_dc = rho * I / (2*np.pi) * (1/d_src - 1/d_snk)
+
+gVx, gVy, gVz = np.gradient(np.nan_to_num(V_dc), dxg, dxg, dzg)
+Jx, Jy, Jz = -gVx/rho, -gVy/rho, -gVz/rho
+
+fig, axes = plt.subplots(2, 1, figsize=(7.5, 9))
+for ax_, comps, pl, ttl in ((axes[0], (Jx, Jy), "z", "a) ground surface, $z=0$"),
+                            (axes[1], (Jx, Jz), "y", "b) vertical section, $y=0$")):
+    fw.show_field_slice(Xg, Yg, Zg, *comps, background=V_dc, ax=ax_, plane=pl,
+                        label="$V$ [V]", density=1.2, title=ttl)
+axes[1].invert_yaxis()                    # depth increases downwards
+plt.tight_layout()
+plt.show()
+```
+:::
+
+Now use the field as an instrument. *All* the current injected at one electrode has to cross any closed surface you draw around it — there is nowhere else for it to go. Test that.
+
+```{code-cell} ipython3
+# The five faces of a box buried in the ground around one electrode. The top
+# face is deliberately absent: it lies in the surface z = 0, where no current
+# crosses into the air, so its contribution is zero by physics.
+def buried_box_current(xc, hw=0.3):
+    i0 = int(np.argmin(np.abs(axis_g - (xc - hw))))
+    i1 = int(np.argmin(np.abs(axis_g - (xc + hw))))
+    j0 = int(np.argmin(np.abs(axis_g + hw)))
+    j1 = int(np.argmin(np.abs(axis_g - hw)))
+    k1 = int(np.argmin(np.abs(depth - hw)))
+    sx, sy, sz = slice(i0, i1+1), slice(j0, j1+1), slice(0, k1+1)
+    return (fw.area_integral(Jx[i1, sy, sz], dxg, dzg) - fw.area_integral(Jx[i0, sy, sz], dxg, dzg)
+          + fw.area_integral(Jy[sx, j1, sz], dxg, dzg) - fw.area_integral(Jy[sx, j0, sz], dxg, dzg)
+          + fw.area_integral(Jz[sx, sy, k1], dxg, dxg))
+
+for xc, name in ((+a_sep/2, "source"), (-a_sep/2, "sink")):
+    print(f"current out of a box around the {name:6s}: {buried_box_current(xc):+7.4f} A")
+print(f"                            injected: {I:+7.4f} A")
+
+# --- self-check (leave this alone) ---
+fw.check_scalar("box around the source carries I", buried_box_current(+a_sep/2), I, rtol=0.01, unit=" A")
+fw.check_scalar("box around the sink carries -I", buried_box_current(-a_sep/2), -I, rtol=0.01, unit=" A")
+```
+
+:::{admonition} Why five faces and not six?
+:class: important
+
+The box is closed by the ground surface itself. Air does not conduct, so $J_z = 0$ at $z=0$ — a **boundary condition**, true by physics, not something to be measured.
+
+It is worth seeing what happens if you do try to measure it. `np.gradient` has no neighbour above $z=0$, so it falls back to a one-sided difference there, right beside a singular electrode — and reports about $-0.35$ A of current flowing into the sky. Including that face would corrupt a result that is otherwise good to 0.35%.
+
+The lesson generalises well beyond this lab: **where you know a boundary condition exactly, impose it — do not ask a finite-difference stencil to rediscover it.** Numerical derivatives are least trustworthy exactly where your domain stops.
+:::
+
 ---
 
-## Part 4 — Divergence: is anything being created here?
+:::{admonition} End of session 1
+:class: note
+
+Parts 1–4 are the gradient, and that is where the first afternoon ends. **Part 5 onwards needs the divergence**, which is lectured next — come back to it in the following session, or read ahead if you are curious.
+:::
+
+---
+
+## Part 5 — Divergence: is anything being created here?
 
 The gradient took a scalar and returned a vector. The divergence goes the other way — hand it a vector field, get back a scalar:
 
-$$ \nabla\cdot\mathbf{A} \;=\; \lim_{\Delta v \to 0}\frac{1}{\Delta v}\oint_S \mathbf{A}\cdot d\mathbf{s} \;=\; \frac{\partial A_x}{\partial x} + \frac{\partial A_y}{\partial y} + \frac{\partial A_z}{\partial z} $$
+$$ \nabla\cdot\boldsymbol{A} \;=\; \lim_{\Delta v \to 0}\frac{1}{\Delta v}\oint_S \boldsymbol{A}\cdot d\boldsymbol{s} \;=\; \frac{\partial A_x}{\partial x} + \frac{\partial A_y}{\partial y} + \frac{\partial A_z}{\partial z} $$
 
-Read the definition on the left, not the formula on the right: **treat $\mathbf{A}$ as the velocity of a fluid**, put a small box anywhere, and measure the net outflow through its walls per unit volume.
+Read the definition on the left, not the formula on the right: **treat $\boldsymbol{A}$ as the velocity of a fluid**, put a small box anywhere, and measure the net outflow through its walls per unit volume.
 
-| $\nabla\cdot\mathbf{A}$ | Name | Picture |
+| $\nabla\cdot\boldsymbol{A}$ | Name | Picture |
 | :---: | :--- | :--- |
 | $> 0$ | **source** | a tap — more leaves than arrives |
 | $< 0$ | **sink** | a drain — more arrives than leaves |
 | $= 0$ | **solenoidal** | whatever flows in, flows out |
 
-### Task 6 — write the divergence
+### Task 10 — write the divergence
 
 ```{code-cell} ipython3
-# Task 6
+# Task 10
 #   Write divergence(Ax, Ay, Az, dx, dy, dz) returning
 #   dAx/dx + dAy/dy + dAz/dz -- one derivative along one axis per component.
 #   np.gradient(Ax, dx, axis=0) gives dAx/dx and nothing else; asking it for
@@ -479,7 +870,7 @@ fw.check_close("div of the position vector = 3",
                divergence(X, Y, Z, dx, dy, dz), 3.0, rtol=1e-6)
 ```
 
-:::{admonition} Solution — Task 6
+:::{admonition} Solution — Task 10
 :class: dropdown
 
 ```python
@@ -490,15 +881,136 @@ def divergence(Ax, Ay, Az, dx, dy, dz):
 ```
 :::
 
-### Task 7 — three flows
+### Task 11 — the only incompressible radial flow
+
+A first use of the operator. Water of constant density flows outward from a source at the origin. Away from that source nothing is created or destroyed, so the flow must be **incompressible**:
+
+$$ \nabla\cdot\boldsymbol{v} = 0 \qquad \text{for } r \neq 0. $$
+
+Constant density and a point source force the flow to be radial, $\boldsymbol{v} = f(r)\,\boldsymbol{r}$, and incompressibility then pins $f$ down completely:
+
+$$ \nabla\cdot\boldsymbol{v} = 3f(r) + r\frac{df}{dr} = 0 \qquad\Longrightarrow\qquad f(r) = \frac{A}{r^{3}}. $$
+
+Do not take that on trust — find it. Try four candidates and let the divergence pick.
+
+```{code-cell} ipython3
+# Task 11
+#   For f(r) = const, 1/r^2, 1/r^3, 1/r^4, build v = f(r) * (X, Y, Z) using
+#   r_safe below, take the divergence, and report a scale-free measure of how
+#   far each is from zero: median |div v| / median(|v|/r) over the test band.
+#   Only one candidate should come out near zero.
+
+r_safe = np.where(r < 0.3, np.nan, r)
+band_i = interior & (r > 0.6) & (r < 1.6)
+
+for name, f_r in [("const", np.ones_like(r_safe)),
+                  ("1/r^2", 1/r_safe**2),
+                  ("1/r^3", 1/r_safe**3),
+                  ("1/r^4", 1/r_safe**4)]:
+    pass   # replace this loop body with your own
+
+
+
+# --- self-check (leave this alone) ---
+_v = 1/r_safe**3
+_d = divergence(*(np.nan_to_num(_v*q) for q in (X, Y, Z)), dx, dy, dz)
+_scale = np.nanmedian(np.abs(np.sqrt(3)*_v*r_safe/r_safe)[band_i])
+fw.check("1/r^3 is the divergence-free one",
+         np.nanmedian(np.abs(_d[band_i])) / _scale < 0.05)
+```
+
+:::{admonition} Solution — Task 11
+:class: dropdown
+
+```python
+for name, f_r in [("const", np.ones_like(r_safe)),
+                  ("1/r^2", 1/r_safe**2),
+                  ("1/r^3", 1/r_safe**3),
+                  ("1/r^4", 1/r_safe**4)]:
+    vx, vy, vz = f_r*X, f_r*Y, f_r*Z
+    d = divergence(np.nan_to_num(vx), np.nan_to_num(vy), np.nan_to_num(vz), dx, dy, dz)
+    scale = np.nanmedian((np.sqrt(vx**2 + vy**2 + vz**2) / r_safe)[band_i])
+    print(f"  f = {name:6s}:  median |div v| / (|v|/r) = {np.nanmedian(np.abs(d[band_i]))/scale:8.2%}")
+```
+:::
+
+:::{admonition} Where the inverse-square law comes from
+:class: important
+
+Three candidates sit near 100%; one sits under 1%. Only $f = A/r^{3}$ survives, exactly as the algebra says — and note what that means for the field itself:
+
+$$ \boldsymbol{v} = \frac{A}{r^{3}}\boldsymbol{r} = \frac{A}{r^{2}}\,\hat{\boldsymbol{r}}. $$
+
+**That is the same $1/r^{2}$ you have been working with since Task 6.** Here it was not assumed, and no charge was mentioned: it fell out of "nothing is created away from the source" plus "space is three-dimensional". The surface of a sphere grows as $r^{2}$, so a fixed amount of stuff crossing it must thin as $1/r^{2}$.
+
+Coulomb's law, Newton's gravity and this water all share an exponent for that one geometric reason.
+:::
+
+### Task 11, continued — a field with no source anywhere
+
+Notice the small print on that result: $\nabla\cdot\boldsymbol{v} = 0$ **for $r \neq 0$**. The origin is excluded, and it has to be — that is where the water is injected. Put a closed surface around it and you would find the tap.
+
+Now a field with no such exception. To first order the Earth's magnetic field is a **dipole**: a north and a south pole so close together that they coincide. With dipole moment $\boldsymbol{m}$ pointing from south to north,
+
+$$ \boldsymbol{B} = \frac{3\boldsymbol{r}\,(\boldsymbol{r}\cdot\boldsymbol{m}) - r^{2}\boldsymbol{m}}{r^{5}}. $$
+
+Take $\boldsymbol{m} = \hat{\boldsymbol{z}}$ and measure its divergence with the same function.
+
+```{code-cell} ipython3
+# Task 11, continued -- fill in the three components.
+#   With m = z-hat, the dot product r . m is simply Z.
+#   Careful with the second term: it appears only in the z-component.
+
+r_dot_m = Z
+Bx = ___
+By = ___
+Bz = ___
+
+div_B = divergence(np.nan_to_num(Bx), np.nan_to_num(By), np.nan_to_num(Bz), dx, dy, dz)
+
+# --- given: the same scale-free measure as above ---
+B_mag = np.sqrt(Bx**2 + By**2 + Bz**2)
+print(f"  dipole B : median |div B| / (|B|/r) = "
+      f"{np.nanmedian(np.abs(div_B[band_i]) / (B_mag/r_safe)[band_i]):8.2%}")
+
+# --- self-check (leave this alone) ---
+fw.check("B is divergence-free",
+         np.nanmedian(np.abs(div_B[band_i]) / (B_mag/r_safe)[band_i]) < 0.05)
+fw.check("B is not simply radial (it has a north and a south)",
+         np.nanmin((Bx*X + By*Y + Bz*Z)[band_i]) < 0)
+```
+
+:::{admonition} Solution — Task 11, continued
+:class: dropdown
+
+```python
+Bx = 3*X*r_dot_m / r_safe**5
+By = 3*Y*r_dot_m / r_safe**5
+Bz = (3*Z*r_dot_m - r_safe**2) / r_safe**5
+```
+:::
+
+:::{admonition} No magnetic monopoles
+:class: important
+
+Both fields are divergence-free where you measured, but they are not the same statement.
+
+The water needed an exclusion: $\nabla\cdot\boldsymbol{v} = 0$ *away from the origin*, because the origin is a tap. The dipole needs none — $\nabla\cdot\boldsymbol{B} = 0$ holds **everywhere in space, including at the source itself**. There is no point you could exclude and find a magnet leaking field the way the tap leaks water. That is one of Maxwell's equations, and it says magnetic monopoles do not exist: field lines of $\boldsymbol{B}$ never begin and never end, they only close on themselves.
+
+Two footnotes on the numbers. The dipole's median error, near 1.8%, is worse than the radial flow's 0.7% — not because the physics is shakier but because $\boldsymbol{B}$ falls off as $1/r^{3}$ instead of $1/r^{2}$, so a centred difference has more curvature to miss. Part 6 will make the "no exception" claim exactly rather than to 2%, by putting a closed surface around the dipole instead of differentiating it.
+
+And the second check is worth a moment: $\boldsymbol{B}\cdot\boldsymbol{r}$ goes negative somewhere, which the outward flow of Task 11 never does. The dipole points *inward* over part of space — it returns. That is what "closes on itself" looks like in a number.
+:::
+
+### Task 12 — three flows
 
 Three velocity fields. For each: **sketch it in your head, predict the sign of the divergence, then measure.** Write the predictions down first — the point of this task is the gap between intuition and the answer.
 
-| | Field $\mathbf{A}$ | What it looks like |
+| | Field $\boldsymbol{A}$ | What it looks like |
 | :---: | :--- | :--- |
-| **(a)** | $x\,\hat{\mathbf{a}}_x + y\,\hat{\mathbf{a}}_y + z\,\hat{\mathbf{a}}_z$ | flow rushing outward in all directions |
-| **(b)** | $-y\,\hat{\mathbf{a}}_x + x\,\hat{\mathbf{a}}_y$ | fluid rotating about the $z$-axis |
-| **(c)** | $x\,\hat{\mathbf{a}}_x - y\,\hat{\mathbf{a}}_y$ | stretching along $x$, squeezing along $y$ |
+| **(a)** | $x\,\hat{\boldsymbol{x}} + y\,\hat{\boldsymbol{y}} + z\,\hat{\boldsymbol{z}}$ | flow rushing outward in all directions |
+| **(b)** | $-y\,\hat{\boldsymbol{x}} + x\,\hat{\boldsymbol{y}}$ | fluid rotating about the $z$-axis |
+| **(c)** | $x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$ | stretching along $x$, squeezing along $y$ |
 
 ```{code-cell} ipython3
 # Commit to your predictions BEFORE the next cell: +1 for a source, -1 for a
@@ -507,9 +1019,9 @@ predictions = {"a": ___, "b": ___, "c": ___}
 ```
 
 ```{code-cell} ipython3
-# Task 7
+# Task 12
 #   1. Build the three fields as triples of arrays.
-#   2. Take the divergence of each with your Task 6 function, as div_a,
+#   2. Take the divergence of each with your Task 10 function, as div_a,
 #      div_b and div_c -- the self-check needs those names. Print the mean
 #      of each.
 #   3. Draw fields (a) and (c) side by side in the z = 0 plane, streamlines
@@ -517,7 +1029,7 @@ predictions = {"a": ___, "b": ___, "c": ___}
 #      so the colours are comparable:
 #          fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
 #          fw.show_field_slice(X, Y, Z, *Aa[:2], background=div_a, ax=axes[0],
-#                              vmin=-3, vmax=3, label=r"$\nabla\cdot\mathbf{A}$",
+#                              vmin=-3, vmax=3, label=r"$\nabla\cdot\boldsymbol{A}$",
 #                              title="(a) outward flow")
 #          ... and the same for (c) with Ac and div_c.
 #      Look hard at the two before reading the note below.
@@ -537,7 +1049,7 @@ for key, measured in (("a", div_a), ("b", div_b), ("c", div_c)):
     print(f"  ({key}) you said {predictions[key]:+d}, measured {sign:+d}  --  {verdict}")
 ```
 
-:::{admonition} Solution — Task 7
+:::{admonition} Solution — Task 12
 :class: dropdown
 
 ```python
@@ -559,7 +1071,7 @@ for ax_, (name, A, d) in zip(axes, [("(a) outward flow", Aa, div_a),
                                     ("(c) shear flow", Ac, div_c)]):
     fw.show_field_slice(X, Y, Z, *A[:2], background=d, ax=ax_, density=1.1,
                         vmin=-3, vmax=3, colorbar=(ax_ is axes[-1]),
-                        label=r"$\nabla\cdot\mathbf{A}$  [s$^{-1}$]", title=name)
+                        label=r"$\nabla\cdot\boldsymbol{A}$  [s$^{-1}$]", title=name)
 plt.tight_layout()
 plt.show()
 ```
@@ -570,95 +1082,95 @@ plt.show()
 
 Along the $x$-axis, field (c) rushes outward. It looks like a source. It is not:
 
-$$ \nabla\cdot\mathbf{A} = \frac{\partial}{\partial x}(x) + \frac{\partial}{\partial y}(-y) = 1 - 1 = 0 $$
+$$ \nabla\cdot\boldsymbol{A} = \frac{\partial}{\partial x}(x) + \frac{\partial}{\partial y}(-y) = 1 - 1 = 0 $$
 
 Put a box at the origin: fluid pours out through the left and right walls and in through the top and bottom at exactly the same rate. The parcel changes **shape**, never **volume**.
 
-*Arrows pointing apart* is not divergence. Outflow in one direction can be cancelled exactly by inflow in another — and in Task 9 you will put a closed surface around this field and measure that cancellation, rather than take it on the strength of this paragraph.
+*Arrows pointing apart* is not divergence. Outflow in one direction can be cancelled exactly by inflow in another — and in Task 14 you will put a closed surface around this field and measure that cancellation, rather than take it on the strength of this paragraph.
 :::
 
-### Task 8 — the divergence as a charge detector
+### Task 13 — the divergence as a charge detector
 
 Maxwell's first equation says
 
-$$ \nabla\cdot\mathbf{E} = \frac{\rho}{\varepsilon_0} $$
+$$ \nabla\cdot\boldsymbol{E} = \frac{\rho_v}{\varepsilon_0} $$
 
-which is a strong claim: **the divergence of $\mathbf{E}$ at a point tells you the charge density at that point and nothing else.** Wherever there is no charge, $\mathbf{E}$ is solenoidal, however dramatically its arrows spread out.
+which is a strong claim: **the divergence of $\boldsymbol{E}$ at a point tells you the charge density at that point and nothing else.** Wherever there is no charge, $\boldsymbol{E}$ is solenoidal, however dramatically its arrows spread out.
 
 Test that pointwise on a real source. Not a point charge — that is an idealisation with infinite density at one location, and no grid can hold it. Take instead a charge **smeared over a finite blob**, which is what any actual charged object is:
 
-$$ \rho(R) = \rho_0\,e^{-R^{2}/a^{2}}, \qquad \rho_0 = 10^{-9}\ \text{C/m}^3, \qquad a = 0.5\ \text{m} $$
+$$ \rho_v(r) = \rho_{v0}\,e^{-r^{2}/a^{2}}, \qquad \rho_{v0} = 10^{-9}\ \text{C/m}^3, \qquad a = 0.5\ \text{m} $$
 
-Integrating that over a sphere of radius $R$ gives the charge it encloses (bookwork — you do not need to do the integral now):
+Integrating that over a sphere of radius $r$ gives the charge it encloses (bookwork — you do not need to do the integral now):
 
-$$ Q_{\text{enc}}(R) = \int_0^{R}\!\rho\,4\pi R'^{2}\,dR' = 4\pi\rho_0\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{R}{a}\right) - \frac{a^{2}R}{2}e^{-R^{2}/a^{2}}\right] $$
+$$ Q_{\text{enc}}(r) = \int_0^{r}\!\rho_v\,4\pi r'^{2}\,dr' = 4\pi\rho_{v0}\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{r}{a}\right) - \frac{a^{2}r}{2}e^{-r^{2}/a^{2}}\right] $$
 
-and Gauss's law in the form you already know, $E_R = Q_{\text{enc}}/4\pi\varepsilon_0R^{2}$, then gives the field — the $4\pi$ cancelling:
+and Gauss's law, $E_r = Q_{\text{enc}}/4\pi\varepsilon_0r^{2}$, then gives the field — the $4\pi$ cancelling:
 
-$$ E_R(R) = \frac{\rho_0}{\varepsilon_0 R^{2}}\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{R}{a}\right) - \frac{a^{2}R}{2}e^{-R^{2}/a^{2}}\right] $$
+$$ E_r(r) = \frac{\rho_{v0}}{\varepsilon_0 r^{2}}\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{r}{a}\right) - \frac{a^{2}r}{2}e^{-r^{2}/a^{2}}\right] $$
 
-Check it at small $R$ before trusting it. There $Q_{\text{enc}} \to \frac{4}{3}\pi R^{3}\rho_0$, so $E_R \to \rho_0R/3\varepsilon_0$: the field **rises linearly** from zero at the centre, because the charge enclosed grows faster than the $R^{2}$ of the surface. It peaks near $R \approx a$ and only then falls off.
+One sanity check: near the centre $Q_{\text{enc}}$ grows as $r^{3}$ while the surface grows as $r^{2}$, so $E_r \to \rho_{v0} r/3\varepsilon_0$ — zero at the centre, rising linearly, peaking at $r \approx a$.
 
 ```{code-cell} ipython3
 from scipy.special import erf
 
-a, rho0 = 0.5, 1e-9
+a, rho_v0 = 0.5, 1e-9
 
-# Task 8
-#   1. rho = rho0 * exp(-r^2 / a^2) on the grid.
-#   2. E_R from the formula above, using Rs in the denominators. (The two
-#      bracketed terms very nearly cancel for R << a, so the closed form
-#      loses accuracy below R ~ 1e-6 m; on this grid the only such sample
-#      is the origin, where the a_R components are zero anyway.)
-#   3. Turn the radial magnitude into components along a_R:
-#      Ex_b = E_R * aRx, and likewise for y and z.
-#   4. div_blob = divergence(...), and compare it against rho / epsilon_0
+# Task 13
+#   1. rho_v = rho_v0 * exp(-r^2 / a^2) on the grid.
+#   2. E_r from the formula above, using rs in the denominators. (The two
+#      bracketed terms very nearly cancel for r << a, so the closed form
+#      loses accuracy below r ~ 1e-6 m; on this grid the only such sample
+#      is the origin, where the r-hat components are zero anyway.)
+#   3. Turn the radial magnitude into components along r-hat:
+#      Ex_b = E_r * rhx, and likewise for y and z.
+#   4. div_blob = divergence(...), and compare it against rho_v / epsilon_0
 #      everywhere -- including inside the source.
 #   5. Plot both, side by side, in the z = 0 plane. Pass the SAME vmin and
 #      vmax to each panel, or they get separate auto-scales and the two
 #      pictures are no longer comparable -- which is the whole point:
-#          hi = float(np.nanmax(rho / epsilon_0))
+#          hi = float(np.nanmax(rho_v / epsilon_0))
 #          fig, axes = plt.subplots(1, 2, figsize=(12, 4.4))
 #          fw.show_scalar_slice(X, Y, Z, div_blob, ax=axes[0], cmap="magma",
 #                               vmin=0, vmax=hi, label=..., title=...)
-#          fw.show_scalar_slice(X, Y, Z, rho / epsilon_0, ax=axes[1], ...)
+#          fw.show_scalar_slice(X, Y, Z, rho_v / epsilon_0, ax=axes[1], ...)
 
 # Write your code here:
 
 
 
 # --- self-check (leave this alone) ---
-peak = np.nanmax(rho / epsilon_0)
-_e = np.abs(div_blob[interior] - (rho / epsilon_0)[interior]) / peak
+peak = np.nanmax(rho_v / epsilon_0)
+_e = np.abs(div_blob[interior] - (rho_v / epsilon_0)[interior]) / peak
 cart_worst, cart_median = float(_e.max()), float(np.median(_e))
-fw.check(f"div E = rho/eps0 pointwise (worst {cart_worst:.2%} of peak)",
-         cart_worst < 0.05, "check the component construction Ex_b = E_R * aRx")
+fw.check(f"div E = rho_v/eps0 pointwise (worst {cart_worst:.2%} of peak)",
+         cart_worst < 0.05, "check the component construction Ex_b = E_r * rhx")
 ```
 
-:::{admonition} Solution — Task 8
+:::{admonition} Solution — Task 13
 :class: dropdown
 
 ```python
-rho = rho0 * np.exp(-r**2 / a**2)
+rho_v = rho_v0 * np.exp(-r**2 / a**2)
 
-E_R = rho0 / (epsilon_0 * Rs**2) * (
-    (a**3 * np.sqrt(np.pi) / 4) * erf(Rs / a) - (a**2 * Rs / 2) * np.exp(-Rs**2 / a**2)
+E_r = rho_v0 / (epsilon_0 * rs**2) * (
+    (a**3 * np.sqrt(np.pi) / 4) * erf(rs / a) - (a**2 * rs / 2) * np.exp(-rs**2 / a**2)
 )
-Ex_b, Ey_b, Ez_b = E_R * aRx, E_R * aRy, E_R * aRz
+Ex_b, Ey_b, Ez_b = E_r * rhx, E_r * rhy, E_r * rhz
 
 div_blob = divergence(Ex_b, Ey_b, Ez_b, dx, dy, dz)
 
-hi = float(np.nanmax(rho / epsilon_0))
+hi = float(np.nanmax(rho_v / epsilon_0))
 units = r"[V m$^{-2}$]"
 fig, axes = plt.subplots(1, 2, figsize=(12, 4.4))
 fw.show_scalar_slice(X, Y, Z, div_blob, ax=axes[0], cmap="magma", label=units,
-                     vmin=0, vmax=hi, title=r"measured $\nabla\cdot\mathbf{E}$")
-fw.show_scalar_slice(X, Y, Z, rho / epsilon_0, ax=axes[1], cmap="magma", label=units,
-                     vmin=0, vmax=hi, title=r"actual $\rho/\varepsilon_0$")
+                     vmin=0, vmax=hi, title=r"measured $\nabla\cdot\boldsymbol{E}$")
+fw.show_scalar_slice(X, Y, Z, rho_v / epsilon_0, ax=axes[1], cmap="magma", label=units,
+                     vmin=0, vmax=hi, title=r"actual $\rho_v/\varepsilon_0$")
 plt.tight_layout()
 plt.show()
 
-print(f"peak of rho/eps0    : {np.nanmax(rho/epsilon_0):8.2f}")
+print(f"peak of rho_v/eps0    : {np.nanmax(rho_v/epsilon_0):8.2f}")
 print(f"peak of measured div: {np.nanmax(div_blob):8.2f}")
 ```
 :::
@@ -675,37 +1187,37 @@ Notice where the divergence vanishes: everywhere outside the blob, where the fie
 
 Everything so far used the Cartesian formula, because `np.gradient` differentiates along array axes. But the divergence *is* flux per unit volume — a physical quantity, which cannot depend on the axes you happened to choose. Only the formula changes:
 
-| | Gradient $\nabla T$ | Divergence $\nabla\cdot\mathbf{A}$ |
+| | Gradient $\nabla T$ | Divergence $\nabla\cdot\boldsymbol{A}$ |
 | :--- | :--- | :--- |
-| Cartesian $(x,y,z)$ | $\dfrac{\partial T}{\partial x}\hat{\mathbf{a}}_x + \dfrac{\partial T}{\partial y}\hat{\mathbf{a}}_y + \dfrac{\partial T}{\partial z}\hat{\mathbf{a}}_z$ | $\dfrac{\partial A_x}{\partial x} + \dfrac{\partial A_y}{\partial y} + \dfrac{\partial A_z}{\partial z}$ |
-| Cylindrical $(r,\phi,z)$ | $\dfrac{\partial T}{\partial r}\hat{\mathbf{a}}_r + \dfrac{1}{r}\dfrac{\partial T}{\partial \phi}\hat{\mathbf{a}}_\phi + \dfrac{\partial T}{\partial z}\hat{\mathbf{a}}_z$ | $\dfrac{1}{r}\dfrac{\partial (rA_r)}{\partial r} + \dfrac{1}{r}\dfrac{\partial A_\phi}{\partial \phi} + \dfrac{\partial A_z}{\partial z}$ |
-| Spherical $(R,\theta,\phi)$ | $\dfrac{\partial T}{\partial R}\hat{\mathbf{a}}_R + \dfrac{1}{R}\dfrac{\partial T}{\partial \theta}\hat{\mathbf{a}}_\theta + \dfrac{1}{R\sin\theta}\dfrac{\partial T}{\partial \phi}\hat{\mathbf{a}}_\phi$ | $\dfrac{1}{R^{2}}\dfrac{\partial (R^{2}A_R)}{\partial R} + \dfrac{1}{R\sin\theta}\dfrac{\partial (A_\theta \sin\theta)}{\partial \theta} + \dfrac{1}{R\sin\theta}\dfrac{\partial A_\phi}{\partial \phi}$ |
+| Cartesian $(x,y,z)$ | $\dfrac{\partial T}{\partial x}\hat{\boldsymbol{x}} + \dfrac{\partial T}{\partial y}\hat{\boldsymbol{y}} + \dfrac{\partial T}{\partial z}\hat{\boldsymbol{z}}$ | $\dfrac{\partial A_x}{\partial x} + \dfrac{\partial A_y}{\partial y} + \dfrac{\partial A_z}{\partial z}$ |
+| Cylindrical $(\varrho,\phi,z)$ | $\dfrac{\partial T}{\partial \varrho}\hat{\boldsymbol{\varrho}} + \dfrac{1}{\varrho}\dfrac{\partial T}{\partial \phi}\hat{\boldsymbol{\phi}} + \dfrac{\partial T}{\partial z}\hat{\boldsymbol{z}}$ | $\dfrac{1}{\varrho}\dfrac{\partial (\varrho v_\varrho)}{\partial \varrho} + \dfrac{1}{\varrho}\dfrac{\partial v_\phi}{\partial \phi} + \dfrac{\partial v_z}{\partial z}$ |
+| Spherical $(r,\phi,\theta)$ | $\dfrac{\partial T}{\partial r}\hat{\boldsymbol{r}} + \dfrac{1}{r}\dfrac{\partial T}{\partial \theta}\hat{\boldsymbol{\theta}} + \dfrac{1}{r\sin\theta}\dfrac{\partial T}{\partial \phi}\hat{\boldsymbol{\phi}}$ | $\dfrac{1}{r^{2}}\dfrac{\partial (r^{2}v_r)}{\partial r} + \dfrac{1}{r\sin\theta}\dfrac{\partial (v_\theta \sin\theta)}{\partial \theta} + \dfrac{1}{r\sin\theta}\dfrac{\partial v_\phi}{\partial \phi}$ |
 
-Cylindrical $r$ is the distance from the $z$-axis; spherical $R$, used throughout this lab, is the distance from the origin.
+Cylindrical $\varrho=\sqrt{x^2+y^2}$ is the distance from the $z$-axis; spherical $r=\sqrt{x^2+y^2+z^2}$, used throughout this lab, is the distance from the origin. They are written differently precisely to keep them apart.
 
-Both fields you have built are spherically symmetric — $\mathbf{E} = E_R(R)\,\hat{\mathbf{a}}_R$, with no $\theta$ or $\phi$ dependence — so two of the three spherical terms vanish and the divergence collapses to one ordinary derivative along one line:
+Both fields you have built are spherically symmetric — $\boldsymbol{E} = E_r(r)\,\hat{\boldsymbol{r}}$, with no $\theta$ or $\phi$ dependence — so two of the three spherical terms vanish and the divergence collapses to one ordinary derivative along one line:
 
-$$ \nabla\cdot\mathbf{E} \;=\; \frac{1}{R^{2}}\frac{d}{dR}\!\left(R^{2}E_R\right) $$
+$$ \nabla\cdot\boldsymbol{E} \;=\; \frac{1}{r^{2}}\frac{d}{dr}\!\left(r^{2}E_r\right) $$
 
 ```{code-cell} ipython3
-dR = 0.005
-R_line = np.arange(0.05, 2.0 + dR, dR)          # one radial line, not a cube
+dr = 0.005
+r_line = np.arange(0.05, 2.0 + dr, dr)          # one radial line, not a cube
 
-# the same two fields as before, as functions of R alone
-E_R_blob = rho0 / (epsilon_0 * R_line**2) * (
-    (a**3 * np.sqrt(np.pi) / 4) * erf(R_line / a)
-    - (a**2 * R_line / 2) * np.exp(-R_line**2 / a**2))
-E_R_point = k_e * Q / R_line**2
+# the same two fields as before, as functions of r alone
+E_R_blob = rho_v0 / (epsilon_0 * r_line**2) * (
+    (a**3 * np.sqrt(np.pi) / 4) * erf(r_line / a)
+    - (a**2 * r_line / 2) * np.exp(-r_line**2 / a**2))
+E_r_point = k_e * Q / r_line**2
 
-div_blob_sph = np.gradient(R_line**2 * E_R_blob, dR) / R_line**2
-div_point_sph = np.gradient(R_line**2 * E_R_point, dR) / R_line**2
+div_blob_sph = np.gradient(r_line**2 * E_R_blob, dr) / r_line**2
+div_point_sph = np.gradient(r_line**2 * E_r_point, dr) / r_line**2
 
-rho_line = rho0 * np.exp(-R_line**2 / a**2)
-err_sph = np.abs(div_blob_sph - rho_line / epsilon_0)[1:-1] / np.max(rho_line / epsilon_0)
-print(f"blob : {R_line.size} samples on a line vs {X.size:,} in the cube")
+rho_v_line = rho_v0 * np.exp(-r_line**2 / a**2)
+err_sph = np.abs(div_blob_sph - rho_v_line / epsilon_0)[1:-1] / np.max(rho_v_line / epsilon_0)
+print(f"blob : {r_line.size} samples on a line vs {X.size:,} in the cube")
 print(f"       worst error {err_sph.max():.3%} of peak, median {np.median(err_sph):.4%}")
-print(f"       Cartesian, from Task 8: {cart_worst:.3%} and {cart_median:.4%}")
-print(f"point: R^2 E_R varies by {np.ptp(R_line**2 * E_R_point):.1e} over the whole line")
+print(f"       Cartesian, from Task 13: {cart_worst:.3%} and {cart_median:.4%}")
+print(f"point: r^2 E_r varies by {np.ptp(r_line**2 * E_r_point):.1e} over the whole line")
 print(f"       max |div E| = {np.abs(div_point_sph).max():.1e}")
 ```
 
@@ -714,24 +1226,24 @@ print(f"       max |div E| = {np.abs(div_point_sph).max():.1e}")
 
 Same field, same operator, same answer — from a few hundred samples on a line instead of a quarter of a million in a cube, and several times more accurately.
 
-For the point charge the gain is not accuracy but certainty. $R^{2}E_R = q/4\pi\varepsilon_0$ is a **constant**, so its derivative is exactly zero for every $R>0$ — not "1.35% of something", but zero. Cartesian coordinates could only ever report that the divergence was small.
+For the point charge the gain is not accuracy but certainty. $r^{2}E_r = q/4\pi\varepsilon_0$ is a **constant**, so its derivative is exactly zero for every $r>0$ — not "1.35% of something", but zero. Cartesian coordinates could only ever report that the divergence was small.
 
 Match your coordinates to the symmetry of the source and three noisy numerical derivatives collapse into one line of algebra. That is what the second and third rows of the table are for.
 :::
 
 ---
 
-## Part 5 — Flux, and the divergence theorem
+## Part 6 — Flux, and the divergence theorem
 
-Part 4 used the *differential* form of Gauss's law, which compares two numbers at one point. The *integral* form connects a volume to the surface enclosing it:
+Part 5 used the *differential* form of Gauss's law, which compares two numbers at one point. The *integral* form connects a volume to the surface enclosing it:
 
-$$ \oint_S \mathbf{E}\cdot d\mathbf{s} \;=\; \int_v \nabla\cdot\mathbf{E}\;dv \;=\; \frac{Q_{\text{enc}}}{\varepsilon_0} $$
+$$ \oint_S \boldsymbol{E}\cdot d\boldsymbol{s} \;=\; \int_v \nabla\cdot\boldsymbol{E}\;dv \;=\; \frac{Q_{\text{enc}}}{\varepsilon_0} $$
 
-The first equality is the **divergence theorem** — pure vector calculus, true for any well-behaved field. The second is the physics. Together: measuring $\mathbf{E}$ on a closed surface tells you how much charge is inside, and nothing about how it is arranged, or about any charge outside.
+The first equality is the **divergence theorem** — pure vector calculus, true for any well-behaved field. The second is the physics. Together: measuring $\boldsymbol{E}$ on a closed surface tells you how much charge is inside, and nothing about how it is arranged, or about any charge outside.
 
-Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid planes. On the $+x$ face the outward normal is $+\hat{\mathbf{a}}_x$, so it contributes $\int\!\!\int E_x\,dy\,dz$; on the $-x$ face the normal is $-\hat{\mathbf{a}}_x$ and the same integral enters negatively. Six faces, three pairs.
+Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid planes. On the $+x$ face the outward normal is $+\hat{\boldsymbol{x}}$, so it contributes $\int\!\!\int E_x\,dy\,dz$; on the $-x$ face the normal is $-\hat{\boldsymbol{x}}$ and the same integral enters negatively. Six faces, three pairs.
 
-### Task 9 — close the surface
+### Task 14 — close the surface
 
 ```{code-cell} ipython3
 # `fw.area_integral(F2, da, db)` integrates a 2-D array over the face it
@@ -760,16 +1272,16 @@ def closed_box_flux(Ax, Ay, Az, half_width):
     return flux_x + flux_y + flux_z
 
 
-# Task 9  (using the blob field Ex_b, Ey_b, Ez_b from Task 8)
+# Task 9  (using the blob field Ex_b, Ey_b, Ez_b from Task 13)
 #   1. Finish closed_box_flux above.
 #   2. For h = 0.6, 1.0 and 1.4 m, print three numbers in V*m and check they
 #      agree: the surface integral; the volume integral of div_blob over the
 #      same cube (fw.volume_integral(div_blob[s, s, s], dx, dy, dz), with
 #      i0, i1 = fw.box_indices(X, h)); and the enclosed charge, the volume
-#      integral of rho over that cube divided by epsilon_0.
+#      integral of rho_v over that cube divided by epsilon_0.
 #   3. Keep the h = 1.0 m surface integral as `flux_1m` -- the self-check
 #      below needs that exact name.
-#   4. Now settle Task 7 by measurement rather than by argument: print
+#   4. Now settle Task 12 by measurement rather than by argument: print
 #      closed_box_flux for fields (b) and (c). Both look like they are
 #      throwing fluid outwards somewhere; a closed surface is the arbiter.
 
@@ -781,14 +1293,14 @@ def closed_box_flux(Ax, Ay, Az, half_width):
 i0, i1 = fw.box_indices(X, 1.0)
 s = slice(i0, i1 + 1)
 fw.check_scalar("closed-surface flux = Q_enc/eps0", flux_1m,
-                fw.volume_integral(rho[s, s, s], dx, dy, dz) / epsilon_0,
+                fw.volume_integral(rho_v[s, s, s], dx, dy, dz) / epsilon_0,
                 rtol=0.01, unit=" V*m")
 fw.check_scalar("divergence theorem: surface = volume", flux_1m,
                 fw.volume_integral(div_blob[s, s, s], dx, dy, dz),
                 rtol=0.01, unit=" V*m")
 ```
 
-:::{admonition} Solution — Task 9
+:::{admonition} Solution — Task 14
 :class: dropdown
 
 ```python
@@ -807,7 +1319,7 @@ for h in (0.6, 1.0, 1.4):
     s = slice(i0, i1 + 1)
     surf = closed_box_flux(Ex_b, Ey_b, Ez_b, h)
     vol = fw.volume_integral(div_blob[s, s, s], dx, dy, dz)
-    qenc = fw.volume_integral(rho[s, s, s], dx, dy, dz) / epsilon_0
+    qenc = fw.volume_integral(rho_v[s, s, s], dx, dy, dz) / epsilon_0
     print(f"{h:6.1f} {surf:12.3f} {vol:12.3f} {qenc:12.3f}")
 
 zero = np.zeros_like(X)
@@ -826,32 +1338,69 @@ The number grows with $h$ and then stops: once the cube holds essentially all th
 
 ### And now shrink the source to a point
 
-Run the same surface integral on the point-charge field from Task 4 — the one whose divergence you could never measure at the origin, because you had to mask it away.
+Run the same surface integral on the point-charge field from Task 7 — the one whose divergence you could never measure at the origin, because you had to mask it away.
+
+Rearranged, Gauss's law turns your flux into a **charge meter**: $Q_{\text{enc}} = \varepsilon_0 \oint_S \boldsymbol{E}\cdot d\boldsymbol{s}$. So weigh the charge inside each box, in coulombs, and compare it with the 1 nC you put there.
 
 ```{code-cell} ipython3
+print("box half-width      charge it finds")
 for h in (0.6, 1.0, 1.4):
-    print(f"h = {h:.1f} m :  flux = {closed_box_flux(Ex, Ey, Ez, h):8.3f} V*m"
-          f"   (Q/eps0 = {Q / epsilon_0:.3f} V*m)")
+    Q_found = epsilon_0 * closed_box_flux(Ex, Ey, Ez, h)
+    print(f"   {h:.1f} m           {Q_found * 1e12:8.2f} pC")
+print(f"\n   actually there   {Q * 1e12:8.2f} pC")
 
-shell = interior & (r > 0.5) & (r < 1.6)
-div_point = divergence(np.nan_to_num(Ex), np.nan_to_num(Ey), np.nan_to_num(Ez), dx, dy, dz)
-scale = (E_mag / Rs)[shell]                # the natural size of a derivative of E here
-print(f"\n|div E| away from the origin: median {np.median(np.abs(div_point[shell]) / scale):.2%} "
-      f"of |E|/r -- zero to within the accuracy of the grid")
+# The shell between the 0.6 m and 1.4 m boxes holds no charge at all. Weigh it:
+# what enters the small box must leave the large one, so the difference of the
+# two fluxes is the charge in between.
+Q_shell = epsilon_0 * (closed_box_flux(Ex, Ey, Ez, 1.4)
+                       - closed_box_flux(Ex, Ey, Ez, 0.6))
+print(f"\ncharge in the shell between them: {Q_shell * 1e12:+.2f} pC "
+      f"({abs(Q_shell) / Q:.2%} of the charge at the centre)")
 ```
 
 :::{admonition} Where did the charge go?
 :class: important
 
-Every box returns $Q/\varepsilon_0$, yet the divergence is zero everywhere you can measure — *exactly* zero, by the spherical calculation above — and the boxes share nothing but the origin.
+Every box weighs the same 1 nC, to a fraction of a percent — and the shell between two of them weighs nothing. All the charge is in the only region every box has in common: the origin.
 
-So the whole source sits at one point, where $\nabla\cdot\mathbf{E}$ is not a large number but no number at all: $\rho$ has become a **Dirac delta**, zero everywhere, infinite at one point, with a finite integral $Q$. The integral form survives exactly where the differential form breaks down.
+So the whole source sits at one point, where $\nabla\cdot\boldsymbol{E}$ is not a large number but no number at all: $\rho_v$ has become a **Dirac delta**, zero everywhere, infinite at one point, with a finite integral $Q$. The integral form survives exactly where the differential form breaks down.
 
 The same statement for magnetism carries no source term at all:
 
-$$ \nabla\cdot\mathbf{B} = 0 \qquad\Longleftrightarrow\qquad \oint_S \mathbf{B}\cdot d\mathbf{s} = 0 \ \ \text{for every closed } S $$
+$$ \nabla\cdot\boldsymbol{B} = 0 \qquad\Longleftrightarrow\qquad \oint_S \boldsymbol{B}\cdot d\boldsymbol{s} = 0 \ \ \text{for every closed } S $$
 
-Run this measurement around any closed surface anywhere and you get zero: there are no magnetic monopoles, and field lines of $\mathbf{B}$ never begin and never end.
+Run this measurement around any closed surface anywhere and you get zero: there are no magnetic monopoles, and field lines of $\boldsymbol{B}$ never begin and never end.
+:::
+
+### And the dipole, exactly
+
+Task 11 measured $\nabla\cdot\boldsymbol{B} = 0$ for the Earth's dipole and got 1.8% — grid error, not physics. Now make the same claim without differentiating anything: put a closed surface around the dipole and weigh what comes out.
+
+```{code-cell} ipython3
+r_dot_m = Z
+Bx = 3*X*r_dot_m / r_safe**5
+By = 3*Y*r_dot_m / r_safe**5
+Bz = (3*Z*r_dot_m - r_safe**2) / r_safe**5
+
+print("  h [m]      flux of B        flux of the radial flow v")
+for h in (0.6, 1.0, 1.4):
+    f_B = closed_box_flux(*(np.nan_to_num(q) for q in (Bx, By, Bz)), h)
+    f_v = closed_box_flux(*(np.nan_to_num(q / r_safe**3) for q in (X, Y, Z)), h)
+    print(f"  {h:4.1f}    {f_B:+12.2e}    {f_v:+12.4f}")
+print(f"\n  4*pi = {4*np.pi:.4f}")
+
+# --- self-check (leave this alone) ---
+fw.check("the dipole encloses nothing, at any radius",
+         max(abs(closed_box_flux(*(np.nan_to_num(q) for q in (Bx, By, Bz)), h))
+             for h in (0.6, 1.0, 1.4)) < 1e-9)
+```
+
+:::{admonition} Two kinds of "divergence-free"
+:class: important
+
+The radial flow returns $4\pi$ through every surface, whatever its size — there is a tap at the origin, and every box finds the same one, exactly as every box found the same 1 nC a moment ago.
+
+The dipole returns **zero to machine precision**, at every radius. Not 1.8%, not small: zero. Shrink the surface as tightly as you like around the source and it stays zero, because there is no source to find. That is $\nabla\cdot\boldsymbol{B} = 0$ stated in the form that admits no exception, and it is why the integral form was worth building: it settles at the source what the differential form could only report away from it.
 :::
 
 ### Where do the 1% errors come from?
@@ -867,8 +1416,8 @@ for n_test in (21, 31, 41, 61):
     Xt, Yt, Zt = np.meshgrid(ax_t, ax_t, ax_t, indexing="ij")
     rt = np.sqrt(Xt**2 + Yt**2 + Zt**2)
     Rst = np.maximum(rt, 1e-12)
-    rho_t = rho0 * np.exp(-rt**2 / a**2)
-    E_Rt = rho0 / (epsilon_0 * Rst**2) * (
+    rho_t = rho_v0 * np.exp(-rt**2 / a**2)
+    E_Rt = rho_v0 / (epsilon_0 * Rst**2) * (
         (a**3 * np.sqrt(np.pi) / 4) * erf(Rst / a)
         - (a**2 * Rst / 2) * np.exp(-Rst**2 / a**2))
     dv = divergence(E_Rt * Xt / Rst, E_Rt * Yt / Rst, E_Rt * Zt / Rst, h_t, h_t, h_t)
@@ -885,7 +1434,7 @@ for n_test in (21, 31, 41, 61):
 
 Compare each ratio with the square of the spacing ratio — $1.5^2 = 2.25$ from $n=21$ to $31$, $1.33^2 = 1.78$ from $31$ to $41$, $1.5^2 = 2.25$ from $41$ to $61$.
 
-So the 1.06% in Task 8 is not noise to be tolerated: it is a number you can predict, and buy down if you need to. And the choice of $n = 61$ in Part 0 is now yours to audit rather than take on trust.
+So the 1.06% in Task 13 is not noise to be tolerated: it is a number you can predict, and buy down if you need to. And the choice of $n = 61$ in Part 2 is now yours to audit rather than take on trust.
 :::
 
 ---
@@ -894,7 +1443,7 @@ So the 1.06% in Task 8 is not noise to be tolerated: it is a number you can pred
 
 Today's chain, in one line:
 
-$$ \rho \;\longrightarrow\; V \;\xrightarrow{\ -\nabla\ }\; \mathbf{E} \;\xrightarrow{\ \nabla\cdot\ }\; \rho/\varepsilon_0 $$
+$$ \rho_v \;\longrightarrow\; V \;\xrightarrow{\ -\nabla\ }\; \boldsymbol{E} \;\xrightarrow{\ \nabla\cdot\ }\; \rho_v/\varepsilon_0 $$
 
 - **Gradient** — scalar in, vector out. Points along steepest increase, perpendicular to the level surfaces, with length equal to the rate of increase.
 - **Divergence** — vector in, scalar out. Net flux per unit volume: what is being created here, and nothing else.
@@ -905,16 +1454,16 @@ Electrostatics is the convenient place to *learn* this pair, not the only place 
 
 | System | Potential | Field | Source equation |
 | :--- | :--- | :--- | :--- |
-| Electrostatics | $V$ [V] | $\mathbf{E} = -\nabla V$ &nbsp; [V/m] | $\nabla\cdot\mathbf{E} = \rho/\varepsilon_0$ |
-| Gravitation | $\Phi$ [J/kg] | $\mathbf{g} = -\nabla \Phi$ &nbsp; [m/s$^2$] | $\nabla\cdot\mathbf{g} = -4\pi G\rho_m$ |
-| Heat conduction | $T$ [K] | $\mathbf{q}_T = -k\nabla T$ &nbsp; [W/m$^2$] | $\nabla\cdot\mathbf{q}_T = 0$ (steady, no sources) |
-| Groundwater flow | $h$ [m] | $\mathbf{q}_h = -K\nabla h$ &nbsp; [m/s] | $\nabla\cdot\mathbf{q}_h = 0$ (steady, incompressible) |
+| Electrostatics | $V$ [V] | $\boldsymbol{E} = -\nabla V$ &nbsp; [V/m] | $\nabla\cdot\boldsymbol{E} = \rho_v/\varepsilon_0$ |
+| Gravitation | $\Phi$ [J/kg] | $\boldsymbol{g} = -\nabla \Phi$ &nbsp; [m/s$^2$] | $\nabla\cdot\boldsymbol{g} = -4\pi G\rho_m$ |
+| Heat conduction | $T$ [K] | $\boldsymbol{q}_T = -k\nabla T$ &nbsp; [W/m$^2$] | $\nabla\cdot\boldsymbol{q}_T = 0$ (steady, no sources) |
+| Groundwater flow | $h$ [m] | $\boldsymbol{q}_h = -K\nabla h$ &nbsp; [m/s] | $\nabla\cdot\boldsymbol{q}_h = 0$ (steady, incompressible) |
 
 with $k$ the thermal conductivity [W m$^{-1}$ K$^{-1}$] and $K$ the hydraulic conductivity [m/s].
 
 The minus signs are all the same minus sign: heat flows from hot to cold, water flows from high head to low, a positive charge falls from high potential to low. Flow runs downhill, and the gradient points uphill.
 
-The last two rows are why a solenoidal field matters so much in practice. $\nabla\cdot\mathbf{q} = 0$ in an aquifer is not an approximation of convenience — it is conservation of water written locally.
+The last two rows are why a solenoidal field matters so much in practice. $\nabla\cdot\boldsymbol{q} = 0$ in an aquifer is not an approximation of convenience — it is conservation of water written locally.
 
 ### What is still missing
 
@@ -922,26 +1471,16 @@ Go back to field **(b)**, the rotation. Its divergence is zero everywhere, so by
 
 Divergence cannot see circulation. The operator that can is the **curl**, the third of the three this chapter is named after.
 
-Keep `fwtools.py` to hand: the later labs in this chapter reuse the same helpers and the same grid conventions.
-
 ### Homework
 
-**Exercise A — a heat source in a room.** Replace the spherical blob with a flat rectangular heater, $1.0 \times 0.6$ m in the $z = 0$ plane. A steady point source of power $P$ in a medium of conductivity $k$ raises the temperature as $P/4\pi k R$ — the same $1/R$ you have worked with all afternoon — so superpose a $20 \times 12$ grid of them over the rectangle, exactly as you superposed two charges in Task 5:
+The exercises in your lecture notes are the written homework. Below is the lab's own extension — the one piece that is computational rather than pen-and-paper, and that carries the afternoon's operators into a system you can feel.
 
-$$ T(\mathbf{r}) = \frac{P}{4\pi k}\sum_i \frac{\Delta A}{\lvert \mathbf{r} - \mathbf{r}_i \rvert}, \qquad k_{\text{air}} = 0.026\ \text{W m}^{-1}\text{K}^{-1} $$
+**A heat source in a room.** Replace the spherical blob with a flat rectangular heater, $1.0 \times 0.6$ m in the $z = 0$ plane. A steady point source of power $P$ in a medium of conductivity $k$ raises the temperature as $P/4\pi k r$ — the same $1/r$ you have worked with all afternoon — so superpose a $20 \times 12$ grid of them over the rectangle, exactly as you superposed two charges in Task 8:
 
-with $P$ the total power (take 100 W) and $\Delta A$ the area each sample represents. Then:
+$$ T(\boldsymbol{r}) = \frac{P}{4\pi k}\sum_i \frac{\Delta A}{\lvert \boldsymbol{r} - \boldsymbol{r}_i \rvert}, \qquad P = 100\ \text{W}, \qquad k_{\text{air}} = 0.026\ \text{W m}^{-1}\text{K}^{-1}, $$
+
+with $\Delta A$ the area each sample represents. Then:
 
 - Plot the isosurfaces. Close to the plate they should be rounded rectangles; far away they should become spheres. Why does the shape forget its source?
-- Compute the heat flux $\mathbf{q} = -k\nabla T$ — the same minus sign, the same reason.
-- Check that $\nabla\cdot\mathbf{q} \approx 0$ away from the heater, and that the closed-surface flux through a box containing the plate is *not* zero. State what each result means physically for a room at steady state.
-
-**Exercise B — the $R^n$ family.** Using $\nabla g(R) = \dfrac{dg}{dR}\hat{\mathbf{a}}_R$, derive $|\nabla R| = 1$ and $|\nabla(1/R)| = 1/R^2$ on paper, then find which power $n$ in $R^{n}$ gives a field falling off as $1/R^{3}$.
-
-**Exercise C — why $1/R^2$, and not any other power.** Compute the flux of $\hat{\mathbf{a}}_R/R^{n}$ through spheres of two different radii. Show that it is independent of radius only for $n = 2$, and connect that to the fact that we live in three dimensions. This is the deepest reason Coulomb's law has the exponent it has.
-
-**Exercise D — the same argument in cylindrical coordinates.** An infinite line charge of density $\lambda$ on the $z$-axis produces
-
-$$ \mathbf{E} = \frac{\lambda}{2\pi\varepsilon_0 r}\,\hat{\mathbf{a}}_r $$
-
-with $r$ now the distance from the *axis*, not the origin. Use the cylindrical divergence from the table to show $\nabla\cdot\mathbf{E} = 0$ for $r > 0$, in one line — note which power of $r$ makes $rA_r$ constant, and compare it with the $R^2E_R$ of the spherical case. Then take a cylinder of radius $r$ and length $L$ about the axis and show its flux is $\lambda L/\varepsilon_0$, independent of $r$. Why is the exponent 1 here where it was 2 before?
+- Compute the heat flux $\boldsymbol{q}_T = -k\nabla T$ — the same minus sign, the same reason as $\boldsymbol{E} = -\nabla V$.
+- Check that $\nabla\cdot\boldsymbol{q}_T \approx 0$ away from the heater, and that the closed-surface flux through a box containing the plate is *not* zero. Say what each result means physically for a room at steady state, and which of the two fields you met in Task 11 the heater resembles.
