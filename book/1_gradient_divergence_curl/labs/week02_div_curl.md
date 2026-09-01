@@ -348,13 +348,13 @@ div_c = ___
 
 # --- given: the three side by side, one shared scale, one colorbar ---
 for name, d in [("(a) outward flow", div_a), ("(b) rotation", div_b),
-                ("(c) shear", div_c)]:
+                ("(c) straining flow", div_c)]:
     print(f"{name:20s} div = {d.mean():+.3f}")
 
 fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
 for ax_, (name, A, d) in zip(axes, [("(a) outward flow", Aa, div_a),
                                     ("(b) rotation", Ab, div_b),
-                                    ("(c) shear flow", Ac, div_c)]):
+                                    ("(c) straining flow", Ac, div_c)]):
     fw.show_field_slice(X, Y, Z, *A[:2], background=d, ax=ax_, density=1.1,
                         vmin=-3, vmax=3, colorbar=(ax_ is axes[-1]),
                         label=r"$\nabla\cdot\mathbf{A}$  [s$^{-1}$]", title=name)
@@ -369,7 +369,7 @@ plt.show()
 # tolerance instead.
 fw.check_close("(a) div = 3", div_a, 3.0, rtol=1e-6)
 fw.check_abs("(b) div = 0 (rotation)", div_b, atol=1e-9)
-fw.check_abs("(c) div = 0 (shear)", div_c, atol=1e-9)
+fw.check_abs("(c) div = 0 (straining flow)", div_c, atol=1e-9)
 
 for key, measured in (("a", div_a), ("b", div_b), ("c", div_c)):
     sign = int(np.sign(np.round(measured.mean(), 6)))
@@ -610,8 +610,8 @@ for h in (0.6, 1.0, 1.4):
 # Task 3 settled by measurement rather than by argument. Both (b) and (c)
 # appear to throw fluid outwards somewhere; a closed surface is the arbiter,
 # and it differentiates nothing.
-print(f"\nflux of (b), the rotation : {closed_box_flux(-Y, X, zero, 1.0):+.2e}")
-print(f"flux of (c), the shear    : {closed_box_flux(X, -Y, zero, 1.0):+.2e}")
+print(f"\nflux of (b), the rotation       : {closed_box_flux(-Y, X, zero, 1.0):+.2e}")
+print(f"flux of (c), the straining flow : {closed_box_flux(X, -Y, zero, 1.0):+.2e}")
 
 # --- self-check (leave this alone) ---
 i0, i1 = fw.box_indices(X, 1.0)
