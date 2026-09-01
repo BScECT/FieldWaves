@@ -434,6 +434,17 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
     if vmin is None:
         vmin = -vmax if symmetric else np.nanpercentile(f2, 100 - percentile)
     hi, lo = float(vmax), float(vmin)
+
+    # A contour boundary usually falls exactly on 0.0, so a field that is zero
+    # only to round-off gets sorted into the first warm and the first cool band
+    # and renders as structure that is not there. The shear flow of Lab 2's
+    # Task 3 is the case that matters: div = +-5e-15, drawn as faint red lobes,
+    # which is precisely the "it looks like a source" reading the task exists to
+    # refute. Anything this far below the plotted range is noise, not signal.
+    span = max(abs(hi), abs(lo))
+    if span > 0.0:
+        f2 = np.where(np.abs(f2) < 1e-9 * span, 0.0, f2)
+
     lv = np.linspace(lo, hi, levels)
 
     created = ax is None
