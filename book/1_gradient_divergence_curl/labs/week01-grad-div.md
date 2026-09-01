@@ -323,11 +323,11 @@ $$ r(x,y,z) = \sqrt{(x-x_0)^2 + (y-y_0)^2 + (z-z_0)^2} $$
 
 One number at every location in space: no charge, no potential, and no units beyond metres.
 
-This is the **spherical** radial coordinate $r$, the distance from a point. The cylindrical radius $\varrho$, the distance from an axis, is a different quantity, and Part 5 returns to the distinction. The equations on this page use $r$, and the code calls it `r`, because it is the only radius in the lab.
+This is the **spherical** radial coordinate $r$, the distance from a point. The cylindrical radius $\varrho$, the distance from an axis, is a different quantity. The equations on this page use $r$, and the code calls it `r`.
 
 ### Task 3 — build the distance field
 
-**The question:** what do the surfaces of constant $r$ look like, and where do they crowd together? Answer before computing. This is the one field on the page that can be pictured completely in advance.
+**The question:** what do the surfaces of constant $r$ look like, and where do they crowd together? 
 
 The source must be movable: Task 8 places two of them at different points, so write the offsets in now rather than hard-coding the origin.
 
@@ -362,7 +362,7 @@ r = distance_to(X, Y, Z)
 ```
 :::
 
-A surface on which $r$ takes one fixed value is an **isosurface**, or level set, the three-dimensional analogue of a contour line on a map. Drag the opacity slider under the figure until the inner shells are visible through the outer one. Evenly spaced values of $r$ give evenly spaced shells: the distance function has no preferred radius, which is why its gradient is so simple in the next task.
+A surface on which $r$ takes one fixed value is an **isosurface**, or level set, the three-dimensional analogue of a contour line on a map. Evenly spaced values of $r$ give evenly spaced shells: the distance function has no preferred radius.
 
 ```{code-cell} ipython3
 fw.show_isosurfaces(X, Y, Z, r, levels=[0.5, 1.0, 1.5], label="r  [m]",
@@ -382,7 +382,7 @@ $$ \nabla r \;=\; \frac{\partial r}{\partial x}\hat{\boldsymbol{x}} + \frac{\par
 
 The last step is the definition of the outward unit radial vector: $\hat{\boldsymbol{r}}$ is the position vector divided by its own length. So $\nabla r$ is a **unit** vector pointing **away** from the source, with both direction and magnitude known in advance.
 
-The cell below tests whether a finite-difference gradient on a grid reproduces that. Two measurements: the magnitude, which should be 1, and the projection $\nabla r \cdot \hat{\boldsymbol{r}}$, which recovers the full magnitude only if the gradient is purely radial, with no component along the sphere.
+The cell below tests whether a **finite-difference gradient** on a grid reproduces that. Two measurements: the magnitude, which should be 1, and the projection $\nabla r \cdot \hat{\boldsymbol{r}}$, which recovers the full magnitude only if the gradient is purely radial, with no component along the sphere.
 
 ```{code-cell} ipython3
 # The outward unit radial vector, used again later.
@@ -439,7 +439,6 @@ $\lvert\nabla r\rvert = 1$ needs no calculus: move one metre directly away from 
 
 The radial check fixes the other half: moving along a sphere does not change $r$, so the gradient has no component there. **$\nabla f$ is normal to the level surfaces of $f$** for every scalar field, not only this one.
 
-The same chain rule settles the next two tasks in advance: $\nabla g(r) = \dfrac{dg}{dr}\,\hat{\boldsymbol{r}}$ for any $g$ depending on position only through $r$. Derive it before running the cells.
 :::
 
 ### Task 5 — the rate of change in an arbitrary direction
@@ -598,7 +597,7 @@ $\nabla V$ points inward, uphill towards the charge. The minus sign reverses it,
 ```{code-cell} ipython3
 V = k_e * Q / r_masked
 
-# Task 7 -- two blanks. Mind the minus sign; it is the whole task.
+# Task 7 -- two blanks. Mind the minus sign.
 Ex, Ey, Ez = ___                          # E = -grad V
 E_mag = ___
 
