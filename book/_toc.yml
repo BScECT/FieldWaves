@@ -11,9 +11,11 @@ parts:
   - caption: Gradient, divergence, and curl
     chapters:
     - file: 1_gradient_divergence_curl/intro.md
-    # - file: 1_gradient_divergence_curl/gradient.md
-    # - file: 1_gradient_divergence_curl/divergence.md
-    # - file: 1_gradient_divergence_curl/curl.md
+    - file: 1_gradient_divergence_curl/sums_series_approx.md
+    - file: 1_gradient_divergence_curl/coord_sys.md
+    - file: 1_gradient_divergence_curl/gradient.md
+    - file: 1_gradient_divergence_curl/divergence.md
+    - file: 1_gradient_divergence_curl/curl.md
     - file: 1_gradient_divergence_curl/labs/week01-grad-div.md
   - caption: Potential Fields
     chapters:
