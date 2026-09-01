@@ -307,7 +307,7 @@ where
 $$
 \boxed{H_z(k)=e^{-kz}},
 \qquad k>0.
-$$
+$$ (eq:upward-continuation-transfer-function)
 
 The function $H_z(k)$ is a **spatial transfer function**. It tells us how the amplitude of each horizontal spatial-frequency component changes between the reference surface and the observation height. Since $H_z(k)$ is close to one for small $k$ but rapidly approaches zero for large $k$, observing the field at altitude acts as a **spatial low-pass filter**: broad features pass more easily than fine details.
 

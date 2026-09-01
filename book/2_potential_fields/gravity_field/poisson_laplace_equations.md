@@ -320,16 +320,56 @@ $$
 
 The potential is not constant and the gravity field is not zero, yet Laplace's equation is satisfied because there is no mass in the exterior region. For a point mass, the origin itself must be excluded from this calculation: that is precisely where the source is located and where $-GM/r$ is singular.
 
-## Checking the uniform sphere
+## Guided exercise: checking the uniform sphere
 
-Inside the uniform sphere, Equation {eq}`eq:uniform-sphere-potential` gives
+We have just verified that the potential outside a uniform sphere satisfies Laplace's equation. Inside the sphere the density is non-zero, so the potential should instead satisfy Poisson's equation. Let us check this directly.
+
+```{admonition} Verify the interior potential
+:class: exercise
+
+For a uniform sphere of radius $R$, total mass $M$, and density $\rho_0$, Equation {eq}`eq:uniform-sphere-potential` gives the interior potential
 
 $$
 \Phi(r)
-=-\frac{GM}{2R}\left(3-\frac{r^2}{R^2}\right).
+=-\frac{GM}{2R}\left(3-\frac{r^2}{R^2}\right),
+\qquad 0\leq r<R.
 $$
 
-Applying the radial Laplacian gives
+1. Before calculating anything, use Poisson's equation to predict the value of $\nabla^2\Phi$ inside the sphere. Should it depend on $r$?
+
+2. The potential depends only on the distance $r$ from the centre. Use the radial form of the Laplacian from Equation {eq}`eq:radial-scalar-laplacian`,
+
+   $$
+   \nabla^2\Phi
+   =\frac{1}{r^2}\frac{\mathrm{d}}{\mathrm{d}r}
+   \left(r^2\frac{\mathrm{d}\Phi}{\mathrm{d}r}\right).
+   $$
+
+3. Calculate $\mathrm{d}\Phi/\mathrm{d}r$. Which part of the potential disappears when you differentiate it?
+
+4. Multiply your result by $r^2$, differentiate once more, and divide by $r^2$. You should obtain an expression involving $G$, $M$, and $R$.
+
+5. Use
+
+   $$
+   M=\frac{4}{3}\pi R^3\rho_0
+   $$
+
+   to rewrite your result in terms of the density. Does it agree with your prediction from Step 1?
+
+6. Compare this result with the exterior calculation above. Why does the potential satisfy different differential equations inside and outside even though it joins smoothly at $r=R$?
+```
+
+```{dropdown} Check your calculation
+
+Differentiating the interior potential gives
+
+$$
+\frac{\mathrm{d}\Phi}{\mathrm{d}r}
+=\frac{GM}{R^3}r.
+$$
+
+The radial Laplacian is therefore
 
 $$
 \begin{aligned}
@@ -342,13 +382,14 @@ $$
 \end{aligned}
 $$
 
-Using $M=4\pi\rho_0R^3/3$, this becomes
+Using $M=4\pi\rho_0R^3/3$ gives
 
 $$
-\nabla^2\Phi=4\pi G\rho_0,
+\boxed{\nabla^2\Phi=4\pi G\rho_0},
 $$
 
-as required by Poisson's equation. The same potential therefore satisfies Poisson's equation inside the matter and Laplace's equation outside it.
+exactly as required by Poisson's equation. Inside the matter, $\rho=\rho_0$; outside it, $\rho=0$ and the potential instead satisfies Laplace's equation.
+```
 
 At the surface of an ordinary body with a finite density, $\Phi$ and the normal component of $\vec{g}$ remain continuous, although the second derivatives of $\Phi$ need not be continuous. This is why the uniform-sphere solutions join continuously at $r=R$. An idealized infinitely thin surface layer requires more care because it concentrates mass directly on the boundary.
 
