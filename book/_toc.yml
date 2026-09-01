@@ -16,7 +16,8 @@ parts:
     - file: 1_gradient_divergence_curl/gradient.md
     - file: 1_gradient_divergence_curl/divergence.md
     - file: 1_gradient_divergence_curl/curl.md
-    - file: 1_gradient_divergence_curl/labs/week01-grad-div.md
+    - file: 1_gradient_divergence_curl/labs/week01_series_grad.md
+    - file: 1_gradient_divergence_curl/labs/week02_div_curl.md
   - caption: Potential Fields
     chapters:
     - file: 2_potential_fields/introduction/intro.md
