@@ -19,7 +19,7 @@ mystnb:
 :::{admonition} Computer lab
 :class: note
 
-The second of two labs on the operators of this chapter, following Lab 1 on series and the gradient. Each task states a physical question, gives the steps, and ends with a self-check you can run. Plotting is supplied in the module `fwtools`, so that your effort goes into the physics rather than into rendering transparent isosurfaces.
+The second of two labs on the operators of this chapter, following Lab 1 on series and the gradient. Parts 1 and 2 take the divergence, Part 3 the curl. Each task states a physical question, gives the steps, and ends with a self-check you can run. Plotting is supplied in the module `fwtools`, so that your effort goes into the physics rather than into rendering transparent isosurfaces.
 :::
 
 ## Learning objectives
@@ -28,6 +28,7 @@ By the end of this lab you should be able to:
 
 - **Distinguish diverging arrows from non-zero divergence.** Compute $\nabla\cdot\boldsymbol{v}$, justify the result by flux rather than by algebra, and identify the only radial flow that is incompressible.
 - **Use the divergence theorem as a measurement.** Verify $\oint_S\boldsymbol{v}\cdot\hat{\boldsymbol{n}}\,dS = \int_{\mathcal{D}} \nabla\cdot\boldsymbol{v}\,dV$ numerically, and account for what happens when the source shrinks to a point.
+- **Measure the curl as circulation per unit area.** Compute $\nabla\times\boldsymbol{v}$, separate rotation from the shape a streamline happens to make, and verify Stokes' theorem on a vortex with a finite core.
 
 ---
 
@@ -787,31 +788,481 @@ The 1.06% in Task 4 is therefore not noise to be tolerated but a predictable qua
 
 ## Part 3 — Curl
 
-Return to field **(b)**, the rotation. Its divergence is zero everywhere, so by that measure it is indistinguishable from a field doing nothing. It nevertheless circulates, and every streamline closes on itself.
+Field **(b)**, the rotation, has zero divergence everywhere, yet it plainly circulates. The divergence cannot detect circulation. The operator that can is the **curl**, which takes a vector field and returns another vector field:
 
-The divergence cannot detect circulation. The operator that can is the **curl**, the third of the three operators this chapter is named after.
+$$ \nabla\times\boldsymbol{v} \;=\; \hat{\boldsymbol{x}}\left(\partial_y v_z - \partial_z v_y\right) + \hat{\boldsymbol{y}}\left(\partial_z v_x - \partial_x v_z\right) + \hat{\boldsymbol{z}}\left(\partial_x v_y - \partial_y v_x\right) $$
 
-:::{admonition} Exercises to follow
-:class: note
+There is no determinant to memorise. Each component pairs an even permutation of $(x,y,z)$ against an odd one, in three places at once: the direction, the differentiation, and the vector component. The $\hat{\boldsymbol{x}}$ term takes $(x,y,z)$ minus $(x,z,y)$, and the other two follow by advancing every letter one step, $x\to y\to z\to x$.
 
-The computer exercises for the curl are not drafted yet. They will build on the circulation
-integral and Stokes' theorem, using field **(b)** of Task 3 as the first test case.
+The interpretation comes from a circulation integral. Take a small rectangle of side $dy$ by $dz$ around a point, walk its four edges once round, and add up the component of $\boldsymbol{v}$ along the direction of travel. Expanding each edge to first order in a Taylor series leaves
+
+$$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \left(\partial_y v_z - \partial_z v_y\right)dy\,dz \;+\; \text{higher order} $$
+
+with $\boldsymbol{\tau}$ the unit tangent along the path. That is the $\hat{\boldsymbol{x}}$ component of the curl times the area of the rectangle, and rectangles perpendicular to $\hat{\boldsymbol{y}}$ and $\hat{\boldsymbol{z}}$ give the other two. So the curl is **net circulation per unit area**:
+
+$$ \hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right) \;=\; \lim_{S\to 0}\frac{\oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl}{A} $$
+
+where $A$ is the area of the open surface $S$ and $\hat{\boldsymbol{n}}$ is its unit normal, oriented so that a right-handed screw turned in the direction of $\boldsymbol{\tau}$ advances along $\hat{\boldsymbol{n}}$. Part 1 built the divergence from flux through a closed surface. The curl is built from circulation around a closed curve, one dimension down.
+
+### Task 6 — the operator, and the three flows again
+
+Three lines, in the pattern of the formula above. `np.gradient(Az, dy, axis=1)` is $\partial_y v_z$: the array holding the $z$-component, differentiated along the $y$-axis.
+
+Put the three fields of Task 3 through it. Field (b) rotates rigidly about the $z$-axis at $\omega = 1$ s$^{-1}$, so a paddle wheel dropped anywhere in it turns; fields (a) and (c) carry no rotation. Predict all three before running the cell.
+
+```{code-cell} ipython3
+# Task 6 -- two blanks. The x-component is given. Advance every letter one
+# step, x -> y -> z -> x, in the direction, the differentiation and the
+# component, and the other two lines write themselves.
+def curl(Ax, Ay, Az, dx, dy, dz):
+    cx = np.gradient(Az, dy, axis=1) - np.gradient(Ay, dz, axis=2)
+    cy = ___
+    cz = ___
+    return cx, cy, cz
+
+# --- given: the three fields of Task 3, through the new operator, and one
+#     more. Field (d) is the same rigid rotation turned onto the y-axis, so
+#     its curl is 2 y-hat: it is here to exercise the second line you wrote,
+#     which the three planar fields above leave at zero whatever you put in it.
+Ad = (Z, zero, -X)
+curl_a, curl_b = curl(*Aa, dx, dy, dz), curl(*Ab, dx, dy, dz)
+curl_c, curl_d = curl(*Ac, dx, dy, dz), curl(*Ad, dx, dy, dz)
+
+for name, w in [("(a) outward flow", curl_a), ("(b) rotation about z", curl_b),
+                ("(c) straining flow", curl_c), ("(d) rotation about y", curl_d)]:
+    print(f"{name:22s} curl = ({w[0].mean():+.2f}, {w[1].mean():+.2f}, {w[2].mean():+.2f})")
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
+for ax_, (name, A, w) in zip(axes, [("(a) outward flow", Aa, curl_a),
+                                    ("(b) rotation", Ab, curl_b),
+                                    ("(c) straining flow", Ac, curl_c)]):
+    fw.show_field_slice(X, Y, Z, *A[:2], background=w[2], ax=ax_, density=1.1,
+                        vmin=-3, vmax=3, colorbar=(ax_ is axes[-1]),
+                        label=r"$(\nabla\times\mathbf{A})_z$  [s$^{-1}$]", title=name)
+plt.tight_layout()
+plt.show()
+
+# --- self-check (leave this alone) ---
+# Each test reads the whole vector, not one component: a sign slip in `cy`
+# leaves every planar field untouched and would otherwise pass unnoticed.
+def _mag(w):
+    return np.sqrt(w[0]**2 + w[1]**2 + w[2]**2)
+
+fw.check_abs("(a) curl = 0 (outward flow)", _mag(curl_a), atol=1e-9)
+fw.check_abs("(c) curl = 0 (straining flow)", _mag(curl_c), atol=1e-9)
+fw.check_close("(b) curl = 2 z-hat", curl_b[2], 2.0, rtol=1e-6)
+fw.check_abs("...and nothing along x or y",
+             np.abs(curl_b[0]) + np.abs(curl_b[1]), atol=1e-9)
+fw.check_close("(d) curl = 2 y-hat", curl_d[1], 2.0, rtol=1e-6,
+               where=interior)
+fw.check_abs("...and nothing along x or z",
+             (np.abs(curl_d[0]) + np.abs(curl_d[2]))[interior], atol=1e-9)
+```
+
+:::{admonition} Solution — Task 6
+:class: dropdown
+
+```python
+    cy = np.gradient(Ax, dz, axis=2) - np.gradient(Az, dx, axis=0)
+    cz = np.gradient(Ay, dx, axis=0) - np.gradient(Ax, dy, axis=1)
+```
+:::
+
+:::{admonition} Two independent questions about one field
+:class: important
+
+The three flows of Task 3 now carry two answers each, and neither constrains the other:
+
+| | Field $\boldsymbol{A}$ | $\nabla\cdot\boldsymbol{A}$ | $\nabla\times\boldsymbol{A}$ |
+| :---: | :--- | :---: | :---: |
+| **(a)** | $x\,\hat{\boldsymbol{x}} + y\,\hat{\boldsymbol{y}} + z\,\hat{\boldsymbol{z}}$ | $3$ | $\boldsymbol{0}$ |
+| **(b)** | $-y\,\hat{\boldsymbol{x}} + x\,\hat{\boldsymbol{y}}$ | $0$ | $2\,\hat{\boldsymbol{z}}$ |
+| **(c)** | $x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$ | $0$ | $\boldsymbol{0}$ |
+
+"How much is created here" and "how much does this spin here" are separate measurements. Field (c) answers zero to both and is still not the zero field: it stretches a fluid parcel along $x$ and squeezes it along $y$ at equal rates, changing its shape while conserving its volume and its orientation. Deformation is the third thing a flow can do, and neither operator reports it.
+
+Field (b) rotates at $\omega = 1$ s$^{-1}$ and its curl is $2\hat{\boldsymbol{z}}$. For rigid rotation at angular velocity $\boldsymbol{\omega}$ the curl is $2\boldsymbol{\omega}$, whatever the axis, which is why field (d) about $\hat{\boldsymbol{y}}$ returns $2\hat{\boldsymbol{y}}$. In fluid mechanics $\nabla\times\boldsymbol{v}$ is the **vorticity**, twice the local angular velocity of a fluid parcel.
+:::
+
+### Task 7 — closed streamlines are not curl
+
+Task 3 established that arrows spreading apart do not make a divergence. The same warning applies here, in the same shape, and the two errors are the same error. **The picture a streamline makes says nothing about the curl.**
+
+Two fields settle it, with the rotation of Task 6 as a control. Both are written on the distance from the $z$-axis, the cylindrical $\varrho = \sqrt{x^2+y^2}$, which is not the spherical $r$ of Parts 1 and 2.
+
+| | Field | Streamlines |
+| :---: | :--- | :--- |
+| **rotation** | $\omega\,\varrho\,\hat{\boldsymbol{\phi}} \;=\; -y\,\hat{\boldsymbol{x}} + x\,\hat{\boldsymbol{y}}$ | concentric circles |
+| **shear** | $\sigma\,y\,\hat{\boldsymbol{x}}$ | straight lines, all parallel to $x$ |
+| **line vortex** | $\dfrac{\Gamma_0}{2\pi\varrho}\hat{\boldsymbol{\phi}} \;=\; \Gamma_0\dfrac{-y\,\hat{\boldsymbol{x}} + x\,\hat{\boldsymbol{y}}}{2\pi\varrho^{2}}$ | concentric circles |
+
+with $\omega = 1$ s$^{-1}$, shear rate $\sigma = 1$ s$^{-1}$ and $\Gamma_0 = 2\pi$ m$^2$/s, so all three curls come out in s$^{-1}$ and one colour scale serves the row.
+
+The shear is the water beside a riverbank, or between two plates sliding past each other: further out it runs faster, but every parcel travels in a straight line and none of them goes round anything. The line vortex circles the axis exactly as the rotation does, and falls off as $1/\varrho$. Record your prediction of the sign of $(\nabla\times\boldsymbol{v})_z$ for each, then measure.
+
+```{code-cell} ipython3
+# +1 for anticlockwise rotation, -1 for clockwise, 0 for none.
+curl_predictions = {"rotation": ___, "shear": ___, "line vortex": ___}
+```
+
+```{code-cell} ipython3
+# --- given: distance from the z-axis, and a test region that avoids it ---
+varrho = np.sqrt(X**2 + Y**2)
+varrho_s = np.maximum(varrho, 1e-12)      # the axis kept out of the denominators
+ring = interior & (varrho > 0.4) & (varrho < 1.6)
+
+# Task 7 -- two blanks, one field each. Both lie in the z = 0 plane, so the
+# third component of each is `zero`. Take Gamma_0 / 2*pi = 1, as above.
+A_shear = ___                             # y x-hat, as a triple
+A_vortex = ___                            # (-Y, X) / varrho_s**2, as a triple
+
+# --- given ---
+curl_shear = curl(*A_shear, dx, dy, dz)
+curl_vortex = curl(*A_vortex, dx, dy, dz)
+
+# Reported as the scale-free ratio Task 2 built for the divergence, with the
+# distance from the AXIS in place of the distance from the origin: the size of
+# the curl against |v|/varrho, the size a derivative of this field would have
+# if nothing cancelled. Same reasoning, same reading: 1 means no cancellation.
+v_mag = np.sqrt(A_vortex[0]**2 + A_vortex[1]**2)
+vortex_ratio = np.median(np.abs(curl_vortex[2][ring]) / (v_mag / varrho_s)[ring])
+measured = {"rotation": curl_b[2].mean(), "shear": curl_shear[2][ring].mean(),
+            "line vortex": curl_vortex[2][ring].mean()}
+print(f"rotation    : curl_z = {measured['rotation']:+.3f} s^-1")
+print(f"shear       : curl_z = {measured['shear']:+.3f} s^-1")
+print(f"line vortex : |curl_z| / (|v|/varrho) = {vortex_ratio:.2%}  (zero, to grid error)")
+# The vortex is zero only to grid error, so the score needs a deadband:
+# anything under 5% of the largest curl in the row counts as no rotation.
+deadband = 0.05 * max(abs(v) for v in measured.values())
+for key, got in measured.items():
+    sign = 0 if abs(got) < deadband else int(np.sign(got))
+    verdict = "as predicted" if curl_predictions[key] == sign else "NOT what you predicted"
+    print(f"  {key:12s} you said {curl_predictions[key]:+d}, measured {sign:+d}  --  {verdict}")
+
+# The vortex is singular on the z-axis. What the operator returns on the few
+# cells around it is the grid's difficulty and not the field's, so those cells
+# are left blank rather than allowed to dominate the panel.
+shown = np.where(varrho < 0.3, np.nan, curl_vortex[2])
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
+panels = [("rotation", Ab, curl_b[2]), ("shear", A_shear, curl_shear[2]),
+          ("line vortex", A_vortex, shown)]
+for ax_, (name, A, w) in zip(axes, panels):
+    fw.show_field_slice(X, Y, Z, *A[:2], background=w, ax=ax_, density=1.1,
+                        vmin=-3, vmax=3, colorbar=(ax_ is axes[-1]),
+                        label=r"$(\nabla\times\mathbf{v})_z$  [s$^{-1}$]", title=name)
+plt.tight_layout()
+plt.show()
+
+# --- self-check (leave this alone) ---
+fw.check_close("shear: curl = -1 z-hat, although nothing goes round",
+               curl_shear[2][ring], -1.0, rtol=1e-6)
+fw.check(f"line vortex: curl = 0, although everything goes round ({vortex_ratio:.2%})",
+         vortex_ratio < 0.05)
+fw.check("...and it really does circle the axis: v has no radial component",
+         np.max(np.abs((A_vortex[0]*X + A_vortex[1]*Y)[ring])) < 1e-12)
+```
+
+:::{admonition} Solution — Task 7
+:class: dropdown
+
+```python
+A_shear = (Y, zero, zero)
+A_vortex = (-Y / varrho_s**2, X / varrho_s**2, zero)
+```
+:::
+
+:::{admonition} What the paddle wheel actually measures
+:class: warning
+
+Drop a small paddle wheel into each flow and watch its axle.
+
+In the **shear** it spins, at half a radian per second, clockwise. The water above the wheel runs faster than the water below, so the top blades are pushed harder than the bottom ones. Nothing in the flow travels in a circle and the curl is still $-\hat{\boldsymbol{z}}$.
+
+In the **line vortex** the wheel is carried once round the axis and comes back pointing the way it started. It orbits without spinning, like the Moon in reverse. Two separate effects cancel, and the cylindrical formula separates them. For a field $v_\phi(\varrho)\,\hat{\boldsymbol{\phi}}$,
+
+$$ (\nabla\times\boldsymbol{v})_z = \frac{1}{\varrho}\frac{\partial\left(\varrho\, v_\phi\right)}{\partial\varrho} - \frac{1}{\varrho}\frac{\partial v_\varrho}{\partial \phi} \;=\; \underbrace{\frac{dv_\phi}{d\varrho}}_{\text{shear}} + \underbrace{\frac{v_\phi}{\varrho}}_{\text{orbit}} $$
+
+the second term dropping because these fields have no radial component. The **shear** term is the blades: the inner ones sit in faster water than the outer ones, which turns the wheel backwards, at $-\Gamma_0/2\pi\varrho^{2}$. The **orbit** term is the wheel's own frame turning once per lap, forwards, at $+\Gamma_0/2\pi\varrho^{2}$. Their sum is zero at $1/\varrho$ and at no other falloff: a steeper $1/\varrho^{2}$ over-cancels and spins the wheel backwards, a shallower one spins it forwards. Their *mean* is the local angular velocity, which is where Task 6's factor of two comes from.
+
+Read the same formula the other way and the curl vanishes when $\varrho\,v_\phi$ is constant, which is $v_\phi \propto 1/\varrho$ and nothing else. Rigid rotation, $v_\phi = \omega\varrho$, gives $2\omega$ instead.
+
+That single surviving field, $\boldsymbol{H} = \dfrac{I}{2\pi\varrho}\hat{\boldsymbol{\phi}}$, is the magnetic field around a straight wire carrying a current $I$. Its curl is zero at every point outside the wire, and the current is still there. The end of this part explains how both can be true.
+:::
+
+### Task 8 — circulation per unit area, and Stokes' theorem
+
+A real vortex has a core. Stirred coffee, a tornado and the vortex trailing from a wing all rotate almost rigidly near the axis and fall off as $1/\varrho$ far from it, because viscosity spreads the vorticity over a finite radius $b$. The **Lamb–Oseen vortex** is the exact solution for that spreading, with $b^{2} = 4\nu t$ after a time $t$ in a fluid of kinematic viscosity $\nu$:
+
+$$ v_\phi(\varrho) = \frac{\Gamma}{2\pi\varrho}\left(1 - e^{-\varrho^{2}/b^{2}}\right), \qquad \Gamma = 1\ \text{m}^2\text{/s}, \qquad b = 0.5\ \text{m}. $$
+
+Inside the core this is $\Gamma\varrho/2\pi b^{2}$, the rigid rotation of Task 6. Outside it is $\Gamma/2\pi\varrho$, the irrotational vortex of Task 7. The cylindrical formula turns it into a vorticity that is a Gaussian blob:
+
+$$ (\nabla\times\boldsymbol{v})_z = \frac{1}{\varrho}\frac{d}{d\varrho}\left(\varrho\,v_\phi\right) = \frac{\Gamma}{\pi b^{2}}\,e^{-\varrho^{2}/b^{2}} $$
+
+the same shape as Task 4's blob of charge, with $\Gamma$ in the part of $Q$. The rest of this task is Part 2 run one dimension down: a closed curve instead of a closed surface, circulation instead of flux, and **Stokes' theorem** instead of the divergence theorem,
+
+$$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right)dS $$
+
+```{code-cell} ipython3
+Gamma, b_core = 1.0, 0.5          # circulation [m^2/s], core radius b [m]
+
+# --- given: the vortex, and the vorticity it should have ---
+_swirl = np.where(varrho < 1e-8, Gamma / (2*np.pi*b_core**2),
+                  Gamma / (2*np.pi*varrho_s**2) * (1 - np.exp(-varrho**2/b_core**2)))
+oseen = (-Y * _swirl, X * _swirl, zero)   # v_phi phi-hat, in Cartesian components
+w_exact = Gamma / (np.pi * b_core**2) * np.exp(-varrho**2 / b_core**2)
+curl_oseen = curl(*oseen, dx, dy, dz)
+
+# Task 8 -- two blanks, one per side of Stokes' theorem.
+#
+# LEFT SIDE. Walk the four edges of a rectangle in the z = 0 plane once
+# counter-clockwise, so the right-hand rule puts the unit normal along +z-hat,
+# and add up the component of the field along the direction of travel:
+#
+#     edge     samples along it   travelling   spacing   sign
+#     y = y0   Ax[sx, iy0, k]        +x          dx       +
+#     x = x1   Ay[ix1, sy, k]        +y          dy       +
+#     y = y1   Ax[sx, iy1, k]        -x          dx       -
+#     x = x0   Ay[ix0, sy, k]        -y          dy       -
+#
+# The two edges walked backwards enter negatively, exactly as the inward faces
+# did in Task 5. The x pair is written for you.
+
+def loop_circulation(Ax, Ay, x0, x1, y0, y1):
+    """Counter-clockwise circulation of (Ax, Ay) round a rectangle in z = 0."""
+    ix0, ix1 = [int(np.argmin(np.abs(axis - q))) for q in (x0, x1)]
+    iy0, iy1 = [int(np.argmin(np.abs(axis - q))) for q in (y0, y1)]
+    sx, sy, k = slice(ix0, ix1 + 1), slice(iy0, iy1 + 1), fw.z0_index(Z)
+    along_x = (fw.line_integral(Ax[sx, iy0, k], dx)
+               - fw.line_integral(Ax[sx, iy1, k], dx))
+    along_y = ___
+    return along_x + along_y
+
+
+# RIGHT SIDE. n-hat is +z-hat, so only the z-component of the curl crosses the
+# rectangle. Integrate it over the flat patch the same indices span: one call
+# to fw.area_integral, on the z = 0 plane, with spacings dx and dy.
+
+def curl_flux(x0, x1, y0, y1):
+    """Flux of the vorticity through the same rectangle: Stokes' right side."""
+    ix0, ix1 = [int(np.argmin(np.abs(axis - q))) for q in (x0, x1)]
+    iy0, iy1 = [int(np.argmin(np.abs(axis - q))) for q in (y0, y1)]
+    return ___
+
+
+# --- given: the limit in the definition, run as a measurement. Every side
+#     below is a whole number of grid spacings, so each loop is the one asked
+#     for rather than the nearest one the grid happens to be able to draw.
+def curl_z_area(A, x0, x1, y0, y1):
+    """Circulation per unit area round the same rectangle."""
+    return loop_circulation(A[0], A[1], x0, x1, y0, y1) / ((x1 - x0) * (y1 - y0))
+
+w_centre = curl_oseen[2][c, c, fw.z0_index(Z)]
+print(f"vorticity at the origin: measured {w_centre:.4f} s^-1, "
+      f"exact {Gamma/(np.pi*b_core**2):.4f} s^-1")
+print(f"the whole Gaussian, worst error "
+      f"{np.abs(curl_oseen[2] - w_exact)[interior].max()/w_exact.max():.2%} of peak\n")
+print(f"{'side [m]':>9} {'samples/edge':>13} {'circulation':>13} {'C/A':>9}"
+      f" {'C/A / measured':>15}")
+for m in (18, 9, 6, 3, 2, 1):
+    h = m * dx
+    print(f"{2*h:9.4f} {2*m+1:13d} {loop_circulation(*oseen[:2], -h, h, -h, h):13.5f}"
+          f" {curl_z_area(oseen, -h, h, -h, h):9.4f}"
+          f" {curl_z_area(oseen, -h, h, -h, h)/w_centre:15.4f}")
+
+# --- given: Stokes' theorem on five rectangles, two of them off-centre ---
+rects = [("centred, side 0.8", (-0.4, 0.4, -0.4, 0.4)),
+         ("centred, side 2.0", (-1.0, 1.0, -1.0, 1.0)),
+         ("centred, side 3.2", (-1.6, 1.6, -1.6, 1.6)),
+         ("off-centre, over the core", (-0.2, 1.4, -0.6, 1.0)),
+         ("off to one side", (0.4, 1.6, -0.6, 0.6))]
+print(f"\n  {'rectangle':<26} {'circulation':>12} {'flux of curl':>13} {'apart':>8}")
+for name, lim in rects:
+    C, S = loop_circulation(*oseen[:2], *lim), curl_flux(*lim)
+    print(f"  {name:<26} {C:12.5f} {S:13.5f} {abs(C - S)/abs(C):8.2%}")
+print(f"\n  all the vorticity there is: Gamma = {Gamma:.4f} m^2/s")
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 4.2))
+fw.show_field_slice(X, Y, Z, *oseen[:2], background=curl_oseen[2], ax=axes[0],
+                    density=1.2, vmin=0, vmax=1.3, levels=14, cmap="inferno",
+                    symmetric=False, stream_color="w",
+                    label=r"$(\nabla\times\mathbf{v})_z$  [s$^{-1}$]",
+                    title="the vortex, over its vorticity")
+prof = np.linspace(1e-3, 2.0, 400)
+axes[1].plot(prof, Gamma/(2*np.pi*prof)*(1 - np.exp(-prof**2/b_core**2)), "k", lw=1.8,
+             label=r"$v_\phi(\varrho)$")
+axes[1].plot(prof, Gamma*prof/(2*np.pi*b_core**2), "C1--", lw=1.2,
+             label=r"core: $\Gamma\varrho/2\pi b^2$")
+axes[1].plot(prof, Gamma/(2*np.pi*prof), "C2:", lw=1.4, label=r"outside: $\Gamma/2\pi\varrho$")
+axes[1].set_ylim(0, 0.25); axes[1].set_title(r"rigid inside the core, $1/\varrho$ outside")
+axes[1].set_xlabel(r"$\varrho$ [m]"); axes[1].set_ylabel(r"$v_\phi$ [m s$^{-1}$]")
+
+# the claim under test, drawn: measured vorticity against the exact Gaussian
+k0 = fw.z0_index(Z)
+axes[2].plot(X[:, c, k0], w_exact[:, c, k0], "k", lw=2.4, alpha=0.35, label="exact")
+axes[2].plot(X[:, c, k0], curl_oseen[2][:, c, k0], "C3", lw=1.2, label="measured")
+axes[2].set_ylim(0, 1.45); axes[2].set_title("vorticity along $y = 0$")
+axes[2].set_xlabel("$x$ [m]"); axes[2].set_ylabel(r"$(\nabla\times\mathbf{v})_z$ [s$^{-1}$]")
+for ax_ in axes[1:]:
+    ax_.axvline(b_core, color="C0", lw=1, alpha=0.6)
+    ax_.grid(alpha=0.3); ax_.legend(fontsize=8)
+axes[1].annotate(r"$\varrho = b$", (b_core + 0.05, 0.02), color="C0", ha="left")
+plt.tight_layout()
+plt.show()
+
+# --- self-check (leave this alone) ---
+_h = 6 * dx
+fw.check_scalar("Stokes: circulation = flux of the curl through the loop",
+                loop_circulation(*oseen[:2], -_h, _h, -_h, _h),
+                curl_flux(-_h, _h, -_h, _h), rtol=0.01, unit=" m^2/s")
+fw.check_scalar("...and again on a rectangle that is not centred on the vortex",
+                loop_circulation(*oseen[:2], -0.2, 1.4, -0.6, 1.0),
+                curl_flux(-0.2, 1.4, -0.6, 1.0), rtol=0.01, unit=" m^2/s")
+_small = curl_z_area(oseen, -dx, dx, -dx, dx)
+fw.check(f"circulation per unit area -> the vorticity at the centre "
+         f"({_small:.4f} against {w_centre:.4f} s^-1)",
+         abs(_small - w_centre) < 0.01 * abs(w_centre))
+_wide = loop_circulation(*oseen[:2], -1.6, 1.6, -1.6, 1.6)
+fw.check(f"a loop well outside the core collects all of Gamma "
+         f"({_wide:.4f} of {Gamma:.4f} m^2/s)", abs(_wide - Gamma) < 0.01 * Gamma)
+```
+
+:::{admonition} Solution — Task 8
+:class: dropdown
+
+```python
+# in loop_circulation, the left side:
+    along_y = (fw.line_integral(Ay[ix1, sy, k], dy)
+               - fw.line_integral(Ay[ix0, sy, k], dy))
+
+# in curl_flux, the right side:
+    return fw.area_integral(curl_oseen[2][ix0:ix1+1, iy0:iy1+1, fw.z0_index(Z)],
+                            dx, dy)
+```
+:::
+
+:::{admonition} The same theorem, one dimension down
+:class: important
+
+Read the first table downwards. The loop shrinks, the circulation falls, the area falls faster, and the ratio climbs to 0.996 of the vorticity measured at the centre: 0.137 of it at side 2.4 m, 0.908 at side 0.4 m. That is the limit in the definition, evaluated rather than asserted. The comparison is against the **measured** 1.2620 s$^{-1}$ rather than the exact 1.2732, so the last 0.9% is the grid error already reported above and not a failure of the limit.
+
+Read the second table across. Five rectangles, two of them not centred on the vortex, and the two sides of Stokes' theorem agree to better than 1% on every one: to a few parts in $10^{5}$ on the largest centred loop, and worst on the smallest, which is only 13 samples across. Size, not placement, is what sets the accuracy, and it is the same second-order error Task 5 measured on the divergence theorem. The left side never looks inside the loop and the right side never looks at the boundary.
+
+| | Divergence theorem | Stokes' theorem |
+| :--- | :--- | :--- |
+| Boundary integral | flux through a closed **surface** | circulation round a closed **curve** |
+| Interior integral | $\nabla\cdot\boldsymbol{v}$ over the enclosed **volume** | $\hat{\boldsymbol{n}}\cdot(\nabla\times\boldsymbol{v})$ over the enclosed **area** |
+| Source it counts | $Q_{\text{enc}}/\varepsilon_0$ | $\Gamma$, or the enclosed current |
+
+The largest loop returns 0.9999 of $\Gamma$, exactly as the largest boxes of Task 5 weighed the whole 1 nC. Enlarging a loop that already encloses all the vorticity adds nothing, for the same reason that charge outside a closed surface contributes nothing.
+:::
+
+### The wire, and Ampère's law
+
+Shrink the vortex core to nothing, $b\to 0$, and $v_\phi$ becomes the irrotational $\Gamma/2\pi\varrho$ of Task 7 at every radius, with all the vorticity compressed onto the axis. The Gaussian collapses to a Dirac delta, as the Gaussian blob of charge did when Part 2 shrank it to a point.
+
+That field is the magnetic field of a straight wire carrying a current $I$ along $\hat{\boldsymbol{z}}$, and the statement relating them is **Ampère's law**, in the differential and integral forms Stokes' theorem connects:
+
+$$ \nabla\times\boldsymbol{H} = \boldsymbol{J} \qquad\Longleftrightarrow\qquad \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{H}\;dl = \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\boldsymbol{J}\;dS = I_{\text{enc}} $$
+
+with $\boldsymbol{H}$ in A/m, $\boldsymbol{J}$ in A/m$^2$, and $\hat{\boldsymbol{n}}$ fixed by the right-hand rule from the direction of travel. `loop_circulation` walks counter-clockwise in the $z=0$ plane, so $\hat{\boldsymbol{n}} = \hat{\boldsymbol{z}}$ and a positive answer means current flowing towards the reader.
+
+```{code-cell} ipython3
+I_wire = 1.0                              # current along +z, in amperes
+Hx, Hy = -Y * I_wire / (2*np.pi*varrho_s**2), X * I_wire / (2*np.pi*varrho_s**2)
+
+print(f"  {'loop':<28} {'oint tau.H dl [A]':>18}")
+for name, lim in [("encloses the wire, side 0.8", (-0.4, 0.4, -0.4, 0.4)),
+                  ("encloses the wire, side 2.0", (-1.0, 1.0, -1.0, 1.0)),
+                  ("encloses the wire, side 3.2", (-1.6, 1.6, -1.6, 1.6)),
+                  ("encloses it, lopsidedly    ", (-0.4, 1.6, -1.0, 0.6)),
+                  ("misses the wire            ", (0.4, 1.6, -0.6, 0.6)),
+                  ("misses it, and is large    ", (0.2, 1.8, -1.8, 1.8))]:
+    print(f"  {name:<28} {loop_circulation(Hx, Hy, *lim):18.5f}")
+print(f"\n  current actually in the wire: {I_wire:.5f} A")
+```
+
+:::{admonition} A loop that encloses nothing measurable
+:class: important
+
+Every loop enclosing the wire returns $I$ to better than two parts in a thousand, at any size and whether or not it is centred on the wire. Every loop missing it returns at most $4\times10^{-4}$ A, which against the enclosing loops' 1 A is zero. The circulation counts what passes through the loop and nothing else, exactly as the closed surface of Part 2 counted the charge inside and nothing else. Shape-independence is part of the same statement, though `loop_circulation` draws only rectangles and cannot demonstrate it; it follows from Stokes' theorem, since two loops enclosing the same current bound surfaces carrying the same flux of $\boldsymbol{J}$.
+
+Now put that beside Task 7. At every point these loops pass through, $\nabla\times\boldsymbol{H} = 0$: the field is irrotational everywhere the grid can sample it, and the loop integral is 1 A regardless. There is no contradiction. Stokes' theorem equates the circulation to the flux of $\boldsymbol{J}$ through the loop, and $\boldsymbol{J}$ is zero over the whole of the loop's interior except one line, where it is infinite. The current density is a Dirac delta on the axis, the integral form survives it, and the differential form does not, which is what happened to $\rho_v$ at the point charge in Part 2.
+
+A real wire has a finite radius and a finite $\boldsymbol{J}$ spread over its cross-section, and then both forms hold everywhere. The homework builds that wire.
+:::
+
+### Why the electric fields had a potential
+
+$\boldsymbol{E} = -\nabla V$ was written in Lab 1 without asking whether an arbitrary vector field can be written that way. The rotation, the shear and the vortex above cannot. The curl is the test:
+
+$$ \nabla\times\left(\nabla p\right) = \boldsymbol{0} \qquad \text{for every twice-differentiable } p $$
+
+because each component subtracts a pair of mixed second derivatives, $\partial_x\partial_y p - \partial_y\partial_x p$, and mixed partials commute. Run the two electric fields of this notebook through the curl.
+
+```{code-cell} ipython3
+E_point = tuple(np.nan_to_num(q) for q in (Ex, Ey, Ez))   # built as -grad V
+curl_point = curl(*E_point, dx, dy, dz)
+curl_blob = curl(Ex_b, Ey_b, Ez_b, dx, dy, dz)            # built from E_r(r) r-hat
+
+shell = interior & (r > 0.5) & (r < 1.6)
+for name, w, A in [("point charge, from -grad V", curl_point, E_point),
+                   ("blob, from the analytic E_r", curl_blob, (Ex_b, Ey_b, Ez_b))]:
+    # index first: |E| is zero inside the mask, and 0/0 there would warn
+    wm = np.sqrt(w[0]**2 + w[1]**2 + w[2]**2)[shell]
+    Am = (np.sqrt(A[0]**2 + A[1]**2 + A[2]**2) / rs)[shell]
+    print(f"  {name:28s} median |curl E| / (|E|/r) = {np.median(wm / Am):.2e}")
+
+# The circulation, on the blob field, which carries no mask for a loop to cross.
+# Reported against the natural scale for a voltage here: the strongest field on
+# the grid, carried along one metre of path.
+scale_V = float(np.max(np.sqrt(Ex_b**2 + Ey_b**2 + Ez_b**2)))
+print(f"\n  {'loop':<20} {'circulation of E':>18} {'/ (|E|max x 1 m)':>18}")
+for name, lim in [("centred, side 2.0", (-1.0, 1.0, -1.0, 1.0)),
+                  ("off-centre", (-0.2, 1.4, -0.6, 1.0)),
+                  ("off to one side", (0.4, 1.6, -0.6, 0.6))]:
+    circ = loop_circulation(Ex_b, Ey_b, *lim)
+    print(f"  {name:<20} {circ:+15.2e} V {abs(circ)/scale_V:18.1e}")
+print(f"\n  the same square, side 2.0, on the wire above: "
+      f"{loop_circulation(Hx, Hy, -1.0, 1.0, -1.0, 1.0):.3f} A")
+```
+
+:::{admonition} Why voltage is a number and not a route
+:class: important
+
+The two fields report zero curl with thirteen orders of magnitude between them, and the gap is in how each was built rather than in the physics. `Ex, Ey, Ez` came out of `-np.gradient(V)`, and the curl subtracts the same centred differences in the opposite order; the stencil obeys the identity as strictly as the algebra does, so nothing survives but the order in which floating-point numbers were added, around $10^{-16}$. The blob field was built from the analytic $E_r(r)$ and never passed through a numerical gradient, so it shows the 0.6% that a centred difference costs on this grid. Neither number measures the physics. Both are consistent with the one statement being tested.
+
+The circulations say the same thing on a closed curve: a few parts in $10^{4}$ of the natural voltage scale, dropping to round-off on the centred loop, whose symmetry cancels it exactly. Put the last line beside them. Same integrator, same grid, same size of loop, and the wire returns a full ampere.
+
+Zero circulation is what makes potential a usable idea. Carrying a charge round a circuit and back to its starting point costs no net work, so the work done between two points is independent of the route, and one number can be attached to each point. That number is $V$.
+
+Two restrictions are worth naming, and Part 3 has already demonstrated both.
+
+**Zero curl gives a potential only where the region has no holes in it.** The wire is the exception: $\nabla\times\boldsymbol{H} = \boldsymbol{0}$ at every point outside it, and $\oint\boldsymbol{\tau}\cdot\boldsymbol{H}\,dl = I \neq 0$. A loop encircling the axis cannot be shrunk to a point without crossing the current, so there is nothing for Stokes' theorem to integrate the curl over, and no single-valued potential for $\boldsymbol{H}$ exists out there. Around a point charge, by contrast, the punctured space *is* simply connected and $V$ survives.
+
+**$\nabla\times\boldsymbol{E} = \boldsymbol{0}$ holds in electrostatics.** When the magnetic field changes with time, $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$, the circulation round a loop is no longer zero, and that circulation is the voltage a generator produces. At that point $V$ alone stops being enough, which is where this course is going.
 :::
 
 ---
 
 ## Closing
 
-The chain built in this lab, in one line:
+The chain built across the two labs, in one line:
 
-$$ \rho_v \;\longrightarrow\; V \;\xrightarrow{\ -\nabla\ }\; \boldsymbol{E} \;\xrightarrow{\ \nabla\cdot\ }\; \rho_v/\varepsilon_0 $$
+$$ \rho_v \;\longrightarrow\; V \;\xrightarrow{\ -\nabla\ }\; \boldsymbol{E} \;\xrightarrow{\ \nabla\cdot\ }\; \rho_v/\varepsilon_0, \qquad \nabla\times\boldsymbol{E} = \boldsymbol{0} $$
+
+with the last statement the licence for the arrow labelled $-\nabla$: only a field with zero curl has a potential to be recovered from.
 
 - **Gradient.** Scalar in, vector out. Points along steepest increase, normal to the level surfaces, with length equal to the rate of increase.
 - **Divergence.** Vector in, scalar out. Net flux per unit volume, which measures what is created at a point and nothing else.
+- **Curl.** Vector in, vector out. Net circulation per unit area, about the axis its own direction gives, which measures local rotation and not the shape of a streamline.
 
-### The same two operators, elsewhere in ECT
+Each of the last two comes with an integral theorem, and each theorem replaces a derivative that fails at a singular source with an integral that does not. The point charge and the current-carrying wire are the same difficulty met twice.
 
-Electrostatics is a convenient place to learn this pair, not the only place to use it. Each row below gives a potential, its gradient, and a statement about sources. The numerical machinery written in this lab applies unchanged to all of them:
+### The same three operators, elsewhere in ECT
+
+Electrostatics is a convenient place to learn these, not the only place to use them. Each row below gives a potential, its gradient, and a statement about sources. The numerical machinery written in these two labs applies unchanged to all of them:
 
 | System | Potential | Field | Source equation |
 | :--- | :--- | :--- | :--- |
@@ -820,15 +1271,19 @@ Electrostatics is a convenient place to learn this pair, not the only place to u
 | Heat conduction | $T$ [K] | $\boldsymbol{q}_T = -k\nabla T$ &nbsp; [W/m$^2$] | $\nabla\cdot\boldsymbol{q}_T = 0$ (steady, no sources) |
 | Groundwater flow | $h$ [m] | $\boldsymbol{q}_h = -K\nabla h$ &nbsp; [m/s] | $\nabla\cdot\boldsymbol{q}_h = 0$ (steady, incompressible) |
 
-with $k$ the thermal conductivity [W m$^{-1}$ K$^{-1}$] and $K$ the hydraulic conductivity [m/s].
+with $G$ the gravitational constant, $\rho_m$ the mass density [kg m$^{-3}$], $k$ the thermal conductivity [W m$^{-1}$ K$^{-1}$] and $K$ the hydraulic conductivity [m/s].
 
 The minus signs are all the same minus sign: heat flows from hot to cold, water flows from high head to low, a positive charge falls from high potential to low. Flow runs downhill, and the gradient points uphill.
 
-The last two rows show why solenoidal fields matter in practice. $\nabla\cdot\boldsymbol{q} = 0$ in an aquifer is not an approximation of convenience; it is conservation of water written locally.
+The last two rows show why solenoidal fields matter in practice. $\nabla\cdot\boldsymbol{q}_h = 0$ in an aquifer states conservation of water locally, in the form a numerical model actually solves.
 
-### Homework
+In a **homogeneous** medium, where $k$ and $K$ are constants, every field in that table is a gradient, so every one of them has zero curl and none can circulate. Let $K$ vary from place to place, as it does in any real aquifer, and $\nabla\times\boldsymbol{q}_h = -\nabla K\times\nabla h$ need not vanish. The fields that circulate are the ones with no potential to be had, and they are the subject of the rest of the course:
 
-The exercises in the lecture notes are the written homework. Below is the lab's computational extension, which carries the same two operators into a different physical system.
+| Field | Circulation equation | What sets it |
+| :--- | :--- | :--- |
+| Magnetic field $\boldsymbol{H}$ [A/m] | $\nabla\times\boldsymbol{H} = \boldsymbol{J}$ | the current threading the loop |
+| Fluid velocity $\boldsymbol{v}$ [m/s] | $\nabla\times\boldsymbol{v} = \boldsymbol{\omega}_v$ | shear at a boundary, and rotation of the Earth |
+| Electric field, unsteady | $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$ | a magnetic field that changes with time |
 
 **A heat source in a room.** Replace the spherical blob with a flat rectangular heater, $1.0 \times 0.6$ m in the $z = 0$ plane. A steady point source of power $P$ in a medium of conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout this lab. Split the plate into $N = 20 \times 12$ sub-sources, give each an equal share $P/N$ of the power, and superpose them as two charges were superposed in Lab 1's Task 8:
 
