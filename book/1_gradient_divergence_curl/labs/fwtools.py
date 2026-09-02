@@ -20,7 +20,7 @@ import plotly.graph_objects as go
 
 __all__ = [
     "z0_index", "slice_z0",
-    "box_indices", "area_integral", "volume_integral",
+    "box_indices", "line_integral", "area_integral", "volume_integral",
     "show_isosurfaces", "show_cones", "show_scalar_slice", "show_field_slice",
     "check", "check_shape", "check_close", "check_abs", "check_scalar",
 ]
@@ -40,11 +40,12 @@ def slice_z0(F: np.ndarray, Z: np.ndarray) -> np.ndarray:
 
 
 # --------------------------------------------------------------------------
-# Integration over grid-aligned boxes and faces
+# Integration over grid-aligned boxes, faces and edges
 #
-# These evaluate the integrals in the definition of the divergence and in the
-# divergence theorem. They are quadrature boilerplate: the trapezoidal weights
-# below simply stop the end samples from being counted as full cells.
+# These evaluate the integrals in the definitions of the divergence and the
+# curl, and in the divergence and Stokes theorems. They are quadrature
+# boilerplate: the trapezoidal weights below simply stop the end samples
+# from being counted as full cells.
 # --------------------------------------------------------------------------
 
 def _trapezoid_weights(n: int) -> np.ndarray:
@@ -65,6 +66,18 @@ def box_indices(X: np.ndarray, half_width: float):
     i0 = int(np.argmin(np.abs(axis + half_width)))
     i1 = int(np.argmin(np.abs(axis - half_width)))
     return i0, i1
+
+
+def line_integral(F1: np.ndarray, ds: float) -> float:
+    """Integrate a 1-D array of samples along the line it spans.
+
+    One edge of a closed loop, for the circulation integral, the way
+    ``area_integral`` handles one face of a box for the flux. Same
+    trapezoidal rule, same refusal to integrate over masked samples.
+    """
+    F1 = np.asarray(F1, float)
+    _reject_masked(F1, "This edge passes through masked samples")
+    return float(np.sum(F1 * _trapezoid_weights(F1.shape[0])) * ds)
 
 
 def area_integral(F2: np.ndarray, da: float, db: float) -> float:
@@ -435,15 +448,20 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
         vmin = -vmax if symmetric else np.nanpercentile(f2, 100 - percentile)
     hi, lo = float(vmax), float(vmin)
 
-    # A contour boundary usually falls exactly on 0.0, so a field that is zero
-    # only to round-off gets sorted into the first warm and the first cool band
-    # and renders as structure that is not there. The straining flow of Lab 2's
-    # Task 3 is the case that matters: div = +-5e-15, drawn as faint red lobes,
-    # which is precisely the "it looks like a source" reading the task exists to
-    # refute. Anything this far below the plotted range is noise, not signal.
+    # Contour boundaries land on round numbers, and the exact answers in this
+    # course are round numbers, so a field that is constant to round-off gets
+    # its cells sorted into the bands either side of a boundary and renders as
+    # structure that is not there. Both cases in Lab 2 are of that kind: the
+    # straining flow of Task 3 is div = +-5e-15 against a boundary at 0.0,
+    # drawn as faint red lobes, which is precisely the "it looks like a source"
+    # reading the task exists to refute; the rotation of Task 6 is curl = 2
+    # +- 1e-15 against a boundary at 2.0, drawn as a patchwork. Quantising at
+    # a billionth of the plotted range is far below any band and far above
+    # double-precision noise, so it removes the artefact and nothing else.
     span = max(abs(hi), abs(lo))
     if span > 0.0:
-        f2 = np.where(np.abs(f2) < 1e-9 * span, 0.0, f2)
+        q = 1e-9 * span
+        f2 = np.round(f2 / q) * q
 
     lv = np.linspace(lo, hi, levels)
 
@@ -463,7 +481,7 @@ def show_scalar_slice(X, Y, Z, F, *, title="", label="", cmap=None,
 def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
                      cmap="RdBu_r", density=1.3, symmetric=True, ax=None,
                      percentile=98, colorbar=True, vmin=None, vmax=None,
-                     plane="z"):
+                     plane="z", levels=25, stream_color="k"):
     """Streamlines of a vector field on a coordinate plane, over an optional
     scalar background (typically the potential that generated it).
 
@@ -474,6 +492,11 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     if no background was given; pass ``colorbar=False`` on every panel of a
     multi-panel figure and hand ``cf`` to ``fig.colorbar(cf, ax=axes, ...)``
     to draw a single bar spanning the lot.
+
+    ``stream_color`` is the colour of the streamlines. Black reads well on a
+    diverging map, which is pale in the middle, and disappears on a sequential
+    one, which is dark at the bottom; pass ``"w"`` over ``inferno`` or
+    ``viridis``.
     """
     created = ax is None
     if created:
@@ -483,7 +506,7 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     if background is not None:
         _, cf = show_scalar_slice(X, Y, Z, background, cmap=cmap, symmetric=symmetric,
                                   percentile=percentile, ax=ax, colorbar=False,
-                                  vmin=vmin, vmax=vmax, plane=plane)
+                                  vmin=vmin, vmax=vmax, plane=plane, levels=levels)
 
     # streamplot needs 1-D increasing axes and arrays shaped (nb, na); our
     # indexing='ij' arrays are (na, nb), hence the transposes.
@@ -491,7 +514,7 @@ def show_field_slice(X, Y, Z, Ax, Ay, *, background=None, title="", label="",
     _, _, v2, _, _ = _plane_slice(X, Y, Z, Ay, plane)
     u = np.nan_to_num(u2).T
     v = np.nan_to_num(v2).T
-    ax.streamplot(x1, y1, u, v, color="k", linewidth=0.7,
+    ax.streamplot(x1, y1, u, v, color=stream_color, linewidth=0.7,
                   density=density, arrowsize=0.9)
 
     ax.set_aspect("equal")
