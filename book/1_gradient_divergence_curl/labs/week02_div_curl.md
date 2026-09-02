@@ -202,19 +202,27 @@ $$ \nabla\cdot\boldsymbol{v} = 3f(r) + r\frac{df}{dr} = 0 \qquad\Longrightarrow\
 
 Rather than assume this, test four candidates and let the divergence select.
 
+One decision comes first, because the four candidates are not the same size. Over the test band their divergences span a factor of a thousand, and the raw numbers cannot be ranked against each other: $f = 1/r^{4}$ returns a *smaller* $\lvert\nabla\cdot\boldsymbol{v}\rvert$ than $f = \text{const}$ does, and neither field is divergence-free. "Is 0.36 small?" has no answer until it is small compared with something.
+
+The something is the size a derivative of that same field would have if nothing cancelled. A derivative is a change in $\boldsymbol{v}$ divided by the distance over which it changes, and for a radial field $f(r)\boldsymbol{r}$ the only distance available is $r$ itself. That makes $\lvert\boldsymbol{v}\rvert/r$ the yardstick, and
+
+$$ \frac{\lvert\nabla\cdot\boldsymbol{v}\rvert}{\lvert\boldsymbol{v}\rvert/r} $$
+
+a pure number, the same for a trickle and a torrent: **1 means the three terms of the divergence did not cancel at all, and 0 means they cancelled completely.** The cell prints the raw divergence beside the ratio, so you can see for yourself why the raw column is unusable.
+
+One entry is known before the code runs. For $f = \text{const}$ the field is $\boldsymbol{v} = \boldsymbol{r}$, so $\lvert\boldsymbol{v}\rvert/r = 1$ and the ratio is nothing but $\nabla\cdot\boldsymbol{r} = 3$, which Task 1 measured. That row is the check that the statistic is being formed correctly, and it is why the last self-check looks for 300%.
+
 ```{code-cell} ipython3
-# The measure reported by the loop below:
-#
-#       |div v| / (|v| / r),  median over the test band
-#
-# |v|/r is the natural size of a derivative of v, so the ratio is a pure
-# number: 1 means "as large as a derivative of this field could be".
+# The statistic, restated: |div v| / (|v|/r), median over the test band.
+# The band avoids the source, where the field is singular, and the outer
+# corners of the box, where np.gradient runs out of neighbours.
 
 r_safe = np.where(r < 0.3, np.nan, r)
 band_i = interior & (r > 0.6) & (r < 1.6)
 
 # Task 2 -- three blanks, inside the loop.
-results = {}
+results, raws = {}, {}
+print(f"  {'f(r)':>7}  {'|div v|':>11}  {'|v|/r':>8}  {'ratio':>9}")
 for name, f_r in [("const", np.ones_like(r_safe)),
                   ("1/r^2", 1/r_safe**2),
                   ("1/r^3", 1/r_safe**3),
@@ -226,10 +234,15 @@ for name, f_r in [("const", np.ones_like(r_safe)),
                                           # and the same length as dv[band_i]
 
     # --- given ---
+    raws[name] = np.nanmedian(np.abs(dv[band_i]))
     results[name] = np.nanmedian(np.abs(dv[band_i]) / scale)
-    print(f"  f = {name:6s}:  median |div v| / (|v|/r) = {results[name]:8.2%}")
+    print(f"  {name:>7}  {raws[name]:11.4f}  {np.nanmedian(scale):8.4f}"
+          f"  {results[name]:9.2%}")
 
 # --- self-check (leave this alone) ---
+fw.check(f"the raw column cannot rank these: 1/r^4 gives a smaller |div v| "
+         f"({raws['1/r^4']:.3f}) than f = const ({raws['const']:.3f}), and "
+         f"neither is divergence-free", raws["1/r^4"] < raws["const"])
 fw.check(f"scale is one value per band point ({np.shape(scale)} vs "
          f"{np.shape(dv[band_i])})", np.shape(scale) == np.shape(dv[band_i]),
          "index it with [band_i] -- a whole-grid array or a single median "
@@ -255,9 +268,7 @@ fw.check(f"f = const reproduces Task 1's div(r) = 3 ({results['const']:.2%})",
 :::{admonition} Where the inverse-square law comes from
 :class: important
 
-One candidate gives 300%, two give almost exactly 100%, and one gives 0.66%. Only $f = A/r^{3}$ survives, as the algebra predicts.
-
-The 300% is not an accident. For $f = \text{const}$ the field is the position vector, $\boldsymbol{v} = \boldsymbol{r}$, whose divergence Task 1 measured as exactly 3, while $\lvert\boldsymbol{v}\rvert/r = 1$, so the ratio must be 3. The surviving case rewrites as
+Two candidates give almost exactly 100%, meaning their three divergence terms did not cancel at all, and the anchor gives its predicted 300%. One gives 0.66%. Only $f = A/r^{3}$ survives, as the algebra predicts, and the raw column beside it would have told you none of this. The surviving case rewrites as
 
 $$ \boldsymbol{v} = \frac{A}{r^{3}}\boldsymbol{r} = \frac{A}{r^{2}}\,\hat{\boldsymbol{r}}. $$
 
