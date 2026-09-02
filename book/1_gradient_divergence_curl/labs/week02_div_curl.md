@@ -1285,13 +1285,196 @@ In a **homogeneous** medium, where $k$ and $K$ are constants, every field in tha
 | Fluid velocity $\boldsymbol{v}$ [m/s] | $\nabla\times\boldsymbol{v} = \boldsymbol{\omega}_v$ | shear at a boundary, and rotation of the Earth |
 | Electric field, unsteady | $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$ | a magnetic field that changes with time |
 
-**A heat source in a room.** Replace the spherical blob with a flat rectangular heater, $1.0 \times 0.6$ m in the $z = 0$ plane. A steady point source of power $P$ in a medium of conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout this lab. Split the plate into $N = 20 \times 12$ sub-sources, give each an equal share $P/N$ of the power, and superpose them as two charges were superposed in Lab 1's Task 8:
+where $\boldsymbol{\omega}_v \equiv \nabla\times\boldsymbol{v} = 2\boldsymbol{\omega}$ is the vorticity, twice the local angular velocity of Task 6.
 
-$$ T(\boldsymbol{r}) = \frac{P}{4\pi k N}\sum_{i=1}^{N} \frac{1}{\lvert \boldsymbol{r} - \boldsymbol{r}_i \rvert}, \qquad P = 100\ \text{W}, \qquad k_{\text{air}} = 0.026\ \text{W m}^{-1}\text{K}^{-1}. $$
+The first row is Ampère's law in the static limit, and the term Maxwell added to it, $\partial\boldsymbol{D}/\partial t$, is the reason light exists. The third is Faraday's law, where the potential $V$ stops being sufficient on its own. Those two together with the two source equations of Parts 1 and 2 are Maxwell's four.
 
-Check the dimensions before coding: $[P]/[k] = \text{W}/(\text{W m}^{-1}\text{K}^{-1}) = \text{m}\cdot\text{K}$, divided by a distance, so $T$ comes out in kelvin. A temperature formula that does not reduce to kelvin contains an error. Then:
+### Formative assessment — Chapters 1 and 2
 
-- Plot the isosurfaces. Close to the plate they should be rounded rectangles; far away they should become spheres. Explain why the shape loses the imprint of its source.
-- Compute the heat flux $\boldsymbol{q}_T = -k\nabla T$, with the same minus sign and the same reason as $\boldsymbol{E} = -\nabla V$.
-- Check that $\nabla\cdot\boldsymbol{q}_T \approx 0$ away from the heater, and that the closed-surface flux through a box containing the plate is *not* zero. State what each result means physically for a room at steady state, and which of the two fields in Task 2 the heater resembles.
-- **Then examine the number.** One metre from a 100 W panel this model predicts about $+290$ K above ambient, a room at 300 °C. The arithmetic is correct, so the physics is wrong. Identify the failed assumption; two are worth naming, namely what actually transports heat through air, and where this solution places the walls of the room. Re-running with $k = 1.5$ W m⁻¹K⁻¹, the conductivity of soil, gives $+5$ K: the same equations now describe a buried heating element, a problem that pure conduction does solve.
+Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **45 minutes**: 12 for Part A and the rest for Part B.
+
+The two chapters end here. Part A checks that you can say what the operators mean; Part B gives you a system nobody has solved for you and asks you to measure all three.
+
+#### Part A — six questions, no code
+
+:::{admonition} A1. Summing and truncating
+:class: tip
+
+The bouncing ball converged: every extra term in $\sum T_n$ brought the answer closer to $T_\infty$. The series for $(1+x)^{-1}$ did not, once $\lvert x\rvert > 1$: no number of terms helps. Both are infinite sums of shrinking-looking terms. What distinguishes them, and how would you decide which case you are in before spending an afternoon adding terms?
+:::
+
+:::{admonition} A2. Which coordinates, and which symbol
+:class: tip
+
+You are handed three fields: the temperature around a buried sphere; the magnetic field around a long straight cable; the field in a rectangular room. Which coordinate system would you compute each in, and why? Then: in cylindrical coordinates the radial distance is written $\varrho$ and in spherical it is written $r$. Give one calculation that goes wrong if you conflate them.
+:::
+
+:::{admonition} A3. The gradient of a distance
+:class: tip
+
+Without computing anything: what is $\lvert\nabla r\rvert$, and why must it be that number for every $r > 0$? What direction does $\nabla r$ point, and what does that say about the surfaces $r = \text{constant}$?
+:::
+
+:::{admonition} A4. Two fields that look like sources
+:class: tip
+
+$\boldsymbol{A} = x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$ has arrows that fly apart along the $x$-axis, and $\nabla\cdot\boldsymbol{A} = 0$. $\boldsymbol{E}$ outside a charged blob has arrows that fly apart in every direction, and $\nabla\cdot\boldsymbol{E} = 0$ as well. Are these the same statement twice? Explain each with a box, not with algebra.
+:::
+
+:::{admonition} A5. The wire that circulates without curling
+:class: tip
+
+Outside a straight current-carrying wire, $\nabla\times\boldsymbol{H} = \boldsymbol{0}$ at every point you can measure, and yet $\oint\boldsymbol{\tau}\cdot\boldsymbol{H}\,dl = I \neq 0$ around any loop enclosing it. Stokes' theorem says these two are equal. Resolve it. Then say what goes wrong if you try to define a potential for $\boldsymbol{H}$ outside the wire.
+:::
+
+:::{admonition} A6. Why keep both forms
+:class: tip
+
+Each operator came with an integral theorem. Name the one situation, met twice in these labs, in which the differential form fails and the integral form still works, and say what the integral form is doing that the derivative cannot.
+:::
+
+#### Part B — a buried heating panel
+
+A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
+
+A steady point source of power $P$ in a medium of thermal conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout these labs. Split the panel into $N = 20\times12$ sub-sources, give each an equal share of the power, and superpose:
+
+$$ T(\boldsymbol{r}) = \frac{P}{4\pi k N}\sum_{i=1}^{N}\frac{1}{\lvert\boldsymbol{r}-\boldsymbol{r}_i\rvert}, \qquad P = 100\ \text{W}, \qquad k_{\text{soil}} = 1.5\ \text{W m}^{-1}\text{K}^{-1} $$
+
+Check the dimensions before you code. $[P]/[k] = \text{W}/(\text{W m}^{-1}\text{K}^{-1}) = \text{m}\cdot\text{K}$, divided by a distance, so $T$ comes out in kelvin. A temperature formula that does not reduce to kelvin has an error in it.
+
+```{code-cell} ipython3
+# --- given: the panel, and the grid it sits on (the cube from Part 0) ---
+P_heat, k_soil = 100.0, 1.5               # W, and W/m/K for soil
+panel_x = np.linspace(-0.5, 0.5, 20)      # sub-source positions, in the z = 0 plane
+panel_y = np.linspace(-0.3, 0.3, 12)
+N_sub = panel_x.size * panel_y.size
+
+# B1 -- two blanks, inside the loop. `d_min` records how close each grid point
+# comes to the nearest sub-source; the mask below uses it.
+T_sum = np.zeros_like(X)
+d_min = np.full(X.shape, np.inf)
+for x0 in panel_x:
+    for y0 in panel_y:
+        d = ___                           # distance from (x0, y0, 0) to every grid point
+        d_min = np.minimum(d_min, d)
+        T_sum += 1.0 / np.maximum(d, 1e-12)
+T_panel = ___                             # the prefactor, applied once at the end
+
+# --- given: the panel is a set of singularities, so keep a shell around it ---
+T_panel = np.where(d_min < 0.15, np.nan, T_panel)
+print(f"{N_sub} sub-sources, each {P_heat/N_sub:.3f} W")
+print(f"T ranges {np.nanmin(T_panel):.2f} to {np.nanmax(T_panel):.2f} K above ambient")
+
+# --- self-check (leave this alone) ---
+fw.check_shape("T has the shape of the grid", T_panel, X.shape)
+_i1 = int(np.argmin(np.abs(axis - 1.0)))
+fw.check_scalar("1 m directly above the centre of the panel", T_panel[c, c, _i1],
+                5.007, rtol=0.01, unit=" K")
+fw.check("...and the prefactor was applied, not left out",
+         np.nanmax(T_panel) < 100.0)
+```
+
+Heat flows down the temperature gradient, with the same minus sign and the same reason as $\boldsymbol{E} = -\nabla V$. Fourier's law is
+
+$$ \boldsymbol{q}_T = -k\nabla T \qquad [\text{W m}^{-2}] $$
+
+and at steady state, away from the panel, no heat is created or destroyed, so $\boldsymbol{q}_T$ should be solenoidal there. It is also a gradient field, so its curl should vanish.
+
+```{code-cell} ipython3
+# B2 -- three blanks. Reuse the operators you wrote: `divergence` from Task 1
+# and `curl` from Task 6. Both need arrays without NaN, so pass them through
+# np.nan_to_num first, as Task 2 did for the dipole.
+qx, qy, qz = ___                          # Fourier's law, as three arrays
+q_T = tuple(np.nan_to_num(v) for v in (qx, qy, qz))
+div_q = ___
+curl_q = ___
+
+# --- given: both reported scale-free, against |q|/d, exactly as Task 2 and
+#     Task 7 did. `far` is the region well clear of the panel.
+far = interior & (d_min > 0.6)
+q_mag = np.sqrt(q_T[0]**2 + q_T[1]**2 + q_T[2]**2)
+yardstick = (q_mag / np.maximum(d_min, 1e-12))[far]
+curl_mag = np.sqrt(curl_q[0]**2 + curl_q[1]**2 + curl_q[2]**2)
+print(f"  |div q| / (|q|/d), away from the panel : "
+      f"{np.median(np.abs(div_q[far]) / yardstick):.3%}")
+print(f"  |curl q| / (|q|/d)                     : "
+      f"{np.median(curl_mag[far] / yardstick):.2e}")
+
+# --- self-check (leave this alone) ---
+fw.check(f"q points away from the panel, so heat flows outward "
+         f"({np.median((q_T[0]*X + q_T[1]*Y + q_T[2]*Z)[far]):+.3f})",
+         np.median((q_T[0]*X + q_T[1]*Y + q_T[2]*Z)[far]) > 0)
+fw.check(f"no heat is created away from the panel "
+         f"({np.median(np.abs(div_q[far]) / yardstick):.2%})",
+         np.median(np.abs(div_q[far]) / yardstick) < 0.05)
+fw.check(f"and the flux of a gradient cannot circulate "
+         f"({np.median(curl_mag[far] / yardstick):.1e})",
+         np.median(curl_mag[far] / yardstick) < 1e-10)
+```
+
+The divergence is zero away from the panel and the panel is certainly a source, so the differential form has nothing to say about how strong it is. Put a closed surface around it instead. `closed_box_flux` from Task 5 works unchanged.
+
+```{code-cell} ipython3
+# --- given: the divergence theorem as an instrument, reading in watts ---
+print("  box half-width      power it finds")
+for h in (1.0, 1.4):
+    print(f"     {h:.1f} m            {closed_box_flux(*q_T, h):8.3f} W")
+print(f"\n     actually buried  {P_heat:8.3f} W")
+
+# The same box at h = 0.6 m returns 84.3 W. Its faces pass 0.1 m from the edge
+# of the panel, inside the shell that was masked out above; np.nan_to_num then
+# integrated the deleted samples as zeros. With no mask it returns 100.2 W.
+# Question B3 asks what the general rule is.
+
+# --- self-check (leave this alone) ---
+fw.check_scalar("closed-surface flux of q = the power buried inside",
+                closed_box_flux(*q_T, 1.0), P_heat, rtol=0.01, unit=" W")
+fw.check("...and a larger box finds the same power, not more",
+         abs(closed_box_flux(*q_T, 1.4) - closed_box_flux(*q_T, 1.0)) < 0.01 * P_heat)
+```
+
+Far from the panel its shape should stop mattering. Test that against the single term a point source would give.
+
+```{code-cell} ipython3
+# --- given: the panel against one point source of the same total power ---
+print(f"  {'distance':>10} {'along x':>10} {'along z':>10} {'point source':>14} {'spread':>8}")
+for d_ in (0.8, 1.2, 1.6):
+    i = int(np.argmin(np.abs(axis - d_)))
+    T_x, T_z = T_panel[i, c, c], T_panel[c, c, i]
+    print(f"  {d_:8.1f} m {T_x:9.3f} K {T_z:9.3f} K "
+          f"{P_heat/(4*np.pi*k_soil*d_):13.3f} K {abs(T_x-T_z)/T_x:8.1%}")
+
+# The blank shell in both panels is the masked region, 0.15 m around the
+# panel. Its outline in the plan view is the panel's own shape.
+fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.6))
+fw.show_field_slice(X, Y, Z, q_T[0], q_T[2], background=T_panel, ax=axes[0],
+                    plane="y", density=1.2, vmin=0, vmax=15, levels=16,
+                    cmap="inferno", symmetric=False, stream_color="w",
+                    label="$T$ above ambient  [K]", title="vertical section, $y = 0$")
+fw.show_field_slice(X, Y, Z, q_T[0], q_T[1], background=T_panel, ax=axes[1],
+                    plane="z", density=1.2, vmin=0, vmax=15, levels=16,
+                    cmap="inferno", symmetric=False, stream_color="w",
+                    label="$T$ above ambient  [K]", title="plan view, $z = 0$")
+plt.tight_layout()
+plt.show()
+```
+
+:::{admonition} B3. Four questions on what you just measured
+:class: tip
+
+Answer these in writing.
+
+1. The closed surface returned 100.05 W and the divergence returned zero everywhere you could measure it. Both are correct. What does each one tell you that the other cannot?
+2. The $h = 0.6$ m box returns 84.3 W with the mask in place and 100.2 W without it. State the general rule this illustrates about masked samples and surface integrals.
+3. `curl_q` came back at $10^{-15}$ rather than at the fraction of a percent `div_q` shows. Why is it so much smaller, and is that a better measurement or a different kind of statement?
+4. In the plan view the isotherms near the panel are rounded rectangles and far away they are circles, and the table shows the difference between the two directions falling from 19% to 5%. What has been lost, and what does that have to do with truncating a series?
+:::
+
+:::{admonition} B4. The number that is wrong
+:class: tip
+
+Everything above was computed in soil, $k = 1.5$ W m⁻¹K⁻¹, and one metre above the panel it predicts $+5.0$ K. Re-run it for the same panel hanging in **air**, $k_{\text{air}} = 0.026$ W m⁻¹K⁻¹. You do not need to recompute anything: $T \propto 1/k$, so the answer is $5.0 \times 1.5/0.026$.
+
+The arithmetic is right and the answer is absurd. Identify the assumption that failed. Two are worth naming.
+:::
