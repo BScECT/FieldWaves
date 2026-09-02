@@ -143,18 +143,18 @@ Read the definition on the left rather than the formula on the right: **treat $\
 
 ### Task 1 — the operator, and its independence of the origin
 
-The operator is three lines, and they are given. One derivative along one axis per component: `np.gradient(Ax, dx, axis=0)` returns $\partial A_x/\partial x$ and nothing else, whereas asking for all three and discarding two costs three times the memory. The cross terms are not part of a divergence.
+The operator is three lines. One derivative along one axis per component: `np.gradient(Ax, dx, axis=0)` returns $\partial A_x/\partial x$ and nothing else, whereas asking for all three and discarding two costs three times the memory. The cross terms are not part of a divergence.
 
 **The question is the one raised by the definition.** Flux per unit volume is measured around a point, so does the result depend on which point is called the origin? Take the outward flow $\boldsymbol{A} = \boldsymbol{r}$, whose divergence follows on paper as $1+1+1 = 3$, then shift the whole field so that it streams out of $(0.8, -0.4, 0.3)$. Predict the divergence before computing it.
 
 ```{code-cell} ipython3
-# --- given ---
+# Task 1
 def divergence(Ax, Ay, Az, dx, dy, dz):
     return (np.gradient(Ax, dx, axis=0)
-            + np.gradient(Ay, dy, axis=1)
-            + np.gradient(Az, dz, axis=2))
+            + ___
+            + ___)
 
-# Task 1 -- two blanks. The same outward flow, seen from somewhere else.
+# The same outward flow, seen from somewhere else.
 x0, y0, z0 = 0.8, -0.4, 0.3
 Sx, Sy, Sz = ___                          # the field r - r0, as three arrays
 div_shifted = ___                         # its divergence
@@ -172,6 +172,11 @@ fw.check("the shifted field really is different from the original",
 :class: dropdown
 
 ```python
+def divergence(Ax, Ay, Az, dx, dy, dz):
+    return (np.gradient(Ax, dx, axis=0)
+            + np.gradient(Ay, dy, axis=1)
+            + np.gradient(Az, dz, axis=2))
+
 Sx, Sy, Sz = X - x0, Y - y0, Z - z0
 div_shifted = divergence(Sx, Sy, Sz, dx, dy, dz)
 ```
