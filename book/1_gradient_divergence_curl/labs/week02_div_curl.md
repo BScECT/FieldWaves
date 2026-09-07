@@ -108,6 +108,13 @@ print(f"grid shape {X.shape},  spacing {dx:.4f} m,  {X.size:,} sample points")
 print(f"X[i,j,k] = x[i]   ->   X[-1, 0, 0] = {X[-1, 0, 0]:.1f} m")
 ```
 
+```{figure} figures/part0_interior_mask.svg
+:name: fig-interior-mask
+:width: 100%
+
+What `interior` keeps, and why. On the six faces of the box `np.gradient` has no neighbour on one side, so it falls back to a one-sided difference that is first order instead of second. The mask drops two layers rather than one because several fields here are built with `np.gradient` and then differentiated again, and each differentiation carries the boundary error one cell further in.
+```
+
 ```{code-cell} ipython3
 # Lab 1, Tasks 3, 4, 6 and 7 -- given here, not set again.
 def distance_to(X, Y, Z, x0=0.0, y0=0.0, z0=0.0):
@@ -212,6 +219,13 @@ $$ \frac{\lvert\nabla\cdot\boldsymbol{v}\rvert}{\lvert\boldsymbol{v}\rvert/r} $$
 a pure number, the same for a trickle and a torrent: **1 means the three terms of the divergence did not cancel at all, and 0 means they cancelled completely.** The cell prints the raw divergence beside the ratio, so you can see for yourself why the raw column is unusable.
 
 One entry is known before the code runs. For $f = \text{const}$ the field is $\boldsymbol{v} = \boldsymbol{r}$, so $\lvert\boldsymbol{v}\rvert/r = 1$ and the ratio is nothing but $\nabla\cdot\boldsymbol{r} = 3$, which Task 1 measured. That row is the check that the statistic is being formed correctly, and it is why the last self-check looks for 300%.
+
+```{figure} figures/task2_test_band.svg
+:name: fig-task2-band
+:width: 92%
+
+The band the median is taken over. Inside $r = 0.3$ the field is singular and those samples are masked. The outer limit at $r = 1.6$ keeps the band clear of the faces of the box, where `np.gradient` is worst; the corners lie well outside it. A median over what is left cannot be moved by a single bad sample.
+```
 
 ```{code-cell} ipython3
 # The statistic, restated: |div v| / (|v|/r), median over the test band.
@@ -584,19 +598,21 @@ Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid pla
 
 ### Task 5 — close the surface
 
+```{figure} figures/task5_box_faces.svg
+:name: fig-task5-faces
+:width: 100%
+
+The six faces, taken in pairs. Each pair contributes the face at `i1` minus the face at `i0`. The `i0` term is subtracted because its outward normal points backwards along the pinned axis while the array holds the forward component. The axis you pin to `i0` and `i1` is the axis whose spacing you leave out of `fw.area_integral`.
+```
+
 ```{code-cell} ipython3
 # `fw.area_integral(F2, da, db)` integrates a 2-D array over the face it
 # spans; `fw.volume_integral(F3, dx, dy, dz)` does the same over a box.
 # `fw.box_indices(X, h)` gives the index range of the cube |x|,|y|,|z| <= h.
 #
-# The x pair is written for you; the pattern is one row per axis:
-#
-#     face pair   outward samples   inward samples    spacings
-#     x           Ax[i1, s, s]      Ax[i0, s, s]      dy, dz
-#     y           Ay[s, i1, s]      Ay[s, i0, s]      dx, dz
-#     z           Az[s, s, i1]      Az[s, s, i0]      dx, dy
-#
-# The axis you pin to i0/i1 is the axis whose spacing you leave out.
+# The x pair is written for you, and the figure above gives the other two,
+# one panel per axis. The axis you pin to i0/i1 is the axis whose spacing you
+# leave out.
 # NOTE: this closes over X, dx, dy, dz from the cell above, so it is tied to
 # this grid and is not a general-purpose function.
 
@@ -659,129 +675,6 @@ fw.check_scalar("divergence theorem: surface = volume", flux_1m,
 Three independent calculations. The first never examines the interior of the box, the second never examines the surface, and the third never examines the field. They agree to a fraction of a percent.
 
 The result grows with $h$ and then stops: once the cube holds nearly all the charge, enlarging it adds surface but no charge. Charge outside a closed surface contributes exactly nothing, because the field lines it sends in through one wall leave through another.
-:::
-
-### Shrinking the source to a point
-
-Run the same surface integral on the point-charge field of Lab 1's Task 7, whose divergence could not be measured at the origin because the singularity had to be masked.
-
-Rearranged, Gauss's law turns the flux into a **charge meter**: $Q_{\text{enc}} = \varepsilon_0 \oint_S \boldsymbol{E}\cdot\hat{\boldsymbol{n}}\,dS$. Weigh the charge inside each box in coulombs and compare it with the 1 nC placed there.
-
-```{code-cell} ipython3
-print("box half-width      charge it finds")
-for h in (0.6, 1.0, 1.4):
-    Q_found = epsilon_0 * closed_box_flux(Ex, Ey, Ez, h)
-    print(f"   {h:.1f} m           {Q_found * 1e12:8.2f} pC")
-print(f"\n   actually there   {Q * 1e12:8.2f} pC")
-
-# The shell between the 0.6 m and 1.4 m boxes holds no charge. Weigh it: what
-# enters the small box must leave the large one, so the difference of the two
-# fluxes is the charge in between.
-Q_shell = epsilon_0 * (closed_box_flux(Ex, Ey, Ez, 1.4)
-                       - closed_box_flux(Ex, Ey, Ez, 0.6))
-print(f"\ncharge in the shell between them: {Q_shell * 1e12:+.2f} pC "
-      f"({abs(Q_shell) / Q:.2%} of the charge at the centre)")
-```
-
-:::{admonition} Where did the charge go?
-:class: important
-
-Every box weighs the same 1 nC to a fraction of a percent, and the shell between two of them weighs nothing. All the charge lies in the only region common to every box: the origin.
-
-The whole source therefore sits at one point, where $\nabla\cdot\boldsymbol{E}$ is not a large number but undefined: $\rho_v$ has become a **Dirac delta**, zero everywhere, infinite at one point, with finite integral $Q$. The integral form survives exactly where the differential form fails.
-
-The same statement for magnetism carries no source term at all:
-
-$$ \nabla\cdot\boldsymbol{B} = 0 \qquad\Longleftrightarrow\qquad \oint_S \boldsymbol{B}\cdot\hat{\boldsymbol{n}}\,dS = 0 \ \ \text{for every closed } S $$
-
-The measurement returns zero around any closed surface anywhere: there are no magnetic monopoles, and field lines of $\boldsymbol{B}$ never begin or end.
-:::
-
-### The dipole, exactly
-
-Task 2 measured $\nabla\cdot\boldsymbol{B} = 0$ for the Earth's dipole and returned 1.8%, which is grid error rather than physics. The same claim can be tested without differentiating: put a closed surface around the dipole and weigh what crosses it.
-
-One warning before reading the numbers. A box centred on the origin is too easy a test for this dipole: with $\boldsymbol{m} = \hat{\boldsymbol{z}}$, $B_x$ and $B_y$ are odd in $z$ and $B_z$ is even, so on a $z$-symmetric box the faces cancel in pairs before any physics enters. An off-centre box is the honest test, and the cell below runs both.
-
-```{code-cell} ipython3
-r_dot_m = Z
-Bx = 3*X*r_dot_m / r_safe**5
-By = 3*Y*r_dot_m / r_safe**5
-Bz = (3*Z*r_dot_m - r_safe**2) / r_safe**5
-
-B = tuple(np.nan_to_num(q) for q in (Bx, By, Bz))
-v = tuple(np.nan_to_num(q / r_safe**3) for q in (X, Y, Z))
-
-# --- given: the same surface integral over any grid-aligned box, centred
-#     on the origin or not. Same six faces, same three pairs as Task 5.
-def box_flux(A, x0, x1, y0, y1, z0, z1):
-    i = [int(np.argmin(np.abs(axis - q))) for q in (x0, x1, y0, y1, z0, z1)]
-    sx, sy, sz = slice(i[0], i[1]+1), slice(i[2], i[3]+1), slice(i[4], i[5]+1)
-    return (fw.area_integral(A[0][i[1], sy, sz], dy, dz) - fw.area_integral(A[0][i[0], sy, sz], dy, dz)
-          + fw.area_integral(A[1][sx, i[3], sz], dx, dz) - fw.area_integral(A[1][sx, i[2], sz], dx, dz)
-          + fw.area_integral(A[2][sx, sy, i[5]], dx, dy) - fw.area_integral(A[2][sx, sy, i[4]], dx, dy))
-
-boxes = [("centred, h = 0.6", (-0.6, 0.6, -0.6, 0.6, -0.6, 0.6)),
-         ("centred, h = 1.0", (-1.0, 1.0, -1.0, 1.0, -1.0, 1.0)),
-         ("centred, h = 1.4", (-1.4, 1.4, -1.4, 1.4, -1.4, 1.4)),
-         ("lopsided in z   ", (-1.0, 1.0, -1.0, 1.0, -0.6, 1.0)),
-         ("lopsided in x, z", (-0.6, 1.0, -1.0, 1.0, -0.6, 1.0))]
-
-print("  box                 flux of B      flux of the radial flow v")
-for name, lim in boxes:
-    print(f"  {name}   {box_flux(B, *lim):+11.2e}   {box_flux(v, *lim):+12.4f}")
-print(f"\n  4*pi = {4*np.pi:.4f};  the integrator misses it by "
-      f"{4*np.pi - box_flux(v, -1, 1, -1, 1, -1, 1):.1e} on the flow")
-
-# --- self-check (leave this alone) ---
-fw.check("the dipole encloses nothing -- even in a box that is not centred on it",
-         max(abs(box_flux(B, *lim)) for _, lim in boxes) < 1e-2)
-fw.check("...and the same integrator does find the tap in the radial flow",
-         abs(box_flux(v, -1, 1, -1, 1, -1, 1) - 4*np.pi) < 0.01 * 4*np.pi)
-```
-
-:::{admonition} Two kinds of "divergence-free"
-:class: important
-
-The radial flow returns $4\pi$ through every surface, whatever its size: there is a tap at the origin, and every box finds the same one, as every box found the same 1 nC above.
-
-The dipole returns **nothing** through any of them. On the three centred boxes the result is zero to machine precision, but the warning above applies: those boxes cancel the field against itself by symmetry and could return nothing else. The off-centre boxes are the measurement that counts, and they return $-2.5\times10^{-3}$ and $-2.2\times10^{-4}$. Compare the adjacent column: the same integrator, on the same grid, misses $4\pi$ by $6.8\times10^{-3}$ on the radial flow. **The flux of the dipole is zero to better than the accuracy this method achieves on anything.**
-
-The two divergence-free fields are therefore different statements. The flow has a tap that can be located by shrinking a surface onto it; the dipole has nothing to locate, at any size or placement of the surface. This is $\nabla\cdot\boldsymbol{B} = 0$ in the form that admits no exception, and it is why the integral form is worth constructing: it settles the question at the source, where the differential form had to be masked.
-:::
-
-### Where do the 1% errors come from?
-
-Every derivative on this page is a centred difference, accurate to $O(\Delta x^{2})$: halving the spacing should reduce the error by four. Confirm it. The study is a single loop.
-
-```{code-cell} ipython3
-print(f"{'n':>4} {'dx [m]':>8} {'worst error':>12} {'ratio':>7}")
-prev = None
-for n_test in (21, 31, 41, 61):
-    ax_t = np.linspace(-L, L, n_test)
-    h_t = ax_t[1] - ax_t[0]
-    Xt, Yt, Zt = np.meshgrid(ax_t, ax_t, ax_t, indexing="ij")
-    rt = np.sqrt(Xt**2 + Yt**2 + Zt**2)
-    Rst = np.maximum(rt, 1e-12)
-    rho_t = rho_v0 * np.exp(-rt**2 / a**2)
-    E_Rt = rho_v0 / (epsilon_0 * Rst**2) * (
-        (a**3 * np.sqrt(np.pi) / 4) * erf(Rst / a)
-        - (a**2 * Rst / 2) * np.exp(-Rst**2 / a**2))
-    dv = divergence(E_Rt * Xt / Rst, E_Rt * Yt / Rst, E_Rt * Zt / Rst, h_t, h_t, h_t)
-    inner = np.zeros(Xt.shape, bool)
-    inner[2:-2, 2:-2, 2:-2] = True
-    e = np.nanmax(np.abs(dv[inner] - (rho_t / epsilon_0)[inner])) / np.nanmax(rho_t / epsilon_0)
-    ratio = "-" if prev is None else f"{prev / e:.2f}"
-    print(f"{n_test:>4} {h_t:>8.4f} {e:>11.2%} {ratio:>7}")
-    prev = e
-```
-
-:::{admonition} Second order, by measurement
-:class: important
-
-Compare each ratio with the square of the spacing ratio: $1.5^2 = 2.25$ from $n=21$ to $31$, $1.33^2 = 1.78$ from $31$ to $41$, and $1.5^2 = 2.25$ from $41$ to $61$.
-
-The 1.06% in Task 4 is therefore not noise to be tolerated but a predictable quantity that can be reduced at a known cost, and the choice of $n = 61$ in Lab 1 can now be audited rather than assumed.
 :::
 
 ---
@@ -1004,6 +897,13 @@ the same shape as Task 4's blob of charge, with $\Gamma$ in the part of $Q$. The
 
 $$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right)dS $$
 
+```{figure} figures/task8_loop_edges.svg
+:name: fig-task8-loop
+:width: 100%
+
+The rectangle `loop_circulation` walks, and the four terms it sums. Each edge carries the slice the code reads along it, the direction of travel, the spacing that scales it, and the sign it enters with. Only the perimeter samples enter this sum. The interior belongs to the other side of Stokes' theorem, which `curl_flux` integrates over the same rectangle.
+```
+
 ```{code-cell} ipython3
 Gamma, b_core = 1.0, 0.5          # circulation [m^2/s], core radius b [m]
 
@@ -1018,16 +918,10 @@ curl_oseen = curl(*oseen, dx, dy, dz)
 #
 # LEFT SIDE. Walk the four edges of a rectangle in the z = 0 plane once
 # counter-clockwise, so the right-hand rule puts the unit normal along +z-hat,
-# and add up the component of the field along the direction of travel:
-#
-#     edge     samples along it   travelling   spacing   sign
-#     y = y0   Ax[sx, iy0, k]        +x          dx       +
-#     x = x1   Ay[ix1, sy, k]        +y          dy       +
-#     y = y1   Ax[sx, iy1, k]        -x          dx       -
-#     x = x0   Ay[ix0, sy, k]        -y          dy       -
-#
-# The two edges walked backwards enter negatively, exactly as the inward faces
-# did in Task 5. The x pair is written for you.
+# and add up the component of the field along the direction of travel. The
+# figure above names the four edges, the slice read along each one, and the
+# sign it enters with. The two edges walked backwards enter negatively, exactly
+# as the inward faces did in Task 5. The x pair is written for you.
 
 def loop_circulation(Ax, Ay, x0, x1, y0, y1):
     """Counter-clockwise circulation of (Ax, Ay) round a rectangle in z = 0."""
@@ -1291,51 +1185,15 @@ The first row is Ampère's law in the static limit, and the term Maxwell added t
 
 ### Formative assessment — Chapters 1 and 2
 
-Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **45 minutes**: 12 for Part A and the rest for Part B.
-
-The two chapters end here. Part A checks that you can say what the operators mean; Part B gives you a system nobody has solved for you and asks you to measure all three.
+Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **45 minutes**.
 
 #### Part A — six questions, no code
 
-:::{admonition} A1. Summing and truncating
-:class: tip
-
-The bouncing ball converged: every extra term in $\sum T_n$ brought the answer closer to $T_\infty$. The series for $(1+x)^{-1}$ did not, once $\lvert x\rvert > 1$: no number of terms helps. Both are infinite sums of shrinking-looking terms. What distinguishes them, and how would you decide which case you are in before spending an afternoon adding terms?
-:::
-
-:::{admonition} A2. Which coordinates, and which symbol
-:class: tip
-
-You are handed three fields: the temperature around a buried sphere; the magnetic field around a long straight cable; the field in a rectangular room. Which coordinate system would you compute each in, and why? Then: in cylindrical coordinates the radial distance is written $\varrho$ and in spherical it is written $r$. Give one calculation that goes wrong if you conflate them.
-:::
-
-:::{admonition} A3. The gradient of a distance
-:class: tip
-
-Without computing anything: what is $\lvert\nabla r\rvert$, and why must it be that number for every $r > 0$? What direction does $\nabla r$ point, and what does that say about the surfaces $r = \text{constant}$?
-:::
-
-:::{admonition} A4. Two fields that look like sources
-:class: tip
-
-$\boldsymbol{A} = x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$ has arrows that fly apart along the $x$-axis, and $\nabla\cdot\boldsymbol{A} = 0$. $\boldsymbol{E}$ outside a charged blob has arrows that fly apart in every direction, and $\nabla\cdot\boldsymbol{E} = 0$ as well. Are these the same statement twice? Explain each with a box, not with algebra.
-:::
-
-:::{admonition} A5. The wire that circulates without curling
-:class: tip
-
-Outside a straight current-carrying wire, $\nabla\times\boldsymbol{H} = \boldsymbol{0}$ at every point you can measure, and yet $\oint\boldsymbol{\tau}\cdot\boldsymbol{H}\,dl = I \neq 0$ around any loop enclosing it. Stokes' theorem says these two are equal. Resolve it. Then say what goes wrong if you try to define a potential for $\boldsymbol{H}$ outside the wire.
-:::
-
-:::{admonition} A6. Why keep both forms
-:class: tip
-
-Each operator came with an integral theorem. Name the one situation, met twice in these labs, in which the differential form fails and the integral form still works, and say what the integral form is doing that the derivative cannot.
-:::
+Handed out at the start of the session.
 
 #### Part B — a buried heating panel
 
-A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
+Continue with your Part A answers in mind. A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
 
 A steady point source of power $P$ in a medium of thermal conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout these labs. Split the panel into $N = 20\times12$ sub-sources, give each an equal share of the power, and superpose:
 
@@ -1415,24 +1273,103 @@ fw.check(f"and the flux of a gradient cannot circulate "
 
 The divergence is zero away from the panel and the panel is certainly a source, so the differential form has nothing to say about how strong it is. Put a closed surface around it instead. `closed_box_flux` from Task 5 works unchanged.
 
+```{figure} figures/b3_nested_boxes.svg
+:name: fig-b3-boxes
+:width: 88%
+
+The two surfaces of B3, seen in section. Each is a closed box centred on the panel, and the second blank asks what the region between them contains.
+```
+
 ```{code-cell} ipython3
-# --- given: the divergence theorem as an instrument, reading in watts ---
+# B3 -- two blanks. Both are one call to `closed_box_flux` from Task 5, which
+# works here unchanged: it takes the three components and a half-width.
+#
+# FIRST BLANK, inside the loop. q_T is a heat flux density in W/m^2, so its
+# integral over a closed surface is already a power in watts. No conversion
+# factor belongs on this line; adding one is the way to get it wrong.
+powers = {}
 print("  box half-width      power it finds")
 for h in (1.0, 1.4):
-    print(f"     {h:.1f} m            {closed_box_flux(*q_T, h):8.3f} W")
+    powers[h] = ___                       # net outward heat flow through |x|,|y|,|z| <= h
+    print(f"     {h:.1f} m            {powers[h]:8.3f} W")
 print(f"\n     actually buried  {P_heat:8.3f} W")
+
+# SECOND BLANK. The shell between those two boxes holds no part of the panel,
+# so nothing in it generates heat. Weigh it. Whatever enters across the inner
+# surface must leave across the outer one, so the power generated in between is
+# the difference of the two fluxes you already have. One line, no new function.
+power_shell = ___
+
+print(f"\n  generated in the shell between them: {power_shell:+.3f} W, "
+      f"{abs(power_shell)/P_heat:.3%} of the panel")
 
 # The same box at h = 0.6 m returns 84.3 W. Its faces pass 0.1 m from the edge
 # of the panel, inside the shell that was masked out above; np.nan_to_num then
 # integrated the deleted samples as zeros. With no mask it returns 100.2 W.
-# Question B3 asks what the general rule is.
+# Question B5 asks what the general rule is.
 
 # --- self-check (leave this alone) ---
 fw.check_scalar("closed-surface flux of q = the power buried inside",
-                closed_box_flux(*q_T, 1.0), P_heat, rtol=0.01, unit=" W")
-fw.check("...and a larger box finds the same power, not more",
-         abs(closed_box_flux(*q_T, 1.4) - closed_box_flux(*q_T, 1.0)) < 0.01 * P_heat)
+                powers[1.0], P_heat, rtol=0.01, unit=" W")
+fw.check(f"...and a larger box finds the same power, not more "
+         f"({powers[1.4] - powers[1.0]:+.3f} W between them)",
+         abs(powers[1.4] - powers[1.0]) < 0.01 * P_heat)
+fw.check(f"the shell between the two boxes generates nothing ({power_shell:+.3f} W)",
+         abs(power_shell) < 0.01 * P_heat)
 ```
+
+Both integral theorems are now in play for the same field. The closed surface weighed the panel without differentiating anything. Stokes' theorem asks the other question: run a loop instead of a surface, and see whether the heat flux circulates.
+
+```{figure} figures/b4_loops_and_mask.svg
+:name: fig-b4-loops
+:width: 96%
+
+The three rectangles, in the plane $z = 0$. Two of them stay clear of the masked shell. The third has an edge running straight through it, and the thick segment marks where. Compare the three numbers the cell prints against this picture before answering B5.5.
+```
+
+```{code-cell} ipython3
+# B4 -- one blank, which serves all three loops. `loop_circulation` from Task 8
+# works unchanged: it takes the two in-plane components and the four edges
+# x0, x1, y0, y1 of a rectangle in the z = 0 plane, walked counter-clockwise.
+#
+# Read each answer against the scale printed first, not as a bare number: a
+# circulation of 1e-16 W/m means nothing until you know what 1 would mean.
+q_scale = np.nanmax(np.sqrt(q_T[0]**2 + q_T[1]**2 + q_T[2]**2))   # W/m, one metre of path
+loops = [("encircling the panel", (-1.2, 1.2, -1.2, 1.2)),
+         ("off to one side", (0.8, 1.6, -0.4, 0.4)),
+         ("crossing the mask", (-0.2, 1.4, -0.6, 1.0))]
+circ = {}
+
+print(f"  strongest |q| carried along 1 m of path: {q_scale:.3f} W/m\n")
+print(f"  {'loop':<22} {'circulation':>13} {'flux of curl':>14} {'C / scale':>11}")
+for name, lim in loops:
+    circ[name] = ___                      # circulation of q_T round this rectangle
+    ix0, ix1 = [int(np.argmin(np.abs(axis - q))) for q in lim[:2]]
+    iy0, iy1 = [int(np.argmin(np.abs(axis - q))) for q in lim[2:]]
+    flux = fw.area_integral(curl_q[2][ix0:ix1+1, iy0:iy1+1, fw.z0_index(Z)], dx, dy)
+    print(f"  {name:<22} {circ[name]:>13.3e} {flux:>14.3e} "
+          f"{abs(circ[name])/q_scale:>11.2e}")
+
+# --- self-check (leave this alone) ---
+fw.check(f"a gradient field does not circulate, even round the source "
+         f"({circ['encircling the panel']:+.2e} W/m)",
+         abs(circ["encircling the panel"]) < 1e-9 * q_scale)
+fw.check(f"...nor round a loop that encloses nothing "
+         f"({circ['off to one side']:+.2e} W/m)",
+         abs(circ["off to one side"]) < 1e-9 * q_scale)
+fw.check_scalar("the third loop, the one whose edge crosses the masked shell (B5.5)",
+                circ["crossing the mask"], -0.0697, rtol=0.03, unit=" W/m")
+```
+
+:::{admonition} Why this field has a potential, and the wire's has none
+:class: important
+
+Two of the three loops return round-off, below $10^{-14}$ W/m against a scale of 35.5 W/m. The heat flux does not circulate, and it cannot: it is $-k\nabla T$, and a gradient has no curl. That is the argument that made $V$ possible for the electric field, so $\boldsymbol{q}_T$ has a potential too, and it is a quantity you have already computed. It is $T$.
+
+The field around the wire in Part 3 is also curl-free at every point, and its loop returns a full ampere. The difference is the region, not the field. The soil around the panel is simply connected, so any loop in it can be shrunk to a point without leaving the region where $\nabla\times\boldsymbol{q}_T = \boldsymbol{0}$, and Stokes' theorem then forces the circulation to zero. Around the wire no such shrinking is possible.
+
+The third loop returns $-0.070$ W/m, which is $2\times10^{-3}$ of the scale where the other two are below $10^{-16}$ of it. Its edge is the only one that runs through the masked shell.
+:::
 
 Far from the panel its shape should stop mattering. Test that against the single term a point source would give.
 
@@ -1460,7 +1397,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-:::{admonition} B3. Four questions on what you just measured
+:::{admonition} B5. Five questions on what you just measured
 :class: tip
 
 Answer these in writing.
@@ -1469,9 +1406,10 @@ Answer these in writing.
 2. The $h = 0.6$ m box returns 84.3 W with the mask in place and 100.2 W without it. State the general rule this illustrates about masked samples and surface integrals.
 3. `curl_q` came back at $10^{-15}$ rather than at the fraction of a percent `div_q` shows. Why is it so much smaller, and is that a better measurement or a different kind of statement?
 4. In the plan view the isotherms near the panel are rounded rectangles and far away they are circles, and the table shows the difference between the two directions falling from 19% to 5%. What has been lost, and what does that have to do with truncating a series?
+5. Two loops returned round-off, below $10^{-14}$ W/m, and the third returned $-0.070$ W/m. The third is the one whose edge runs through the masked shell. Say what that number is a measurement of. Question 2 makes the same point for a closed surface. State the rule once, in a form that covers a line integral and a surface integral together.
 :::
 
-:::{admonition} B4. The number that is wrong
+:::{admonition} B6. The number that is wrong
 :class: tip
 
 Everything above was computed in soil, $k = 1.5$ W m⁻¹K⁻¹, and one metre above the panel it predicts $+5.0$ K. Re-run it for the same panel hanging in **air**, $k_{\text{air}} = 0.026$ W m⁻¹K⁻¹. You do not need to recompute anything: $T \propto 1/k$, so the answer is $5.0 \times 1.5/0.026$.
