@@ -108,6 +108,13 @@ print(f"grid shape {X.shape},  spacing {dx:.4f} m,  {X.size:,} sample points")
 print(f"X[i,j,k] = x[i]   ->   X[-1, 0, 0] = {X[-1, 0, 0]:.1f} m")
 ```
 
+```{figure} figures/part0_interior_mask.svg
+:name: fig-interior-mask
+:width: 100%
+
+What `interior` keeps, and why. On the six faces of the box `np.gradient` has no neighbour on one side, so it falls back to a one-sided difference that is first order instead of second. The mask drops two layers rather than one because several fields here are built with `np.gradient` and then differentiated again, and each differentiation carries the boundary error one cell further in.
+```
+
 ```{code-cell} ipython3
 # Lab 1, Tasks 3, 4, 6 and 7 -- given here, not set again.
 def distance_to(X, Y, Z, x0=0.0, y0=0.0, z0=0.0):
@@ -212,6 +219,13 @@ $$ \frac{\lvert\nabla\cdot\boldsymbol{v}\rvert}{\lvert\boldsymbol{v}\rvert/r} $$
 a pure number, the same for a trickle and a torrent: **1 means the three terms of the divergence did not cancel at all, and 0 means they cancelled completely.** The cell prints the raw divergence beside the ratio, so you can see for yourself why the raw column is unusable.
 
 One entry is known before the code runs. For $f = \text{const}$ the field is $\boldsymbol{v} = \boldsymbol{r}$, so $\lvert\boldsymbol{v}\rvert/r = 1$ and the ratio is nothing but $\nabla\cdot\boldsymbol{r} = 3$, which Task 1 measured. That row is the check that the statistic is being formed correctly, and it is why the last self-check looks for 300%.
+
+```{figure} figures/task2_test_band.svg
+:name: fig-task2-band
+:width: 92%
+
+The band the median is taken over. Inside $r = 0.3$ the field is singular and those samples are masked. The outer limit at $r = 1.6$ keeps the band clear of the faces of the box, where `np.gradient` is worst; the corners lie well outside it. A median over what is left cannot be moved by a single bad sample.
+```
 
 ```{code-cell} ipython3
 # The statistic, restated: |div v| / (|v|/r), median over the test band.
@@ -584,19 +598,21 @@ Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid pla
 
 ### Task 5 — close the surface
 
+```{figure} figures/task5_box_faces.svg
+:name: fig-task5-faces
+:width: 100%
+
+The six faces, taken in pairs. Each pair contributes the face at `i1` minus the face at `i0`. The `i0` term is subtracted because its outward normal points backwards along the pinned axis while the array holds the forward component. The axis you pin to `i0` and `i1` is the axis whose spacing you leave out of `fw.area_integral`.
+```
+
 ```{code-cell} ipython3
 # `fw.area_integral(F2, da, db)` integrates a 2-D array over the face it
 # spans; `fw.volume_integral(F3, dx, dy, dz)` does the same over a box.
 # `fw.box_indices(X, h)` gives the index range of the cube |x|,|y|,|z| <= h.
 #
-# The x pair is written for you; the pattern is one row per axis:
-#
-#     face pair   outward samples   inward samples    spacings
-#     x           Ax[i1, s, s]      Ax[i0, s, s]      dy, dz
-#     y           Ay[s, i1, s]      Ay[s, i0, s]      dx, dz
-#     z           Az[s, s, i1]      Az[s, s, i0]      dx, dy
-#
-# The axis you pin to i0/i1 is the axis whose spacing you leave out.
+# The x pair is written for you, and the figure above gives the other two,
+# one panel per axis. The axis you pin to i0/i1 is the axis whose spacing you
+# leave out.
 # NOTE: this closes over X, dx, dy, dz from the cell above, so it is tied to
 # this grid and is not a general-purpose function.
 
@@ -881,6 +897,13 @@ the same shape as Task 4's blob of charge, with $\Gamma$ in the part of $Q$. The
 
 $$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right)dS $$
 
+```{figure} figures/task8_loop_edges.svg
+:name: fig-task8-loop
+:width: 100%
+
+The rectangle `loop_circulation` walks, and the four terms it sums. Each edge carries the slice the code reads along it, the direction of travel, the spacing that scales it, and the sign it enters with. Only the perimeter samples enter this sum. The interior belongs to the other side of Stokes' theorem, which `curl_flux` integrates over the same rectangle.
+```
+
 ```{code-cell} ipython3
 Gamma, b_core = 1.0, 0.5          # circulation [m^2/s], core radius b [m]
 
@@ -895,16 +918,10 @@ curl_oseen = curl(*oseen, dx, dy, dz)
 #
 # LEFT SIDE. Walk the four edges of a rectangle in the z = 0 plane once
 # counter-clockwise, so the right-hand rule puts the unit normal along +z-hat,
-# and add up the component of the field along the direction of travel:
-#
-#     edge     samples along it   travelling   spacing   sign
-#     y = y0   Ax[sx, iy0, k]        +x          dx       +
-#     x = x1   Ay[ix1, sy, k]        +y          dy       +
-#     y = y1   Ax[sx, iy1, k]        -x          dx       -
-#     x = x0   Ay[ix0, sy, k]        -y          dy       -
-#
-# The two edges walked backwards enter negatively, exactly as the inward faces
-# did in Task 5. The x pair is written for you.
+# and add up the component of the field along the direction of travel. The
+# figure above names the four edges, the slice read along each one, and the
+# sign it enters with. The two edges walked backwards enter negatively, exactly
+# as the inward faces did in Task 5. The x pair is written for you.
 
 def loop_circulation(Ax, Ay, x0, x1, y0, y1):
     """Counter-clockwise circulation of (Ax, Ay) round a rectangle in z = 0."""
@@ -1168,9 +1185,7 @@ The first row is Ampère's law in the static limit, and the term Maxwell added t
 
 ### Formative assessment — Chapters 1 and 2
 
-Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **50 minutes**: 12 for Part A and the rest for Part B.
-
-The two chapters end here. Part A checks that you can say what the operators mean; Part B gives you a system nobody has solved for you and asks you to measure all three, then to close a surface and a loop around it.
+Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **45 minutes**.
 
 #### Part A — six questions, no code
 
@@ -1258,6 +1273,13 @@ fw.check(f"and the flux of a gradient cannot circulate "
 
 The divergence is zero away from the panel and the panel is certainly a source, so the differential form has nothing to say about how strong it is. Put a closed surface around it instead. `closed_box_flux` from Task 5 works unchanged.
 
+```{figure} figures/b3_nested_boxes.svg
+:name: fig-b3-boxes
+:width: 88%
+
+The two surfaces of B3, seen in section. Each is a closed box centred on the panel, and the second blank asks what the region between them contains.
+```
+
 ```{code-cell} ipython3
 # B3 -- two blanks. Both are one call to `closed_box_flux` from Task 5, which
 # works here unchanged: it takes the three components and a half-width.
@@ -1297,6 +1319,13 @@ fw.check(f"the shell between the two boxes generates nothing ({power_shell:+.3f}
 ```
 
 Both integral theorems are now in play for the same field. The closed surface weighed the panel without differentiating anything. Stokes' theorem asks the other question: run a loop instead of a surface, and see whether the heat flux circulates.
+
+```{figure} figures/b4_loops_and_mask.svg
+:name: fig-b4-loops
+:width: 96%
+
+The three rectangles, in the plane $z = 0$. Two of them stay clear of the masked shell. The third has an edge running straight through it, and the thick segment marks where. Compare the three numbers the cell prints against this picture before answering B5.5.
+```
 
 ```{code-cell} ipython3
 # B4 -- one blank, which serves all three loops. `loop_circulation` from Task 8
