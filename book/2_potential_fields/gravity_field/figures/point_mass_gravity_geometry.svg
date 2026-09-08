@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title description">
+  <title id="title">Geometry of the gravitational force between two point masses</title>
+  <desc id="description">
+    Position vectors locate masses M and m from an arbitrary origin. The separation vector points from M to m,
+    while the gravitational force on m points back toward M. Equal unit vectors are shown at m and at the origin.
+  </desc>
+
+  <defs>
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#161616" />
+    </marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1769e8" />
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="20" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16852a" />
+    </marker>
+    <marker id="red-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="22" markerHeight="22" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e32626" />
+    </marker>
+    <style>
+      .axis { fill: none; stroke: #161616; stroke-width: 4; marker-end: url(#axis-arrow); }
+      .position { fill: none; stroke: #1769e8; stroke-width: 5; marker-end: url(#blue-arrow); }
+      .separation { fill: none; stroke: #16852a; stroke-width: 7; marker-end: url(#green-arrow); }
+      .unit { fill: none; stroke: #16852a; stroke-width: 7; marker-end: url(#green-arrow); }
+      .force { fill: none; stroke: #e32626; stroke-width: 10; stroke-opacity: 0.72; marker-end: url(#red-arrow); }
+      .math { font-family: "STIX Two Math", "Times New Roman", serif; font-size: 46px; font-style: italic; }
+      .small-math { font-family: "STIX Two Math", "Times New Roman", serif; font-size: 40px; font-style: italic; }
+      .mass-label { font-family: "STIX Two Math", "Times New Roman", serif; font-size: 52px; font-style: italic; fill: #111; }
+      .axis-label { font-family: "STIX Two Math", "Times New Roman", serif; font-size: 44px; font-style: italic; fill: #111; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#fff" />
+
+  <!-- Arbitrary coordinate system. -->
+  <path class="axis" d="M 110 680 L 1130 680" />
+  <path class="axis" d="M 110 680 L 110 70" />
+  <text class="axis-label" x="1135" y="720">x</text>
+  <text class="axis-label" x="67" y="72">y</text>
+  <text class="axis-label" x="65" y="727">O</text>
+
+  <!-- Position vectors from O to the source and observation points. -->
+  <path class="position" d="M 110 680 L 275 400" />
+  <path class="position" d="M 110 680 L 830 220" />
+  <text class="math" x="205" y="555" fill="#1769e8">r&#x20D7;&#x2032;</text>
+  <text class="math" x="480" y="470" fill="#1769e8">r&#x20D7;</text>
+
+  <!-- The masses. -->
+  <circle cx="275" cy="400" r="27" fill="#111" />
+  <circle cx="830" cy="220" r="19" fill="#111" />
+  <text class="mass-label" x="245" y="350">M</text>
+  <text class="mass-label" x="812" y="180">m</text>
+
+  <!-- Separation vector from M to m. -->
+  <path class="separation" d="M 275 400 L 830 220" />
+  <text class="math" x="430" y="280" fill="#16852a">R&#x20D7; = r&#x20D7; - r&#x20D7;&#x2032;</text>
+
+  <!-- The force begins at m and points back toward M. Transparency keeps R visible underneath. -->
+  <path class="force" d="M 830 220 L 650 278" />
+  <text class="math" x="700" y="255" fill="#e32626">F&#x20D7;</text>
+
+  <!-- Equal translated copies of the unit vector, both parallel to R. -->
+  <path class="unit" d="M 830 220 L 992 167" />
+  <text class="small-math" x="925" y="150" fill="#16852a">R&#x302;</text>
+
+  <path class="unit" d="M 110 680 L 272 627" />
+  <text class="small-math" x="210" y="620" fill="#16852a">R&#x302;</text>
+</svg>

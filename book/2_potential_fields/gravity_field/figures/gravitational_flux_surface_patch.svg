@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1000 580"
+   role="img"
+   aria-labelledby="title description"
+   version="1.1"
+   id="svg60"
+   sodipodi:docname="gravitational_flux_surface_patch.svg"
+   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
+   inkscape:export-filename="gravitational_flux_surface_patch.png"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview62"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.0463967"
+     inkscape:cx="474.00759"
+     inkscape:cy="366.49579"
+     inkscape:window-width="1571"
+     inkscape:window-height="1205"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg60" />
+  <title
+     id="title">Gravity field and area vector on a spherical surface</title>
+  <desc
+     id="description">
+    A two-dimensional slice through a spherical surface surrounds a central mass. At a highlighted surface patch,
+    the area vector points outward and the gravitational field points inward, so their dot product is negative.
+  </desc>
+  <defs
+     id="defs12">
+    <marker
+       style="overflow:visible"
+       id="marker2087"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="2.324"
+       markerHeight="2.68670516"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path2085" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="2.324"
+       markerHeight="2.68670516"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       id="green-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerUnits="userSpaceOnUse"
+       markerWidth="18"
+       markerHeight="18"
+       orient="auto"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#16852a"
+         id="path4" />
+    </marker>
+    <marker
+       id="red-arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerUnits="userSpaceOnUse"
+       markerWidth="18"
+       markerHeight="18"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#d62828"
+         id="path7" />
+    </marker>
+    <style
+       id="style10">
+      .surface { fill: #eef6f8; fill-opacity: 0.42; stroke: #202020; stroke-width: 4; }
+      .patch { fill: none; stroke: #00a6b2; stroke-width: 16; stroke-linecap: round; }
+      .tangent { fill: none; stroke: #69757a; stroke-width: 3; stroke-dasharray: 10 8; }
+      .radial { fill: none; stroke: #899397; stroke-width: 3; stroke-dasharray: 8 8; }
+      .area-vector { fill: none; stroke: #16852a; stroke-width: 8; marker-end: url(#green-arrow); }
+      .gravity-vector { fill: none; stroke: #d62828; stroke-width: 9; stroke-opacity: 0.88; marker-end: url(#red-arrow); }
+      .math { font-family: &quot;STIX Two Math&quot;, &quot;Times New Roman&quot;, serif; font-size: 39px; font-style: italic; }
+      .formula { font-family: &quot;STIX Two Math&quot;, &quot;Times New Roman&quot;, serif; font-size: 36px; }
+      .label { font-family: Arial, Helvetica, sans-serif; font-size: 24px; fill: #30383b; }
+      .small { font-family: Arial, Helvetica, sans-serif; font-size: 21px; fill: #4a5559; }
+    </style>
+  </defs>
+  <rect
+     width="1000"
+     height="580"
+     fill="#fff"
+     id="rect14" />
+  <!-- Two-dimensional slice through the spherical Gaussian surface. -->
+  <circle
+     class="surface"
+     cx="330"
+     cy="290"
+     r="205"
+     id="circle16" />
+  <text
+     class="math"
+     x="152.08989"
+     y="130.68219"
+     fill="#202020"
+     id="text20">S<tspan
+   baseline-shift="sub"
+   font-size="26px"
+   id="tspan18">r</tspan></text>
+  <!-- Central source mass. -->
+  <circle
+     cx="330"
+     cy="290"
+     r="23"
+     fill="#161616"
+     id="circle22" />
+  <text
+     class="math"
+     x="295"
+     y="350"
+     fill="#161616"
+     id="text24">M</text>
+  <!-- Highlighted patch and its local tangent. -->
+  <path
+     class="patch"
+     d="M 475 145 Q 501 170 516 203"
+     id="path26" />
+  <path
+     class="tangent"
+     d="M 446 98 L 550 246"
+     id="path28" />
+  <circle
+     cx="498"
+     cy="172"
+     r="7"
+     fill="#00a6b2"
+     id="circle30" />
+  <text
+     class="small"
+     x="529"
+     y="178"
+     id="text32">surface patch dA</text>
+  <!-- Radius is normal to the spherical surface. -->
+  <path
+     class="radial"
+     d="M 330 290 L 498 172"
+     id="path34" />
+  <!-- Outward area vector and inward gravity vector share the same point of application. -->
+  <path
+     class="area-vector"
+     d="M 498 172 L 654 63"
+     id="path36"
+     style="marker-end:url(#TriangleStart)" />
+  <text
+     class="math"
+     x="571.47675"
+     y="77.287323"
+     fill="#16852a"
+     id="text38">dA⃗</text>
+  <text
+     class="small"
+     x="665"
+     y="85"
+     fill="#16852a"
+     id="text40">outward normal</text>
+  <path
+     class="gravity-vector"
+     d="M 498 172 L 365 266"
+     id="path42"
+     style="marker-end:url(#marker2087)" />
+  <text
+     class="math"
+     x="435.12842"
+     y="253.82825"
+     fill="#d62828"
+     id="text44">g⃗</text>
+  <text
+     class="small"
+     x="400.73395"
+     y="280.73395"
+     fill="#d62828"
+     id="text46">towards M</text>
+  <!-- Dot-product interpretation. -->
+  <rect
+     x="610"
+     y="320"
+     width="355"
+     height="235"
+     rx="6"
+     fill="#f7f8f8"
+     stroke="#c6ced1"
+     stroke-width="2"
+     id="rect48" />
+  <text
+     class="label"
+     x="640"
+     y="360"
+     id="text50">The vectors are antiparallel:</text>
+  <text
+     class="formula"
+     x="640"
+     y="407"
+     font-size="31"
+     id="text52">g⃗ · dA⃗ = |g⃗| dA cos θ</text>
+  <text
+     class="formula"
+     x="640"
+     y="452"
+     id="text54">θ = π</text>
+  <text
+     class="formula"
+     x="640"
+     y="497"
+     font-size="32"
+     fill="#d62828"
+     id="text56">g⃗ · dA⃗ = -|g⃗| dA</text>
+  <text
+     class="label"
+     x="640"
+     y="535"
+     fill="#d62828"
+     id="text58">negative flux</text>
+</svg>
