@@ -19,16 +19,16 @@ mystnb:
 :::{admonition} Computer lab
 :class: note
 
-The second of two labs on the operators of this chapter, following Lab 1 on series and the gradient. Parts 1 and 2 take the divergence, Part 3 the curl. Each task states a physical question, gives the steps, and ends with a self-check you can run. Plotting is supplied in the module `fwtools`, so that your effort goes into the physics rather than into rendering transparent isosurfaces.
+The second of two labs on this chapter's operators, following Lab 1 on series and the gradient. Parts 1 and 2 take the divergence, Part 3 the curl. Each task states a physical question, gives the steps, and ends with a self-check. Plotting is supplied in `fwtools`, so your effort goes into the physics.
 :::
 
 ## Learning objectives
 
 By the end of this lab you should be able to:
 
-- **Distinguish diverging arrows from non-zero divergence.** Compute $\nabla\cdot\boldsymbol{v}$, justify the result by flux rather than by algebra, and identify the only radial flow that is incompressible.
-- **Use the divergence theorem as a measurement.** Verify $\oint_S\boldsymbol{v}\cdot\hat{\boldsymbol{n}}\,dS = \int_{\mathcal{D}} \nabla\cdot\boldsymbol{v}\,dV$ numerically, and account for what happens when the source shrinks to a point.
-- **Measure the curl as circulation per unit area.** Compute $\nabla\times\boldsymbol{v}$, separate rotation from the shape a streamline happens to make, and verify Stokes' theorem on a vortex with a finite core.
+- **Distinguish diverging arrows from non-zero divergence.** Compute $\nabla\cdot\boldsymbol{v}$, justify it by flux rather than algebra, and identify the only incompressible radial flow.
+- **Use the divergence theorem as a measurement.** Verify $\oint_S\boldsymbol{v}\cdot\hat{\boldsymbol{n}}\,dS = \int_{\mathcal{D}} \nabla\cdot\boldsymbol{v}\,dV$ numerically, and say what a closed surface can measure that a derivative at a point cannot.
+- **Measure the curl as circulation per unit area.** Compute $\nabla\times\boldsymbol{v}$, separate rotation from the shape a streamline happens to make, and verify Stokes' theorem on a vortex with a core.
 
 ---
 
@@ -141,7 +141,7 @@ The gradient takes a scalar and returns a vector. The divergence takes a vector 
 
 $$ \nabla\cdot\boldsymbol{A} \;=\; \lim_{\Delta V \to 0}\frac{1}{\Delta V}\oint_S \boldsymbol{A}\cdot\hat{\boldsymbol{n}}\,dS \;=\; \frac{\partial A_x}{\partial x} + \frac{\partial A_y}{\partial y} + \frac{\partial A_z}{\partial z} $$
 
-Read the definition on the left rather than the formula on the right: **treat $\boldsymbol{A}$ as a fluid velocity**, place a small box anywhere, and measure the net outflow through its walls per unit volume.
+Read the definition on the left, not the formula on the right: **treat $\boldsymbol{A}$ as a fluid velocity**, put a small box anywhere, and measure the net outflow through its walls per unit volume.
 
 | $\nabla\cdot\boldsymbol{A}$ | Name | Picture |
 | :---: | :--- | :--- |
@@ -151,9 +151,9 @@ Read the definition on the left rather than the formula on the right: **treat $\
 
 ### Task 1 — the operator, and its independence of the origin
 
-The operator is three lines. One derivative along one axis per component: `np.gradient(Ax, dx, axis=0)` returns $\partial A_x/\partial x$ and nothing else, whereas asking for all three and discarding two costs three times the memory. The cross terms are not part of a divergence.
+The operator is three lines, one derivative along one axis per component: `np.gradient(Ax, dx, axis=0)` returns $\partial A_x/\partial x$ and nothing else. The cross terms are not part of a divergence.
 
-**The question is the one raised by the definition.** Flux per unit volume is measured around a point, so does the result depend on which point is called the origin? Take the outward flow $\boldsymbol{A} = \boldsymbol{r}$, whose divergence follows on paper as $1+1+1 = 3$, then shift the whole field so that it streams out of $(0.8, -0.4, 0.3)$. Predict the divergence before computing it.
+**The definition raises its own question.** Flux per unit volume is measured around a point, so does the answer depend on which point is called the origin? Take $\boldsymbol{A} = \boldsymbol{r}$, whose divergence is $1+1+1 = 3$ on paper, then shift the field so it streams out of $(0.8, -0.4, 0.3)$. Predict the divergence before computing it.
 
 ```{code-cell} ipython3
 # Task 1
@@ -193,32 +193,35 @@ div_shifted = divergence(Sx, Sy, Sz, dx, dy, dz)
 :::{admonition} Why the answer had to be 3 either way
 :class: tip
 
-Moving the source changed every arrow in the box and changed the divergence nowhere. Differentiation removes the constant: $\partial(x - x_0)/\partial x = 1$ for any $x_0$.
+Moving the source changed every arrow and changed the divergence nowhere, because differentiation removes the constant: $\partial(x - x_0)/\partial x = 1$ for any $x_0$.
 
-The divergence is a **local** quantity: it is built from a limit taken around one point, so it depends on the field in a shrinking neighbourhood of that point and not on where the axes were placed. Every operator in this course has that property, and it is what makes $\nabla\cdot\boldsymbol{E} = \rho_v/\varepsilon_0$ a statement about places rather than about coordinate systems.
+The divergence is **local**. It is built from a limit around one point, so it depends on the field in a shrinking neighbourhood and not on where the axes were put. Every operator in this course has that property, and it is what makes $\nabla\cdot\boldsymbol{E} = \rho_v/\varepsilon_0$ a statement about places rather than about coordinate systems.
 :::
 
 ### Task 2 — the only incompressible radial flow
 
-Water of constant density flows outward from a source at the origin. Away from that source nothing is created or destroyed, so the flow is **incompressible**:
-
-$$ \nabla\cdot\boldsymbol{v} = 0 \qquad \text{for } r \neq 0. $$
-
-Constant density and a point source force the flow to be radial, $\boldsymbol{v} = f(r)\,\boldsymbol{r}$, and incompressibility then pins $f$ down completely:
+Water of constant density flows outward from a source at the origin. Away from that source nothing is created or destroyed, so the flow is **incompressible**, $\nabla\cdot\boldsymbol{v} = 0$ for $r \neq 0$. Constant density and a point source force it to be radial, $\boldsymbol{v} = f(r)\,\boldsymbol{r}$, and incompressibility then pins $f$ down:
 
 $$ \nabla\cdot\boldsymbol{v} = 3f(r) + r\frac{df}{dr} = 0 \qquad\Longrightarrow\qquad f(r) = \frac{A}{r^{3}}. $$
 
-Rather than assume this, test four candidates and let the divergence select.
+Rather than take that on trust, put four radial fields through the operator and let the measurement pick the survivor. Each is $\boldsymbol{v} = f(r)\,\boldsymbol{r}$, and they differ only in the falloff $f$:
 
-One decision comes first, because the four candidates are not the same size. Over the test band their divergences span a factor of a thousand, and the raw numbers cannot be ranked against each other: $f = 1/r^{4}$ returns a *smaller* $\lvert\nabla\cdot\boldsymbol{v}\rvert$ than $f = \text{const}$ does, and neither field is divergence-free. "Is 0.36 small?" has no answer until it is small compared with something.
+| $f(r)$ | the field it gives | why it is in the list |
+| :--- | :--- | :--- |
+| $\text{const}$ | $\boldsymbol{v} = \boldsymbol{r}$ | the anchor: Task 1 already measured its divergence as 3 |
+| $1/r^{2}$ | $\hat{\boldsymbol{r}}/r$ | falls off, but too slowly |
+| $1/r^{3}$ | $\hat{\boldsymbol{r}}/r^{2}$ | the one the algebra above predicts |
+| $1/r^{4}$ | $\hat{\boldsymbol{r}}/r^{3}$ | falls off too steeply |
 
-The something is the size a derivative of that same field would have if nothing cancelled. A derivative is a change in $\boldsymbol{v}$ divided by the distance over which it changes, and for a radial field $f(r)\boldsymbol{r}$ the only distance available is $r$ itself. That makes $\lvert\boldsymbol{v}\rvert/r$ the yardstick, and
+Three of them should show a divergence somewhere and one should not.
+
+Raw divergences cannot be compared, because the four fields are not the same size: $f = 1/r^{4}$ returns a *smaller* $\lvert\nabla\cdot\boldsymbol{v}\rvert$ than $f = \text{const}$ does, and neither is divergence-free. "Is 0.36 small?" has no answer until it is small compared with something. That something is the size a derivative of the same field would have if nothing cancelled, and for $f(r)\boldsymbol{r}$ the only distance available is $r$ itself, which makes $\lvert\boldsymbol{v}\rvert/r$ the yardstick:
 
 $$ \frac{\lvert\nabla\cdot\boldsymbol{v}\rvert}{\lvert\boldsymbol{v}\rvert/r} $$
 
-a pure number, the same for a trickle and a torrent: **1 means the three terms of the divergence did not cancel at all, and 0 means they cancelled completely.** The cell prints the raw divergence beside the ratio, so you can see for yourself why the raw column is unusable.
+**1 means the three terms did not cancel at all, 0 means they cancelled completely**, and the number is the same for a trickle and a torrent. The cell prints the raw divergence beside it so you can see why the raw column is unusable.
 
-One entry is known before the code runs. For $f = \text{const}$ the field is $\boldsymbol{v} = \boldsymbol{r}$, so $\lvert\boldsymbol{v}\rvert/r = 1$ and the ratio is nothing but $\nabla\cdot\boldsymbol{r} = 3$, which Task 1 measured. That row is the check that the statistic is being formed correctly, and it is why the last self-check looks for 300%.
+The $f = \text{const}$ row is known in advance: there $\lvert\boldsymbol{v}\rvert/r = 1$ and the ratio is just $\nabla\cdot\boldsymbol{r} = 3$, which is why the last self-check looks for 300%.
 
 ```{figure} figures/task2_test_band.svg
 :name: fig-task2-band
@@ -283,26 +286,20 @@ fw.check(f"f = const reproduces Task 1's div(r) = 3 ({results['const']:.2%})",
 :::{admonition} Where the inverse-square law comes from
 :class: important
 
-Two candidates give almost exactly 100%, meaning their three divergence terms did not cancel at all, and the anchor gives its predicted 300%. One gives 0.66%. Only $f = A/r^{3}$ survives, as the algebra predicts, and the raw column beside it would have told you none of this. The surviving case rewrites as
+Two candidates give almost exactly 100%, their three terms not cancelling at all, and the anchor gives its predicted 300%. One gives 0.66%. Only $f = A/r^{3}$ survives, and the raw column beside it would have told you none of this. It rewrites as
 
 $$ \boldsymbol{v} = \frac{A}{r^{3}}\boldsymbol{r} = \frac{A}{r^{2}}\,\hat{\boldsymbol{r}}. $$
 
-**This is the same $1/r^{2}$ used since Lab 1's Task 6.** Here it was not assumed and no charge was mentioned; it follows from conservation away from the source together with the three-dimensionality of space. The surface of a sphere grows as $r^{2}$, so a fixed flux crossing it must thin as $1/r^{2}$.
-
-Coulomb's law, Newtonian gravity and this flow share an exponent for that one geometric reason.
+**This is the same $1/r^{2}$ used since Lab 1's Task 6**, here neither assumed nor tied to charge. It follows from conservation away from the source and the three-dimensionality of space: the surface of a sphere grows as $r^{2}$, so a fixed flux crossing it must thin as $1/r^{2}$. Coulomb's law, Newtonian gravity and this flow share an exponent for that one geometric reason.
 :::
 
 ### Task 2, continued — a field with no source anywhere
 
-Note the restriction on that result: $\nabla\cdot\boldsymbol{v} = 0$ **for $r \neq 0$**. The origin must be excluded, because that is where the water is injected; a closed surface around it would find the tap.
-
-The next field admits no such exception. To first order the Earth's magnetic field is a **dipole**: a north and a south pole so close together that they coincide. With dipole moment $\boldsymbol{m}$,
+That result carried a restriction: $\nabla\cdot\boldsymbol{v} = 0$ **for $r \neq 0$**, the origin excluded because that is where the water is injected. The next field admits no such exception. To first order the Earth's magnetic field is a **dipole**, a north and a south pole so close together that they coincide, and with moment $\boldsymbol{m}$,
 
 $$ \boldsymbol{B} = \frac{3\boldsymbol{r}\,(\boldsymbol{r}\cdot\boldsymbol{m}) - r^{2}\boldsymbol{m}}{r^{5}}. $$
 
-Take $\boldsymbol{m} = \hat{\boldsymbol{z}}$ on the cube set up above, where $z$ points up, and measure the divergence with the same function.
-
-The Earth's own moment points roughly geographic south, which is why the magnetic pole in the Arctic is magnetically a **south** pole and attracts the north end of a compass needle. Reversing $\boldsymbol{m}$ reverses every arrow below and leaves $\nabla\cdot\boldsymbol{B}$ unchanged.
+Take $\boldsymbol{m} = \hat{\boldsymbol{z}}$ on the cube above and measure the divergence with the same function. The Earth's own moment points roughly geographic south, which is why the magnetic pole in the Arctic is magnetically a **south** pole; reversing $\boldsymbol{m}$ reverses every arrow and leaves $\nabla\cdot\boldsymbol{B}$ unchanged.
 
 ```{code-cell} ipython3
 # Task 2, continued -- fill in the three components.
@@ -339,20 +336,18 @@ Bz = (3*Z*r_dot_m - r_safe**2) / r_safe**5
 :::
 
 :::{admonition} No magnetic monopoles
-:class: important
+:class: important dropdown
 
-Both fields are divergence-free over the region measured, but the two statements differ.
+Both fields are divergence-free over the region measured, but the statements differ. The flow needed an exclusion, because the origin is a tap. The dipole needs none: $\nabla\cdot\boldsymbol{B} = 0$ holds **everywhere, including at the source**, and no point can be excluded to reveal a magnet leaking field the way the tap leaks water. This is one of Maxwell's equations. Magnetic monopoles do not exist, and field lines of $\boldsymbol{B}$ never begin or end.
 
-The flow required an exclusion: $\nabla\cdot\boldsymbol{v} = 0$ away from the origin, because the origin is a tap. The dipole requires none, and $\nabla\cdot\boldsymbol{B} = 0$ holds **everywhere in space, including at the source**. No point can be excluded to reveal a magnet leaking field the way the tap leaks water. This is one of Maxwell's equations: magnetic monopoles do not exist, and field lines of $\boldsymbol{B}$ never begin or end but close on themselves.
+Both cells report the same scale-free measure, so the numbers are comparable. The dipole's 1.8% is worse than the radial flow's 0.66% because $\boldsymbol{B}$ falls off as $1/r^{3}$ rather than $1/r^{2}$, leaving a centred difference more curvature to miss. Part 2 builds the alternative, a closed surface integral, which never differentiates the field and so never pays that cost.
 
-Two remarks on the numbers. Both cells report the same scale-free measure, so the results are directly comparable. The dipole's 1.8% is worse than the radial flow's 0.66%, not because the physics is less secure but because $\boldsymbol{B}$ falls off as $1/r^{3}$ rather than $1/r^{2}$, leaving a centred difference more curvature to miss. Part 2 tests the same claim far below 2% by putting a closed surface around the dipole instead of differentiating it.
-
-The second check is also informative: $\boldsymbol{B}\cdot\boldsymbol{r}$ is negative somewhere, whereas the outward flow of Task 2 is never negative. The dipole points inward over part of space; it returns. That is the numerical signature of a field closing on itself.
+The second check matters too: $\boldsymbol{B}\cdot\boldsymbol{r}$ is negative somewhere, whereas the outward flow is never negative. The dipole points inward over part of space, which is the numerical signature of a field closing on itself.
 :::
 
 ### Task 3 — three flows
 
-Three velocity fields. For each one: **sketch it, predict the sign of the divergence, then measure.** Record the predictions first; the task is about the gap between intuition and the result.
+Three velocity fields. For each: **sketch it, predict the sign of the divergence, then measure.** Record the predictions first, because the task is about the gap between intuition and the result.
 
 | | Field $\boldsymbol{A}$ | What it looks like |
 | :---: | :--- | :--- |
@@ -425,13 +420,11 @@ div_c = divergence(*Ac, dx, dy, dz)
 :::{admonition} Field (c) is the trap
 :class: warning
 
-Along the $x$-axis, field (c) flows outward and resembles a source. It is not:
+Along the $x$-axis, field (c) flows outward and looks like a source. It is not:
 
 $$ \nabla\cdot\boldsymbol{A} = \frac{\partial}{\partial x}(x) + \frac{\partial}{\partial y}(-y) = 1 - 1 = 0 $$
 
-Place a box at the origin: fluid leaves through the left and right walls and enters through the top and bottom at exactly the same rate. The parcel changes **shape**, not **volume**.
-
-Diverging arrows are not divergence. Outflow in one direction can be cancelled exactly by inflow in another. Task 5 puts a closed surface around this field and measures the cancellation directly.
+Put a box at the origin: fluid leaves through the left and right walls and enters through the top and bottom at the same rate. The parcel changes **shape**, not **volume**. Diverging arrows are not divergence, and Task 5 measures the cancellation directly.
 :::
 
 ### Task 4 — the divergence as a charge detector
@@ -440,15 +433,13 @@ Gauss's law, for a field in vacuum, says
 
 $$ \nabla\cdot\boldsymbol{E} = \frac{\rho_v}{\varepsilon_0} $$
 
-which is a strong claim: **the divergence of $\boldsymbol{E}$ at a point gives the charge density at that point and nothing else.** Where there is no charge, $\boldsymbol{E}$ is solenoidal, however widely its arrows spread.
+a strong claim: **the divergence of $\boldsymbol{E}$ at a point gives the charge density at that point and nothing else.** Where there is no charge, $\boldsymbol{E}$ is solenoidal however widely its arrows spread.
 
-Test that pointwise, on a source a grid can hold. A point charge cannot serve: it has infinite density at one location. Take instead a charge **distributed over a finite blob**, which is what any real charged object is:
+Test it pointwise, on a source a grid can hold. A point charge cannot serve, having infinite density at one location, so take a charge **spread over a finite blob**, which is what any real charged object is:
 
 $$ \rho_v(r) = \rho_{v0}\,e^{-r^{2}/a^{2}}, \qquad \rho_{v0} = 10^{-9}\ \text{C/m}^3, \qquad a = 0.5\ \text{m} $$
 
-Here $a$ is the **width of the blob**. In Lab 1's Task 9 the same letter denoted an electrode separation, the second symbol these two labs overload, after $\rho$. The code keeps them apart as `a` here and `a_sep` there; in algebra only the context distinguishes them.
-
-Integrating over a sphere of radius $r$ gives the charge it encloses:
+Here $a$ is the **width of the blob**, not Lab 1's electrode separation; the code keeps them apart as `a` and `a_sep`. Integrating over a sphere of radius $r$ gives the charge enclosed:
 
 $$ Q_{\text{enc}}(r) = \int_0^{r}\!\rho_v\,4\pi r'^{2}\,dr' = 4\pi\rho_{v0}\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{r}{a}\right) - \frac{a^{2}r}{2}e^{-r^{2}/a^{2}}\right] $$
 
@@ -456,7 +447,7 @@ and Gauss's law, $E_r = Q_{\text{enc}}/4\pi\varepsilon_0r^{2}$, then gives the f
 
 $$ E_r(r) = \frac{\rho_{v0}}{\varepsilon_0 r^{2}}\left[\frac{a^{3}\sqrt{\pi}}{4}\operatorname{erf}\!\left(\frac{r}{a}\right) - \frac{a^{2}r}{2}e^{-r^{2}/a^{2}}\right] $$
 
-One check: near the centre $Q_{\text{enc}}$ grows as $r^{3}$ while the surface grows as $r^{2}$, so $E_r \to \rho_{v0} r/3\varepsilon_0$, zero at the centre, rising linearly, and peaking at $r \approx a$.
+Near the centre $Q_{\text{enc}}$ grows as $r^{3}$ while the surface grows as $r^{2}$, so $E_r \to \rho_{v0} r/3\varepsilon_0$: zero at the centre, rising linearly, peaking at $r \approx a$.
 
 ```{code-cell} ipython3
 from scipy.special import erf
@@ -511,24 +502,14 @@ div_blob = divergence(Ex_b, Ey_b, Ez_b, dx, dy, dz)
 :::{admonition} What the two panels show
 :class: important
 
-The two panels show the same distribution. The location of the charge was never supplied to the code: a field was differentiated, and the charge distribution came back out.
-
-Note where the divergence vanishes: everywhere outside the blob, where the field is still large and still spreading. **Strong field, zero divergence**: the two quantities are unrelated.
+The two panels show the same distribution, and the location of the charge was never supplied to the code: a field was differentiated, and the charge came back out. Note where the divergence vanishes, everywhere outside the blob, where the field is still large and still spreading. **Strong field, zero divergence.**
 :::
 
 ### The same operator, a different formula
 
-Everything so far used the Cartesian formula, because `np.gradient` differentiates along array axes. The divergence is flux per unit volume, a physical quantity that cannot depend on the choice of axes. Only the formula changes:
+Everything so far used the Cartesian formula, because `np.gradient` differentiates along array axes. Flux per unit volume cannot depend on the choice of axes, so only the formula changes. The three coordinate systems are set out in full in the lecture notes on [coordinate systems](../coord_sys.md) and [divergence](../divergence.md); what matters here is what one of them buys.
 
-| | Gradient $\nabla T$ | Divergence $\nabla\cdot\boldsymbol{A}$ |
-| :--- | :--- | :--- |
-| Cartesian $(x,y,z)$ | $\dfrac{\partial T}{\partial x}\hat{\boldsymbol{x}} + \dfrac{\partial T}{\partial y}\hat{\boldsymbol{y}} + \dfrac{\partial T}{\partial z}\hat{\boldsymbol{z}}$ | $\dfrac{\partial A_x}{\partial x} + \dfrac{\partial A_y}{\partial y} + \dfrac{\partial A_z}{\partial z}$ |
-| Cylindrical $(\varrho,\phi,z)$ | $\dfrac{\partial T}{\partial \varrho}\hat{\boldsymbol{\varrho}} + \dfrac{1}{\varrho}\dfrac{\partial T}{\partial \phi}\hat{\boldsymbol{\phi}} + \dfrac{\partial T}{\partial z}\hat{\boldsymbol{z}}$ | $\dfrac{1}{\varrho}\dfrac{\partial (\varrho v_\varrho)}{\partial \varrho} + \dfrac{1}{\varrho}\dfrac{\partial v_\phi}{\partial \phi} + \dfrac{\partial v_z}{\partial z}$ |
-| Spherical $(r,\phi,\theta)$ | $\dfrac{\partial T}{\partial r}\hat{\boldsymbol{r}} + \dfrac{1}{r}\dfrac{\partial T}{\partial \theta}\hat{\boldsymbol{\theta}} + \dfrac{1}{r\sin\theta}\dfrac{\partial T}{\partial \phi}\hat{\boldsymbol{\phi}}$ | $\dfrac{1}{r^{2}}\dfrac{\partial (r^{2}v_r)}{\partial r} + \dfrac{1}{r\sin\theta}\dfrac{\partial (v_\theta \sin\theta)}{\partial \theta} + \dfrac{1}{r\sin\theta}\dfrac{\partial v_\phi}{\partial \phi}$ |
-
-Cylindrical $\varrho=\sqrt{x^2+y^2}$ is the distance from the $z$-axis; spherical $r=\sqrt{x^2+y^2+z^2}$, used throughout this lab, is the distance from the origin. They are written differently precisely to keep them apart.
-
-One reading note: the spherical coordinates are named $(r,\phi,\theta)$, but the terms in the row above are listed as $r$, then $\theta$, then $\phi$, the order in which the scale factors $(1,\ r,\ r\sin\theta)$ are derived. The order of terms in a sum is immaterial.
+Cylindrical $\varrho=\sqrt{x^2+y^2}$ is the distance from the $z$-axis, spherical $r=\sqrt{x^2+y^2+z^2}$ the distance from the origin, and the two are written differently to keep them apart.
 
 Both fields built so far are spherically symmetric, $\boldsymbol{E} = E_r(r)\,\hat{\boldsymbol{r}}$ with no $\theta$ or $\phi$ dependence, so two of the three spherical terms vanish and the divergence reduces to one ordinary derivative along one line:
 
@@ -575,11 +556,11 @@ print(f"       max |div E| = {np.abs(div_point_sph).max():.1e}  (round-off, not 
 :::{admonition} Why curvilinear coordinates are worth the trouble
 :class: important
 
-Same field, same operator, same answer, obtained from a few hundred samples on a line rather than a quarter of a million in a cube, and several times more accurately.
+Same field, same operator, same answer, from a few hundred samples on a line rather than a quarter of a million in a cube, and several times more accurately.
 
-For the point charge the gain is certainty rather than accuracy. $r^{2}E_r = Q/4\pi\varepsilon_0$ is a **constant**, so its derivative is analytically zero for every $r>0$: not 1% of something, but zero, in one line of algebra. What the cell prints is the precision with which double arithmetic subtracts two equal numbers, around $10^{-13}$, or exactly $0$ when the cancellation is exact. Changing `dr` moves that last digit; it does not move the algebra. Cartesian coordinates could establish only that the divergence is small.
+For the point charge the gain is certainty rather than accuracy. $r^{2}E_r = Q/4\pi\varepsilon_0$ is a **constant**, so its derivative is analytically zero for every $r>0$: not 1% of something, but zero, in one line of algebra. What the cell prints is the precision with which double arithmetic subtracts two equal numbers, around $10^{-13}$. Cartesian coordinates could establish only that the divergence is small.
 
-Matching the coordinates to the symmetry of the source replaces three noisy numerical derivatives with one line of algebra. That is the purpose of the second and third rows of the table.
+Matching the coordinates to the symmetry of the source replaces three noisy derivatives with one line of algebra. That is what the curvilinear formulae are for.
 :::
 
 ---
@@ -592,11 +573,13 @@ $$ \oint_S \boldsymbol{E}\cdot\hat{\boldsymbol{n}}\,dS \;=\; \int_{\mathcal{D}} 
 
 with $S$ the closed surface, $\hat{\boldsymbol{n}}$ its outward unit normal, and $\mathcal{D}$ the volume it encloses.
 
-The first equality is the **divergence theorem**, pure vector calculus, valid for any well-behaved field. The second is the physics. Together they state that measuring $\boldsymbol{E}$ on a closed surface gives the charge inside, and nothing about its arrangement or about any charge outside.
+The first equality is the **divergence theorem**, valid for any well-behaved field; the second is the physics. Together they say that measuring $\boldsymbol{E}$ on a closed surface gives the charge inside, and nothing about its arrangement or about charge outside.
 
-Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid planes. On the $+x$ face the outward normal is $+\hat{\boldsymbol{x}}$, so it contributes $\int\!\!\int E_x\,dy\,dz$; on the $-x$ face the normal is $-\hat{\boldsymbol{x}}$ and the same integral enters negatively. Six faces, three pairs.
+Take $S$ to be a cube of half-width $h$ centred on the origin, faces on grid planes: six faces, three pairs.
 
 ### Task 5 — close the surface
+
+Write that six-face sum as a function of the half-width $h$, then run it on the blob of Task 4, whose enclosed charge is already known two other ways. Three routes to one number is the point of the task.
 
 ```{figure} figures/task5_box_faces.svg
 :name: fig-task5-faces
@@ -672,10 +655,12 @@ fw.check_scalar("divergence theorem: surface = volume", flux_1m,
 :::{admonition} Three routes, one number
 :class: important
 
-Three independent calculations. The first never examines the interior of the box, the second never examines the surface, and the third never examines the field. They agree to a fraction of a percent.
+Three independent calculations, agreeing to a fraction of a percent. The first never examines the interior of the box, the second never examines the surface, the third never examines the field.
 
-The result grows with $h$ and then stops: once the cube holds nearly all the charge, enlarging it adds surface but no charge. Charge outside a closed surface contributes exactly nothing, because the field lines it sends in through one wall leave through another.
+The result grows with $h$ and then stops: once the cube holds nearly all the charge, enlarging it adds surface but no charge. Charge outside a closed surface contributes nothing, because the field lines it sends in through one wall leave through another.
 :::
+
+Here the closed surface buys accuracy. In general it buys more. Concentrate the same charge onto a point and $\rho_v$ stops being a function, so $\nabla\cdot\boldsymbol{E}$ has no value there at all, which is why Task 4 gave its blob a width. The surface integral never visits the source and still returns the charge enclosed. Part 3 meets that case again, in a field whose source really is concentrated.
 
 ---
 
@@ -687,21 +672,15 @@ $$ \nabla\times\boldsymbol{v} \;=\; \hat{\boldsymbol{x}}\left(\partial_y v_z - \
 
 There is no determinant to memorise. Each component pairs an even permutation of $(x,y,z)$ against an odd one, in three places at once: the direction, the differentiation, and the vector component. The $\hat{\boldsymbol{x}}$ term takes $(x,y,z)$ minus $(x,z,y)$, and the other two follow by advancing every letter one step, $x\to y\to z\to x$.
 
-The interpretation comes from a circulation integral. Take a small rectangle of side $dy$ by $dz$ around a point, walk its four edges once round, and add up the component of $\boldsymbol{v}$ along the direction of travel. Expanding each edge to first order in a Taylor series leaves
-
-$$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \left(\partial_y v_z - \partial_z v_y\right)dy\,dz \;+\; \text{higher order} $$
-
-with $\boldsymbol{\tau}$ the unit tangent along the path. That is the $\hat{\boldsymbol{x}}$ component of the curl times the area of the rectangle, and rectangles perpendicular to $\hat{\boldsymbol{y}}$ and $\hat{\boldsymbol{z}}$ give the other two. So the curl is **net circulation per unit area**:
+The [notes on the curl](../curl.md) derive what that means by walking a small rectangle and expanding each edge to first order. The result is the definition this part measures, **net circulation per unit area**:
 
 $$ \hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right) \;=\; \lim_{S\to 0}\frac{\oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl}{A} $$
 
-where $A$ is the area of the open surface $S$ and $\hat{\boldsymbol{n}}$ is its unit normal, oriented so that a right-handed screw turned in the direction of $\boldsymbol{\tau}$ advances along $\hat{\boldsymbol{n}}$. Part 1 built the divergence from flux through a closed surface. The curl is built from circulation around a closed curve, one dimension down.
+with $A$ the area of the open surface $S$ and $\hat{\boldsymbol{n}}$ its unit normal, oriented by the right-hand rule from the direction of travel $\boldsymbol{\tau}$. Part 1 built the divergence from flux through a closed surface; the curl is built from circulation around a closed curve, one dimension down.
 
 ### Task 6 — the operator, and the three flows again
 
-Three lines, in the pattern of the formula above. `np.gradient(Az, dy, axis=1)` is $\partial_y v_z$: the array holding the $z$-component, differentiated along the $y$-axis.
-
-Put the three fields of Task 3 through it. Field (b) rotates rigidly about the $z$-axis at $\omega = 1$ s$^{-1}$, so a paddle wheel dropped anywhere in it turns; fields (a) and (c) carry no rotation. Predict all three before running the cell.
+Three lines, in the pattern of the formula above: `np.gradient(Az, dy, axis=1)` is $\partial_y v_z$, the array holding the $z$-component differentiated along the $y$-axis. Put the three fields of Task 3 through it, predicting all three first. Field (b) rotates rigidly about $z$ at $\omega = 1$ s$^{-1}$; fields (a) and (c) carry no rotation.
 
 ```{code-cell} ipython3
 # Task 6 -- two blanks. The x-component is given. Advance every letter one
@@ -761,8 +740,8 @@ fw.check_abs("...and nothing along x or z",
 ```
 :::
 
-:::{admonition} Two independent questions about one field
-:class: important
+:::{admonition} Divergence and curl are independent, and field (c) is zero in both
+:class: important dropdown
 
 The three flows of Task 3 now carry two answers each, and neither constrains the other:
 
@@ -772,16 +751,14 @@ The three flows of Task 3 now carry two answers each, and neither constrains the
 | **(b)** | $-y\,\hat{\boldsymbol{x}} + x\,\hat{\boldsymbol{y}}$ | $0$ | $2\,\hat{\boldsymbol{z}}$ |
 | **(c)** | $x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$ | $0$ | $\boldsymbol{0}$ |
 
-"How much is created here" and "how much does this spin here" are separate measurements. Field (c) answers zero to both and is still not the zero field: it stretches a fluid parcel along $x$ and squeezes it along $y$ at equal rates, changing its shape while conserving its volume and its orientation. Deformation is the third thing a flow can do, and neither operator reports it.
+"How much is created here" and "how much does this spin here" are separate measurements. Field (c) answers zero to both and is still not the zero field: it stretches a parcel along $x$ and squeezes it along $y$ at equal rates, changing shape while conserving volume and orientation. Deformation is the third thing a flow can do, and neither operator reports it.
 
-Field (b) rotates at $\omega = 1$ s$^{-1}$ and its curl is $2\hat{\boldsymbol{z}}$. For rigid rotation at angular velocity $\boldsymbol{\omega}$ the curl is $2\boldsymbol{\omega}$, whatever the axis, which is why field (d) about $\hat{\boldsymbol{y}}$ returns $2\hat{\boldsymbol{y}}$. In fluid mechanics $\nabla\times\boldsymbol{v}$ is the **vorticity**, twice the local angular velocity of a fluid parcel.
+For rigid rotation at angular velocity $\boldsymbol{\omega}$ the curl is $2\boldsymbol{\omega}$ whatever the axis, which is why (b) returns $2\hat{\boldsymbol{z}}$ and (d) returns $2\hat{\boldsymbol{y}}$. In fluid mechanics $\nabla\times\boldsymbol{v}$ is the **vorticity**, twice the local angular velocity of a parcel.
 :::
 
 ### Task 7 — closed streamlines are not curl
 
-Task 3 established that arrows spreading apart do not make a divergence. The same warning applies here, in the same shape, and the two errors are the same error. **The picture a streamline makes says nothing about the curl.**
-
-Two fields settle it, with the rotation of Task 6 as a control. Both are written on the distance from the $z$-axis, the cylindrical $\varrho = \sqrt{x^2+y^2}$, which is not the spherical $r$ of Parts 1 and 2.
+Task 3 established that arrows spreading apart do not make a divergence. The same error has the same shape here: **the picture a streamline makes says nothing about the curl.** Two fields settle it, with the rotation of Task 6 as a control, both written on the cylindrical $\varrho = \sqrt{x^2+y^2}$ rather than the spherical $r$ of Parts 1 and 2.
 
 | | Field | Streamlines |
 | :---: | :--- | :--- |
@@ -791,7 +768,7 @@ Two fields settle it, with the rotation of Task 6 as a control. Both are written
 
 with $\omega = 1$ s$^{-1}$, shear rate $\sigma = 1$ s$^{-1}$ and $\Gamma_0 = 2\pi$ m$^2$/s, so all three curls come out in s$^{-1}$ and one colour scale serves the row.
 
-The shear is the water beside a riverbank, or between two plates sliding past each other: further out it runs faster, but every parcel travels in a straight line and none of them goes round anything. The line vortex circles the axis exactly as the rotation does, and falls off as $1/\varrho$. Record your prediction of the sign of $(\nabla\times\boldsymbol{v})_z$ for each, then measure.
+The shear is the water beside a riverbank: further out it runs faster, but every parcel travels in a straight line and none goes round anything. The line vortex circles the axis exactly as the rotation does, and falls off as $1/\varrho$. Predict the sign of $(\nabla\times\boldsymbol{v})_z$ for each, then measure.
 
 ```{code-cell} ipython3
 # +1 for anticlockwise rotation, -1 for clockwise, 0 for none.
@@ -865,35 +842,53 @@ A_vortex = (-Y / varrho_s**2, X / varrho_s**2, zero)
 ```
 :::
 
-:::{admonition} What the paddle wheel actually measures
+```{figure} figures/task7_carousel_gondola.svg
+:name: fig-task7-wheel
+:width: 100%
+
+One paddle wheel, four moments of a single lap, with one blade marked in red. The first two panels carry the *same* circular streamline and opposite answers, so the path cannot be what the curl is measuring. The third has no circular path at all and a non-zero curl.
+```
+
+:::{admonition} Going round is not the same as turning
 :class: warning
 
-Drop a small paddle wheel into each flow and watch its axle.
+Drop a small paddle wheel into each flow, mark one blade, and watch **the blade** rather than the path the wheel travels.
 
-In the **shear** it spins, at half a radian per second, clockwise. The water above the wheel runs faster than the water below, so the top blades are pushed harder than the bottom ones. Nothing in the flow travels in a circle and the curl is still $-\hat{\boldsymbol{z}}$.
+**Rigid rotation is a carousel.** The wheel is carried round, and the marked blade keeps the same face to the centre. After one lap it has turned once, exactly as a horse bolted to a merry-go-round comes back facing the way it set off. It goes round *and* turns, and $\nabla\times\boldsymbol{v} = 2\omega$.
 
-In the **line vortex** the wheel is carried once round the axis and comes back pointing the way it started. It orbits without spinning, like the Moon in reverse. Two separate effects cancel, and the cylindrical formula separates them. For a field $v_\phi(\varrho)\,\hat{\boldsymbol{\phi}}$,
+**The line vortex is a Ferris wheel.** The wheel travels the same circular path, and the marked blade comes back pointing the direction it started. A Ferris-wheel gondola goes right round and stays upright the whole way. It goes round *without* turning, and $\nabla\times\boldsymbol{v} = \boldsymbol{0}$.
 
-$$ (\nabla\times\boldsymbol{v})_z = \frac{1}{\varrho}\frac{\partial\left(\varrho\, v_\phi\right)}{\partial\varrho} - \frac{1}{\varrho}\frac{\partial v_\varrho}{\partial \phi} \;=\; \underbrace{\frac{dv_\phi}{d\varrho}}_{\text{shear}} + \underbrace{\frac{v_\phi}{\varrho}}_{\text{orbit}} $$
+Those two have identical streamlines, so the streamline cannot be what is being measured.
 
-the second term dropping because these fields have no radial component. The **shear** term is the blades: the inner ones sit in faster water than the outer ones, which turns the wheel backwards, at $-\Gamma_0/2\pi\varrho^{2}$. The **orbit** term is the wheel's own frame turning once per lap, forwards, at $+\Gamma_0/2\pi\varrho^{2}$. Their sum is zero at $1/\varrho$ and at no other falloff: a steeper $1/\varrho^{2}$ over-cancels and spins the wheel backwards, a shallower one spins it forwards. Their *mean* is the local angular velocity, which is where Task 6's factor of two comes from.
+**The shear turns the wheel with no circular path at all.** Above the axis the water runs to the right and below it to the left, so the upper blades are pushed one way and the lower blades the other. The wheel turns clockwise at half a radian per second while every parcel of water travels in a straight line.
 
-Read the same formula the other way and the curl vanishes when $\varrho\,v_\phi$ is constant, which is $v_\phi \propto 1/\varrho$ and nothing else. Rigid rotation, $v_\phi = \omega\varrho$, gives $2\omega$ instead.
+The cylindrical formula separates the two contributions. For a field $v_\phi(\varrho)\,\hat{\boldsymbol{\phi}}$ with no radial component,
+
+$$ (\nabla\times\boldsymbol{v})_z = \frac{1}{\varrho}\frac{d\left(\varrho\, v_\phi\right)}{d\varrho} \;=\; \underbrace{\frac{v_\phi}{\varrho}}_{\text{orbit}} \;+\; \underbrace{\frac{dv_\phi}{d\varrho}}_{\text{shear}} $$
+
+The **orbit** term is the carousel: a wheel carried round a circle of radius $\varrho$ at speed $v_\phi$ turns once per lap, forwards, at $v_\phi/\varrho$. The **shear** term is the blades: when the inner blade sits in faster water than the outer one, $dv_\phi/d\varrho$ is negative and the wheel is twisted backwards. Put the two fields through it:
+
+| | orbit $v_\phi/\varrho$ | shear $dv_\phi/d\varrho$ | sum |
+| :--- | :---: | :---: | :---: |
+| rigid rotation, $v_\phi = \omega\varrho$ | $+\omega$ | $+\omega$ | $2\omega$ |
+| line vortex, $v_\phi = \Gamma_0/2\pi\varrho$ | $+\Gamma_0/2\pi\varrho^{2}$ | $-\Gamma_0/2\pi\varrho^{2}$ | $0$ |
+
+In the vortex the inner fluid runs faster by exactly the amount needed to twist the wheel backwards once per lap, cancelling the forward turn the orbit gives it. The two terms cancel at $v_\phi \propto 1/\varrho$ and at no other falloff. Their *mean* is the local angular velocity, which is where Task 6's factor of two comes from.
 
 That single surviving field, $\boldsymbol{H} = \dfrac{I}{2\pi\varrho}\hat{\boldsymbol{\phi}}$, is the magnetic field around a straight wire carrying a current $I$. Its curl is zero at every point outside the wire, and the current is still there. The end of this part explains how both can be true.
 :::
 
 ### Task 8 — circulation per unit area, and Stokes' theorem
 
-A real vortex has a core. Stirred coffee, a tornado and the vortex trailing from a wing all rotate almost rigidly near the axis and fall off as $1/\varrho$ far from it, because viscosity spreads the vorticity over a finite radius $b$. The **Lamb–Oseen vortex** is the exact solution for that spreading, with $b^{2} = 4\nu t$ after a time $t$ in a fluid of kinematic viscosity $\nu$:
+A real vortex has a core. Stirred coffee, a tornado and the vortex trailing from a wing all rotate almost rigidly near the axis and fall off as $1/\varrho$ far from it, because viscosity spreads the vorticity over a finite radius $b$. The **Lamb–Oseen vortex** is the exact solution, with $b^{2} = 4\nu t$ in a fluid of kinematic viscosity $\nu$:
 
 $$ v_\phi(\varrho) = \frac{\Gamma}{2\pi\varrho}\left(1 - e^{-\varrho^{2}/b^{2}}\right), \qquad \Gamma = 1\ \text{m}^2\text{/s}, \qquad b = 0.5\ \text{m}. $$
 
-Inside the core this is $\Gamma\varrho/2\pi b^{2}$, the rigid rotation of Task 6. Outside it is $\Gamma/2\pi\varrho$, the irrotational vortex of Task 7. The cylindrical formula turns it into a vorticity that is a Gaussian blob:
+Inside the core this is $\Gamma\varrho/2\pi b^{2}$, the rigid rotation of Task 6; outside it is $\Gamma/2\pi\varrho$, the irrotational vortex of Task 7. Its vorticity is a Gaussian blob:
 
 $$ (\nabla\times\boldsymbol{v})_z = \frac{1}{\varrho}\frac{d}{d\varrho}\left(\varrho\,v_\phi\right) = \frac{\Gamma}{\pi b^{2}}\,e^{-\varrho^{2}/b^{2}} $$
 
-the same shape as Task 4's blob of charge, with $\Gamma$ in the part of $Q$. The rest of this task is Part 2 run one dimension down: a closed curve instead of a closed surface, circulation instead of flux, and **Stokes' theorem** instead of the divergence theorem,
+the same shape as Task 4's blob of charge, with $\Gamma$ in the part of $Q$. The rest of the task is Part 2 one dimension down: a closed curve instead of a closed surface, circulation instead of flux, and **Stokes' theorem** instead of the divergence theorem,
 
 $$ \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{v}\;dl \;=\; \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\left(\nabla\times\boldsymbol{v}\right)dS $$
 
@@ -1037,11 +1032,11 @@ fw.check(f"a loop well outside the core collects all of Gamma "
 :::
 
 :::{admonition} The same theorem, one dimension down
-:class: important
+:class: important dropdown
 
-Read the first table downwards. The loop shrinks, the circulation falls, the area falls faster, and the ratio climbs to 0.996 of the vorticity measured at the centre: 0.137 of it at side 2.4 m, 0.908 at side 0.4 m. That is the limit in the definition, evaluated rather than asserted. The comparison is against the **measured** 1.2620 s$^{-1}$ rather than the exact 1.2732, so the last 0.9% is the grid error already reported above and not a failure of the limit.
+Read the first table downwards. As the loop shrinks the area falls faster than the circulation, and the ratio climbs from 0.137 at side 2.4 m to 0.908 at side 0.4 m and 0.996 at the smallest: the limit in the definition, evaluated rather than asserted. The comparison is against the **measured** 1.2620 s$^{-1}$ rather than the exact 1.2732, so the last 0.9% is grid error, not a failure of the limit.
 
-Read the second table across. Five rectangles, two of them not centred on the vortex, and the two sides of Stokes' theorem agree to better than 1% on every one: to a few parts in $10^{5}$ on the largest centred loop, and worst on the smallest, which is only 13 samples across. Size, not placement, is what sets the accuracy, and it is the same second-order error Task 5 measured on the divergence theorem. The left side never looks inside the loop and the right side never looks at the boundary.
+Read the second table across. On all five rectangles, two of them off-centre, the two sides of Stokes' theorem agree to better than 1%: a few parts in $10^{5}$ on the largest, worst on the smallest, which is only 13 samples across. Size sets the accuracy, not placement, and it is the same second-order error Task 5 measured. The left side never looks inside the loop, the right side never looks at the boundary.
 
 | | Divergence theorem | Stokes' theorem |
 | :--- | :--- | :--- |
@@ -1049,18 +1044,18 @@ Read the second table across. Five rectangles, two of them not centred on the vo
 | Interior integral | $\nabla\cdot\boldsymbol{v}$ over the enclosed **volume** | $\hat{\boldsymbol{n}}\cdot(\nabla\times\boldsymbol{v})$ over the enclosed **area** |
 | Source it counts | $Q_{\text{enc}}/\varepsilon_0$ | $\Gamma$, or the enclosed current |
 
-The largest loop returns 0.9999 of $\Gamma$, exactly as the largest boxes of Task 5 weighed the whole 1 nC. Enlarging a loop that already encloses all the vorticity adds nothing, for the same reason that charge outside a closed surface contributes nothing.
+The largest loop returns 0.9999 of $\Gamma$, as the largest box of Task 5 recovered 99.95% of the blob's charge. Enlarging a loop that already encloses all the vorticity adds nothing, for the same reason charge outside a closed surface contributes nothing.
 :::
 
 ### The wire, and Ampère's law
 
-Shrink the vortex core to nothing, $b\to 0$, and $v_\phi$ becomes the irrotational $\Gamma/2\pi\varrho$ of Task 7 at every radius, with all the vorticity compressed onto the axis. The Gaussian collapses to a Dirac delta, as the Gaussian blob of charge did when Part 2 shrank it to a point.
+Shrink the core to nothing, $b\to 0$, and $v_\phi$ becomes the irrotational $\Gamma/2\pi\varrho$ of Task 7 at every radius, with all the vorticity compressed onto the axis. The Gaussian collapses to a **Dirac delta**: zero everywhere, undefined on the axis, finite integral all the same. It is the object Task 4 stepped around by giving its charge a width.
 
-That field is the magnetic field of a straight wire carrying a current $I$ along $\hat{\boldsymbol{z}}$, and the statement relating them is **Ampère's law**, in the differential and integral forms Stokes' theorem connects:
+That field is the magnetic field of a straight wire carrying a current $I$ along $\hat{\boldsymbol{z}}$, and **Ampère's law** relates them, in the two forms Stokes' theorem connects:
 
-$$ \nabla\times\boldsymbol{H} = \boldsymbol{J} \qquad\Longleftrightarrow\qquad \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{H}\;dl = \int_{\boldsymbol{r}\in S}\hat{\boldsymbol{n}}\cdot\boldsymbol{J}\;dS = I_{\text{enc}} $$
+$$ \nabla\times\boldsymbol{H} = \boldsymbol{J} \qquad\Longleftrightarrow\qquad \oint_{\boldsymbol{r}}\boldsymbol{\tau}\cdot\boldsymbol{H}\;dl = I_{\text{enc}} $$
 
-with $\boldsymbol{H}$ in A/m, $\boldsymbol{J}$ in A/m$^2$, and $\hat{\boldsymbol{n}}$ fixed by the right-hand rule from the direction of travel. `loop_circulation` walks counter-clockwise in the $z=0$ plane, so $\hat{\boldsymbol{n}} = \hat{\boldsymbol{z}}$ and a positive answer means current flowing towards the reader.
+`loop_circulation` walks counter-clockwise in the $z=0$ plane, so $\hat{\boldsymbol{n}} = \hat{\boldsymbol{z}}$ and a positive answer means current towards the reader.
 
 ```{code-cell} ipython3
 I_wire = 1.0                              # current along +z, in amperes
@@ -1078,13 +1073,11 @@ print(f"\n  current actually in the wire: {I_wire:.5f} A")
 ```
 
 :::{admonition} A loop that encloses nothing measurable
-:class: important
+:class: important dropdown
 
-Every loop enclosing the wire returns $I$ to better than two parts in a thousand, at any size and whether or not it is centred on the wire. Every loop missing it returns at most $4\times10^{-4}$ A, which against the enclosing loops' 1 A is zero. The circulation counts what passes through the loop and nothing else, exactly as the closed surface of Part 2 counted the charge inside and nothing else. Shape-independence is part of the same statement, though `loop_circulation` draws only rectangles and cannot demonstrate it; it follows from Stokes' theorem, since two loops enclosing the same current bound surfaces carrying the same flux of $\boldsymbol{J}$.
+Every loop enclosing the wire returns $I$ to better than two parts in a thousand, at any size and wherever it is centred. Every loop missing it returns at most $4\times10^{-4}$ A, which against 1 A is zero. The circulation counts what passes through the loop and nothing else, exactly as the closed surface of Part 2 counted the charge inside and nothing else.
 
-Now put that beside Task 7. At every point these loops pass through, $\nabla\times\boldsymbol{H} = 0$: the field is irrotational everywhere the grid can sample it, and the loop integral is 1 A regardless. There is no contradiction. Stokes' theorem equates the circulation to the flux of $\boldsymbol{J}$ through the loop, and $\boldsymbol{J}$ is zero over the whole of the loop's interior except one line, where it is infinite. The current density is a Dirac delta on the axis, the integral form survives it, and the differential form does not, which is what happened to $\rho_v$ at the point charge in Part 2.
-
-A real wire has a finite radius and a finite $\boldsymbol{J}$ spread over its cross-section, and then both forms hold everywhere. The homework builds that wire.
+Now put that beside Task 7. At every point these loops pass through $\nabla\times\boldsymbol{H} = 0$, and the loop integral is 1 A regardless. There is no contradiction: Stokes' theorem equates the circulation to the flux of $\boldsymbol{J}$ through the loop, and $\boldsymbol{J}$ is zero over the whole interior except one line, where it is infinite. The integral form survives that delta and the differential form does not, which is the difficulty Part 2 named at the end. A real wire has a finite radius and a finite $\boldsymbol{J}$, and then both forms hold everywhere, exactly as once Task 4 gave its charge a width.
 :::
 
 ### Why the electric fields had a potential
@@ -1123,19 +1116,19 @@ print(f"\n  the same square, side 2.0, on the wire above: "
 ```
 
 :::{admonition} Why voltage is a number and not a route
-:class: important
+:class: important dropdown
 
-The two fields report zero curl with thirteen orders of magnitude between them, and the gap is in how each was built rather than in the physics. `Ex, Ey, Ez` came out of `-np.gradient(V)`, and the curl subtracts the same centred differences in the opposite order; the stencil obeys the identity as strictly as the algebra does, so nothing survives but the order in which floating-point numbers were added, around $10^{-16}$. The blob field was built from the analytic $E_r(r)$ and never passed through a numerical gradient, so it shows the 0.6% that a centred difference costs on this grid. Neither number measures the physics. Both are consistent with the one statement being tested.
+Both fields report zero curl, thirteen orders of magnitude apart, and the gap is in how each was built. `Ex, Ey, Ez` came out of `-np.gradient(V)`, and the curl subtracts the same centred differences in the opposite order, so the stencil obeys the identity as strictly as the algebra does and nothing survives but floating-point ordering, around $10^{-16}$. The blob field was built from the analytic $E_r(r)$ and never passed through a numerical gradient, so it shows the 0.6% a centred difference costs on this grid. Neither number measures the physics; both are consistent with the statement being tested.
 
-The circulations say the same thing on a closed curve: a few parts in $10^{4}$ of the natural voltage scale, dropping to round-off on the centred loop, whose symmetry cancels it exactly. Put the last line beside them. Same integrator, same grid, same size of loop, and the wire returns a full ampere.
+The circulations say the same on a closed curve: a few parts in $10^{4}$ of the natural voltage scale, dropping to round-off on the centred loop, whose symmetry cancels it exactly. Put the last line beside them. Same integrator, same grid, same loop, and the wire returns a full ampere.
 
-Zero circulation is what makes potential a usable idea. Carrying a charge round a circuit and back to its starting point costs no net work, so the work done between two points is independent of the route, and one number can be attached to each point. That number is $V$.
+Zero circulation is what makes potential usable. Carrying a charge round a circuit costs no net work, so the work between two points is independent of the route and one number can be attached to each point. That number is $V$.
 
-Two restrictions are worth naming, and Part 3 has already demonstrated both.
+Two restrictions, both already demonstrated in Part 3.
 
-**Zero curl gives a potential only where the region has no holes in it.** The wire is the exception: $\nabla\times\boldsymbol{H} = \boldsymbol{0}$ at every point outside it, and $\oint\boldsymbol{\tau}\cdot\boldsymbol{H}\,dl = I \neq 0$. A loop encircling the axis cannot be shrunk to a point without crossing the current, so there is nothing for Stokes' theorem to integrate the curl over, and no single-valued potential for $\boldsymbol{H}$ exists out there. Around a point charge, by contrast, the punctured space *is* simply connected and $V$ survives.
+**Zero curl gives a potential only where the region has no holes.** The wire is the exception: $\nabla\times\boldsymbol{H} = \boldsymbol{0}$ everywhere outside it, and $\oint\boldsymbol{\tau}\cdot\boldsymbol{H}\,dl = I \neq 0$. A loop encircling the axis cannot be shrunk to a point without crossing the current, so no single-valued potential for $\boldsymbol{H}$ exists out there. Around a point charge the punctured space *is* simply connected, and $V$ survives.
 
-**$\nabla\times\boldsymbol{E} = \boldsymbol{0}$ holds in electrostatics.** When the magnetic field changes with time, $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$, the circulation round a loop is no longer zero, and that circulation is the voltage a generator produces. At that point $V$ alone stops being enough, which is where this course is going.
+**$\nabla\times\boldsymbol{E} = \boldsymbol{0}$ holds in electrostatics.** When $\boldsymbol{B}$ changes with time, $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$, the circulation is no longer zero, and that circulation is the voltage a generator produces. $V$ alone stops being enough, which is where the course goes next.
 :::
 
 ---
@@ -1146,17 +1139,17 @@ The chain built across the two labs, in one line:
 
 $$ \rho_v \;\longrightarrow\; V \;\xrightarrow{\ -\nabla\ }\; \boldsymbol{E} \;\xrightarrow{\ \nabla\cdot\ }\; \rho_v/\varepsilon_0, \qquad \nabla\times\boldsymbol{E} = \boldsymbol{0} $$
 
-with the last statement the licence for the arrow labelled $-\nabla$: only a field with zero curl has a potential to be recovered from.
+with the last statement the licence for the arrow labelled $-\nabla$: only a curl-free field has a potential to recover.
 
-- **Gradient.** Scalar in, vector out. Points along steepest increase, normal to the level surfaces, with length equal to the rate of increase.
-- **Divergence.** Vector in, scalar out. Net flux per unit volume, which measures what is created at a point and nothing else.
-- **Curl.** Vector in, vector out. Net circulation per unit area, about the axis its own direction gives, which measures local rotation and not the shape of a streamline.
+- **Gradient.** Scalar in, vector out. Points along steepest increase, normal to the level surfaces, length equal to the rate of increase.
+- **Divergence.** Vector in, scalar out. Net flux per unit volume: what is created at a point, and nothing else.
+- **Curl.** Vector in, vector out. Net circulation per unit area about the axis its own direction gives: local rotation, not the shape of a streamline.
 
-Each of the last two comes with an integral theorem, and each theorem replaces a derivative that fails at a singular source with an integral that does not. The point charge and the current-carrying wire are the same difficulty met twice.
+Each of the last two comes with an integral theorem, and each replaces a derivative that fails at a singular source with an integral that does not. The point charge and the current-carrying wire are the same difficulty met twice.
 
 ### The same three operators, elsewhere in ECT
 
-Electrostatics is a convenient place to learn these, not the only place to use them. Each row below gives a potential, its gradient, and a statement about sources. The numerical machinery written in these two labs applies unchanged to all of them:
+Electrostatics is a convenient place to learn these, not the only place to use them. The machinery of these two labs applies unchanged to every row:
 
 | System | Potential | Field | Source equation |
 | :--- | :--- | :--- | :--- |
@@ -1165,13 +1158,9 @@ Electrostatics is a convenient place to learn these, not the only place to use t
 | Heat conduction | $T$ [K] | $\boldsymbol{q}_T = -k\nabla T$ &nbsp; [W/m$^2$] | $\nabla\cdot\boldsymbol{q}_T = 0$ (steady, no sources) |
 | Groundwater flow | $h$ [m] | $\boldsymbol{q}_h = -K\nabla h$ &nbsp; [m/s] | $\nabla\cdot\boldsymbol{q}_h = 0$ (steady, incompressible) |
 
-with $G$ the gravitational constant, $\rho_m$ the mass density [kg m$^{-3}$], $k$ the thermal conductivity [W m$^{-1}$ K$^{-1}$] and $K$ the hydraulic conductivity [m/s].
+with $G$ the gravitational constant, $\rho_m$ the mass density, $k$ the thermal conductivity and $K$ the hydraulic conductivity. The minus signs are one minus sign: flow runs downhill, and the gradient points uphill.
 
-The minus signs are all the same minus sign: heat flows from hot to cold, water flows from high head to low, a positive charge falls from high potential to low. Flow runs downhill, and the gradient points uphill.
-
-The last two rows show why solenoidal fields matter in practice. $\nabla\cdot\boldsymbol{q}_h = 0$ in an aquifer states conservation of water locally, in the form a numerical model actually solves.
-
-In a **homogeneous** medium, where $k$ and $K$ are constants, every field in that table is a gradient, so every one of them has zero curl and none can circulate. Let $K$ vary from place to place, as it does in any real aquifer, and $\nabla\times\boldsymbol{q}_h = -\nabla K\times\nabla h$ need not vanish. The fields that circulate are the ones with no potential to be had, and they are the subject of the rest of the course:
+Every field there is a gradient wherever $k$ and $K$ are constant, so none can circulate. Let $K$ vary, as in any real aquifer, and $\nabla\times\boldsymbol{q}_h = -\nabla K\times\nabla h$ need not vanish. The fields that circulate are the ones with no potential to be had:
 
 | Field | Circulation equation | What sets it |
 | :--- | :--- | :--- |
@@ -1179,9 +1168,7 @@ In a **homogeneous** medium, where $k$ and $K$ are constants, every field in tha
 | Fluid velocity $\boldsymbol{v}$ [m/s] | $\nabla\times\boldsymbol{v} = \boldsymbol{\omega}_v$ | shear at a boundary, and rotation of the Earth |
 | Electric field, unsteady | $\nabla\times\boldsymbol{E} = -\partial\boldsymbol{B}/\partial t$ | a magnetic field that changes with time |
 
-where $\boldsymbol{\omega}_v \equiv \nabla\times\boldsymbol{v} = 2\boldsymbol{\omega}$ is the vorticity, twice the local angular velocity of Task 6.
-
-The first row is Ampère's law in the static limit, and the term Maxwell added to it, $\partial\boldsymbol{D}/\partial t$, is the reason light exists. The third is Faraday's law, where the potential $V$ stops being sufficient on its own. Those two together with the two source equations of Parts 1 and 2 are Maxwell's four.
+with $\boldsymbol{\omega}_v = 2\boldsymbol{\omega}$ the vorticity of Task 6. The first row is Ampère's law in the static limit; Maxwell's added $\partial\boldsymbol{D}/\partial t$ is why light exists. The third is Faraday's law. Those two with the source equations of Parts 1 and 2 are Maxwell's four.
 
 ### Formative assessment — Chapters 1 and 2
 
@@ -1195,11 +1182,11 @@ Handed out at the start of the session.
 
 Continue with your Part A answers in mind. A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
 
-A steady point source of power $P$ in a medium of thermal conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout these labs. Split the panel into $N = 20\times12$ sub-sources, give each an equal share of the power, and superpose:
+A steady point source of power $P$ in a medium of conductivity $k$ raises the temperature above ambient by $P/4\pi k r$, the same $1/r$ used throughout these labs. Split the panel into $N = 20\times12$ sub-sources sharing the power equally, and superpose:
 
 $$ T(\boldsymbol{r}) = \frac{P}{4\pi k N}\sum_{i=1}^{N}\frac{1}{\lvert\boldsymbol{r}-\boldsymbol{r}_i\rvert}, \qquad P = 100\ \text{W}, \qquad k_{\text{soil}} = 1.5\ \text{W m}^{-1}\text{K}^{-1} $$
 
-Check the dimensions before you code. $[P]/[k] = \text{W}/(\text{W m}^{-1}\text{K}^{-1}) = \text{m}\cdot\text{K}$, divided by a distance, so $T$ comes out in kelvin. A temperature formula that does not reduce to kelvin has an error in it.
+Check the dimensions before you code: $[P]/[k] = \text{m}\cdot\text{K}$, divided by a distance, so $T$ comes out in kelvin. A formula that does not reduce to kelvin has an error in it.
 
 ```{code-cell} ipython3
 # --- given: the panel, and the grid it sits on (the cube from Part 0) ---
@@ -1233,11 +1220,11 @@ fw.check("...and the prefactor was applied, not left out",
          np.nanmax(T_panel) < 100.0)
 ```
 
-Heat flows down the temperature gradient, with the same minus sign and the same reason as $\boldsymbol{E} = -\nabla V$. Fourier's law is
+Heat flows down the temperature gradient, the same minus sign and the same reason as $\boldsymbol{E} = -\nabla V$:
 
 $$ \boldsymbol{q}_T = -k\nabla T \qquad [\text{W m}^{-2}] $$
 
-and at steady state, away from the panel, no heat is created or destroyed, so $\boldsymbol{q}_T$ should be solenoidal there. It is also a gradient field, so its curl should vanish.
+At steady state, away from the panel, nothing creates or destroys heat, so $\boldsymbol{q}_T$ should be solenoidal there. It is also a gradient, so its curl should vanish.
 
 ```{code-cell} ipython3
 # B2 -- three blanks. Reuse the operators you wrote: `divergence` from Task 1
@@ -1271,7 +1258,7 @@ fw.check(f"and the flux of a gradient cannot circulate "
          np.median(curl_mag[far] / yardstick) < 1e-10)
 ```
 
-The divergence is zero away from the panel and the panel is certainly a source, so the differential form has nothing to say about how strong it is. Put a closed surface around it instead. `closed_box_flux` from Task 5 works unchanged.
+The divergence is zero away from the panel, so it says nothing about how strong the panel is. Put a closed surface around it instead; `closed_box_flux` from Task 5 works unchanged.
 
 ```{figure} figures/b3_nested_boxes.svg
 :name: fig-b3-boxes
@@ -1318,7 +1305,7 @@ fw.check(f"the shell between the two boxes generates nothing ({power_shell:+.3f}
          abs(power_shell) < 0.01 * P_heat)
 ```
 
-Both integral theorems are now in play for the same field. The closed surface weighed the panel without differentiating anything. Stokes' theorem asks the other question: run a loop instead of a surface, and see whether the heat flux circulates.
+The closed surface weighed the panel without differentiating anything. Stokes' theorem asks the other question: run a loop instead of a surface, and see whether the heat flux circulates.
 
 ```{figure} figures/b4_loops_and_mask.svg
 :name: fig-b4-loops
@@ -1364,11 +1351,11 @@ fw.check_scalar("the third loop, the one whose edge crosses the masked shell (B5
 :::{admonition} Why this field has a potential, and the wire's has none
 :class: important
 
-Two of the three loops return round-off, below $10^{-14}$ W/m against a scale of 35.5 W/m. The heat flux does not circulate, and it cannot: it is $-k\nabla T$, and a gradient has no curl. That is the argument that made $V$ possible for the electric field, so $\boldsymbol{q}_T$ has a potential too, and it is a quantity you have already computed. It is $T$.
+Two of the three loops return round-off, below $10^{-14}$ W/m against a scale of 35.5 W/m. The heat flux cannot circulate: it is $-k\nabla T$, and a gradient has no curl. That is the argument that made $V$ possible, so $\boldsymbol{q}_T$ has a potential too, and it is a quantity you have already computed. It is $T$.
 
-The field around the wire in Part 3 is also curl-free at every point, and its loop returns a full ampere. The difference is the region, not the field. The soil around the panel is simply connected, so any loop in it can be shrunk to a point without leaving the region where $\nabla\times\boldsymbol{q}_T = \boldsymbol{0}$, and Stokes' theorem then forces the circulation to zero. Around the wire no such shrinking is possible.
+The wire in Part 3 is also curl-free at every point, and its loop returns a full ampere. The difference is the region, not the field: the soil around the panel is simply connected, so any loop can be shrunk to a point without leaving the region where $\nabla\times\boldsymbol{q}_T = \boldsymbol{0}$, and Stokes' theorem forces the circulation to zero. Around the wire no such shrinking is possible.
 
-The third loop returns $-0.070$ W/m, which is $2\times10^{-3}$ of the scale where the other two are below $10^{-16}$ of it. Its edge is the only one that runs through the masked shell.
+The third loop returns $-0.070$ W/m, $2\times10^{-3}$ of the scale where the other two are below $10^{-16}$ of it. Its edge is the only one running through the masked shell.
 :::
 
 Far from the panel its shape should stop mattering. Test that against the single term a point source would give.
@@ -1406,13 +1393,13 @@ Answer these in writing.
 2. The $h = 0.6$ m box returns 84.3 W with the mask in place and 100.2 W without it. State the general rule this illustrates about masked samples and surface integrals.
 3. `curl_q` came back at $10^{-15}$ rather than at the fraction of a percent `div_q` shows. Why is it so much smaller, and is that a better measurement or a different kind of statement?
 4. In the plan view the isotherms near the panel are rounded rectangles and far away they are circles, and the table shows the difference between the two directions falling from 19% to 5%. What has been lost, and what does that have to do with truncating a series?
-5. Two loops returned round-off, below $10^{-14}$ W/m, and the third returned $-0.070$ W/m. The third is the one whose edge runs through the masked shell. Say what that number is a measurement of. Question 2 makes the same point for a closed surface. State the rule once, in a form that covers a line integral and a surface integral together.
+5. Two loops returned round-off, below $10^{-14}$ W/m; the third, whose edge runs through the masked shell, returned $-0.070$ W/m. Say what that number measures. Question 2 makes the same point for a closed surface: state the rule once, covering a line integral and a surface integral together.
 :::
 
 :::{admonition} B6. The number that is wrong
 :class: tip
 
-Everything above was computed in soil, $k = 1.5$ W m⁻¹K⁻¹, and one metre above the panel it predicts $+5.0$ K. Re-run it for the same panel hanging in **air**, $k_{\text{air}} = 0.026$ W m⁻¹K⁻¹. You do not need to recompute anything: $T \propto 1/k$, so the answer is $5.0 \times 1.5/0.026$.
+Everything above was computed in soil, $k = 1.5$ W m⁻¹K⁻¹, giving $+5.0$ K one metre above the panel. Re-run it for the same panel hanging in **air**, $k_{\text{air}} = 0.026$ W m⁻¹K⁻¹. Nothing needs recomputing: $T \propto 1/k$, so the answer is $5.0 \times 1.5/0.026$.
 
 The arithmetic is right and the answer is absurd. Identify the assumption that failed. Two are worth naming.
 :::
