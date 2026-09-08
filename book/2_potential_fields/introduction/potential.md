@@ -94,6 +94,9 @@ Field lines point in the direction of steepest decrease of the potential. Equipo
 ```
 
 ```{prf:example} Topographic maps
-A common example of a diagram containing equipotential lines is a topographic map. Lines indicate constant elevation, and therefore, constant gravitational potential. 
+A common analogy for equipotentials are topographic maps. Lines indicate constant elevation, and therefore, constant gravitational potential. 
 Consider: if you see many equipotiential lines spaced close together, what is this saying about the field? What does it mean if they are spaced far apart? 
+
+```{figure} figures/topographic_map.jpg
+```
 ``` 
