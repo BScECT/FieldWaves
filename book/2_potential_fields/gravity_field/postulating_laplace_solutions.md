@@ -186,6 +186,111 @@ $$
 
 A proposed function that satisfies Laplace's equation is therefore only a possible solution. It becomes a solution to the physical problem only if it also satisfies the relevant boundary conditions.
 
+(sec:uniqueness-potential-problems)=
+### Uniqueness: why verification is enough
+
+Once we specify the sources and the potential on the whole boundary of a domain, can two different potentials still satisfy the same problem? Under the usual regularity assumptions, the answer is **no**: if a solution exists, it is unique. Specifying the potential on the boundary is called a **Dirichlet boundary condition**.
+
+This is what makes our strategy of postulating and checking solutions useful. We do not have to try every possible function or follow a particular recipe for solving the equation. Once a proposed potential satisfies the equation, the source requirements, and all the boundary conditions, there is no competing solution to find.
+
+The guided proof below uses the product rule and the divergence theorem. Its central idea is simple: subtract two proposed solutions and measure the size of the difference between their gradients. Squaring that size prevents differences in one part of the domain from cancelling differences elsewhere.
+
+```{admonition} Guided exercise: can a difference hide inside the domain?
+:class: exercise
+
+Consider a bounded, connected domain $\mathcal V$. Suppose two sufficiently smooth potentials $\Phi_1$ and $\Phi_2$ satisfy the same Poisson equation inside it and have the same values everywhere on its boundary $\partial\mathcal V$. We assume the boundary is regular enough to apply the divergence theorem.
+
+**1. Subtract the two solutions.** Define
+
+$$
+u=\Phi_1-\Phi_2.
+$$
+
+Explain why the source terms cancel when we subtract the two Poisson equations, giving
+
+$$
+\nabla^2u=0\quad\text{inside }\mathcal V,
+\qquad
+u=0\quad\text{on }\partial\mathcal V.
+$$
+
+The same reasoning applies if both potentials originally satisfy Laplace's equation. Our question is now whether $u$ can be nonzero inside while remaining zero on the entire boundary.
+
+**2. Use the product rule.** Verify that
+
+$$
+\vec\nabla\cdot(u\vec\nabla u)
+=\vec\nabla u\cdot\vec\nabla u+u\nabla^2u
+=|\vec\nabla u|^2.
+$$
+
+For example, the $x$ contribution is
+$\partial_x(u\,\partial_xu)=(\partial_xu)^2+u\,\partial_x^2u$.
+Add the three coordinate contributions and use $\nabla^2u=0$.
+
+**3. Turn the volume integral into a boundary integral.** Recall the divergence theorem from Equation {eq}`eq:divergence-theorem`: the volume integral of a vector field's divergence equals its outward flux through the boundary. Here we apply it to the constructed vector field
+
+$$
+\vec F=u\vec\nabla u.
+$$
+
+A scalar multiplied by a vector is itself a vector, so the theorem applies to this field just as it did to the gravity field. Recall also that $\mathrm d\vec A=\hat n\,\mathrm dS$: the vector area element is the outward unit normal multiplied by the scalar area element.
+
+Using the identity from step 2, followed by the divergence theorem, gives
+
+$$
+\begin{aligned}
+\int_{\mathcal V}|\vec\nabla u|^2\,\mathrm d\mathcal V
+&=\int_{\mathcal V}\vec\nabla\cdot(u\vec\nabla u)\,\mathrm d\mathcal V
+&&\text{(step 2)}\\
+&=\oint_{\partial\mathcal V}(u\vec\nabla u)\cdot\hat n\,\mathrm dS
+&&\text{(divergence theorem)}\\
+&=0
+&&\text{($u=0$ on the boundary).}
+\end{aligned}
+$$
+
+Explain why the last step does not require the normal derivative of $u$ to vanish on the boundary.
+
+**4. Interpret the zero integral.** The integrand is a sum of squares,
+
+$$
+|\vec\nabla u|^2
+=\left(\frac{\partial u}{\partial x}\right)^2
++\left(\frac{\partial u}{\partial y}\right)^2
++\left(\frac{\partial u}{\partial z}\right)^2
+\geq0.
+$$
+
+It measures how strongly the two potential gradients differ. There are no negative contributions to cancel positive ones. If this continuous quantity were positive at any point, it would also be positive in a small region around that point, making the integral positive. Therefore the zero integral requires $\vec\nabla u=\vec 0$ everywhere.
+
+**5. Finish the argument.** A zero gradient means that $u$ is constant throughout the connected domain. Use its boundary value to determine that constant. You should conclude that
+
+$$
+u=0,
+\qquad\text{so}\qquad
+\Phi_1=\Phi_2.
+$$
+
+The supposedly different solutions are the same. The key step is that the squared gradient difference cannot cancel itself out.
+```
+
+If instead the **normal derivative** of the potential is specified on the whole boundary, we have a **Neumann boundary condition**. For two solutions with the same prescribed normal derivative, $\vec\nabla u\cdot\hat n=0$, so the boundary integral in the proof again vanishes. Their difference is therefore constant, but its value is not fixed. The potential is unique up to an additive constant; the field $-\vec\nabla\Phi$ is unique. This is a uniqueness statement assuming a solution exists; the prescribed sources and boundary flux must also be consistent with Gauss's law.
+
+The proof above concerns a bounded domain. For an unbounded domain, behaviour at infinity also matters: appropriate conditions there are needed to exclude additional solutions. We must include those conditions when checking a proposed potential.
+
+```{admonition} The practical consequence
+:class: important
+
+For a potential problem with boundary conditions that ensure uniqueness, if we find a potential that
+
+1. satisfies Poisson's or Laplace's equation throughout the specified domain;
+2. contains the required sources and no additional sources in that domain; and
+3. satisfies **all** boundary conditions, including its behaviour at infinity when relevant,
+
+then we are done. Uniqueness tells us that this is the solution to the stated physical problem, with only the arbitrary reference constant remaining when the boundary conditions do not fix it. We do not need to know how the solution was discovered.
+```
+
 ## A periodic gravity anomaly
 
 Now consider a more interesting problem. Imagine that the mass distribution below a locally flat reference surface at $z=0$ varies periodically in the $x$ direction. We might expect the resulting perturbation of the gravitational potential above it to have a similar horizontal variation.
