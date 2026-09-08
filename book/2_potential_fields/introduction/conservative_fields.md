@@ -11,6 +11,12 @@ $$
 $$
 
 Earth's gravitational field is an example of a conservative field: the work depends only on the starting and ending positions, not on the detailed route taken between them.
+<!-- Phil: A note on notation: theta is being used here as the azimuthal coordinate in a circular system. I would suggest using phi instead to keep things consistent -->
+
+<!-- Phil: I found this example quite confusing. Perhaps start with something easier? 
+I also don't like how this solution mixes circular and cartesian coordinates. Writing F(r,theta) with x and y unit vectors is very counter-intuitive-->
+
+
 
 ```{admonition} Exercise: a non-conservative field
 Show that the two-dimensional vector field
@@ -81,6 +87,10 @@ $$
 This is not zero. A conservative field must have zero work around any closed path, so this field is not conservative.
 ```
 
+<!-- Phil: this is very misleading. In this case, the magnetic field is not doing work on the particle. 
+F_B = q v cross B,
+this cross product is zero in this case. Here we are just in uniform motion and there is no force applied  -->
+
 ```{admonition} Physical example: magnetic field around a wire
 We will come back to magnetic fields later in the course, so for now we simply postulate the following result.
 
@@ -123,19 +133,19 @@ $$
 This result is not zero, so this magnetic field is not conservative. This equation is a preview of Ampere's law, which we will study properly when we discuss electromagnetic fields.
 ```
 
-Let is now consider the work done by a conservative force field to go from $P_0$ to an arbitrary point $P$,
+Let us now consider the work done by a conservative force field to go from $P_0$ to an arbitrary point $P$,
 
 $$
 W(P_0,P) = \int_{P_0}^P \vec{F}(x,y,z) \cdot \vec{ds},
 $$
 
-and to a point desplaced in the x-direction,
+and to a point displaced in the x-direction,
 
 $$
 W(P_0,P+\Delta x \cdot \hat{x}) = \int_{P_0}^{P+\Delta x \cdot \hat{x}} \vec{F}(x,y,z) \cdot \vec{ds}.
 $$
 
-Becase the path does not matter, we can go first from $P_0$ to $P$ and from there to $P+\Delta x \cdot \hat{x}$, so we have
+Because the path does not matter, we can go first from $P_0$ to $P$ and from there to $P+\Delta x \cdot \hat{x}$, so we have
 
 $$
 W(P_0,P+\Delta x \cdot \hat{x}) = W(P_0,P) + W(P,P+\Delta x \cdot \hat{x}),
@@ -147,7 +157,7 @@ $$
 W(P_0,P+\Delta x \cdot \hat{x}) - W(P_0,P) = W(P,P+\Delta x \cdot \hat{x}) = \int_{P}^{P+\Delta x \cdot \hat{x}} \vec{F}(x,y,z) \cdot \vec{ds}.
 $$
 
-If we go in a straight line to $P+\Delta x \cdot \hat{x}$, the path diferencial becomes 
+If we go in a straight line to $P+\Delta x \cdot \hat{x}$, the path differential becomes 
 
 $$
 \vec{ds} = dx\cdot \hat{x}.
@@ -203,4 +213,4 @@ In *words*, {eq}`eq:work_is_gradient_of_work` tells us:
 - The force field is the gradient of the work;
 - The vector field, $\vec{F}$, is fully determined by the scalar field, $W$.
 
-Any vector field that can be constructed as the gradient of a *work* function, i.e. by {eq}`eq:work_is_gradient_of_work`, is a **conservative field**..
+Any vector field that can be constructed as the gradient of a *work* function, i.e. by {eq}`eq:work_is_gradient_of_work`, is a **conservative field**.

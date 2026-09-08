@@ -35,9 +35,8 @@ In spherical coordinates $(r,\theta,\varphi)$, where $\theta$ is the polar angle
 $$
 \begin{aligned}
 \nabla^2\Phi
-={}&\frac{1}{r^2}\frac{\partial}{\partial r}
-\left(r^2\frac{\partial\Phi}{\partial r}\right)\\
-&+\frac{1}{r^2\sin\theta}\frac{\partial}{\partial\theta}
+=\frac{1}{r^2}\frac{\partial}{\partial r}
+\left(r^2\frac{\partial\Phi}{\partial r}\right) +\frac{1}{r^2\sin\theta}\frac{\partial}{\partial\theta}
 \left(\sin\theta\frac{\partial\Phi}{\partial\theta}\right)
 +\frac{1}{r^2\sin^2\theta}\frac{\partial^2\Phi}{\partial\varphi^2}.
 \end{aligned}
@@ -135,7 +134,7 @@ $$
 \vec{g}=-\frac{GM}{r^2}\hat{r}.
 $$
 
-To picture the flux, imagine covering the spherical surface with a mosaic of very small patches. Attach an arrow to each patch that points perpendicular to the surface and out of the sphere. This is the area vector
+The **flux** of a field through a surface measures how much of the field passes through that surface. To picture the flux, imagine covering the spherical surface with a mosaic of very small patches. Attach an arrow to each patch that points perpendicular to the surface and out of the sphere. This is the area vector
 
 $$
 \mathrm{d}\vec{A}=\hat{r}\,\mathrm{d}A.
