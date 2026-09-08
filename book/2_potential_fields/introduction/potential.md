@@ -1,44 +1,53 @@
 # Potential and Equipotential Surfaces
 
-For a conservative field, the work done between two points can be described using a scalar function. This scalar function is called a **potential**.
+For a conservative field, the field can be described using a scalar function. This scalar function is called a **potential**.
 
 The central idea is that instead of describing the vector field directly, we can describe a scalar field whose spatial changes determine the vector field.
 
+<!-- Phil: this sction is mixing the definitions of potential and potential energy together. 
+I think electrical potential is an easy example to consider as well, because everyone knows what voltage is.  -->
+
 ## Potential
 
-In the previous section we introduced a work function $W(P_0,P)$ and found that, for a conservative force field,
+In the previous section we introduced the work function $W(P_0,P)$. For a conservative field, the work between two points is independent of the path:
 
 $$
-  \vec{F} = \vec{\nabla} W.
+  W(P_0,P) = \int_{P_0}^{P} \vec{g}\cdot\vec{ds}.
 $$
 
-In many physical problems we define the potential $\Phi$ with the opposite sign:
+This motivates describing the field with a scalar potential. We define the potential $\Phi$ by
 
 $$
-  \Phi = -W.
+  \vec{g} = -\vec{\nabla} \Phi.
 $$
 
-With this convention, the force field is
+Equivalently, choosing the reference point so that $\Phi(P_0)=0$, the work done by the field is
 
 $$
-  \vec{F} = -\vec{\nabla} \Phi.
+  W(P_0,P) = -\Phi(P).
 $$
 
-The minus sign has an important physical meaning: the force points in the direction where the potential decreases most rapidly.
-
-For example, near Earth's surface the gravitational potential energy of a mass $m$ can be written approximately as
+For a gravitational field, $\Phi$ is the gravitational potential energy per unit mass. The corresponding force on a mass $m$ is therefore
 
 $$
-  \Phi(z) = mgz,
+  \vec{F} = m\vec{g} = -m\vec{\nabla} \Phi.
 $$
 
-where $z$ is height. The gravitational force is then
+The minus sign means that the gravitational field points in the direction where the potential decreases most rapidly. The associated gravitational potential energy is $U=m\Phi$.
+
+For example, near Earth's surface the gravitational potential can be written approximately as
 
 $$
-  \vec{F} = -\vec{\nabla} \Phi = -mg\,\hat{z}.
+  \Phi(z) = gz,
 $$
 
-The force points downward, toward lower gravitational potential energy.
+where $z$ is height. The gravitational field is then
+
+$$
+  \vec{g} = -\vec{\nabla} \Phi = -g\,\hat{z}.
+$$
+
+The corresponding force on a mass $m$ is $\vec{F}=-mg\,\hat{z}$, and the gravitational potential energy is $U=mgz$.
 
 As a further example, consider the gravitational field of a point mass $M$ at the origin. We will derive this result later; for now, we postulate that the gravitational potential per unit mass is
 
@@ -58,6 +67,8 @@ The vector $\vec{r}/|\vec{r}|^3$ combines the outward radial direction with an i
 
 ## Equipotential surfaces
 
+<!-- Phil: a nice example here is a topographical map. Lines of constant elevation are equipotentials  -->
+
 An **equipotential surface** is a surface on which the potential has the same value everywhere:
 
 $$
@@ -67,17 +78,22 @@ $$
 If a particle moves along an equipotential surface, then the change in potential is zero:
 
 $$
-  dV = 0.
+  d\Phi = 0.
 $$
 
-Because the force is related to the gradient of the potential,
+Because the field is related to the gradient of the potential,
 
 $$
-  \vec{F} = -\vec{\nabla} \Phi,
+  \vec{g} = -\vec{\nabla} \Phi,
 $$
 
 the force is perpendicular to the equipotential surface. Motion along the surface is sideways relative to the force, so the force does no work for a displacement along that surface.
 
 ```{admonition} Key idea
-Field lines point in the direction of steepest change of the potential. Equipotential surfaces are perpendicular to those field lines.
+Field lines point in the direction of steepest decrease of the potential. Equipotential surfaces are perpendicular to those field lines.
 ```
+
+```{prf:example} Topographic maps
+A common example of a diagram containing equipotential lines is a topographic map. Lines indicate constant elevation, and therefore, constant gravitational potential. 
+Consider: if you see many equipotiential lines spaced close together, what is this saying about the field? What does it mean if they are spaced far apart? 
+``` 
