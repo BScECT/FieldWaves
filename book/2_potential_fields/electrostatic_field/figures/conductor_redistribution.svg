@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Charge redistribution in a conductor</title>
+  <desc id="desc">An external field separates mobile charge until the induced field cancels it inside a conductor.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1769aa"/></marker>
+    <marker id="counter" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b85c00"/></marker>
+    <style>.body{fill:#e7edf2;stroke:#30363b;stroke-width:4}.applied{stroke:#1769aa;stroke-width:5;marker-end:url(#arrow)}.induced{stroke:#b85c00;stroke-width:5;marker-end:url(#counter);stroke-dasharray:8 6}.label{font:28px Arial,sans-serif;fill:#202428}.small{font:23px Arial,sans-serif;fill:#40464c}.plus{font:bold 30px Arial,sans-serif;fill:#c43c39}.minus{font:bold 34px Arial,sans-serif;fill:#2764ae}</style>
+  </defs>
+  <text class="label" x="300" y="45" text-anchor="middle">field applied</text><text class="label" x="900" y="45" text-anchor="middle">electrostatic equilibrium</text>
+  <rect class="body" x="145" y="185" width="310" height="260" rx="22"/><rect class="body" x="745" y="185" width="310" height="260" rx="22"/>
+  <g class="applied"><line x1="90" y1="120" x2="500" y2="120"/><line x1="90" y1="315" x2="500" y2="315"/><line x1="690" y1="120" x2="1100" y2="120"/><line x1="690" y1="315" x2="1100" y2="315"/></g>
+  <text class="small" x="165" y="485">mobile charges begin to move</text>
+  <g class="minus"><text x="765" y="235">−</text><text x="765" y="305">−</text><text x="765" y="375">−</text></g>
+  <g class="plus"><text x="1015" y="235">+</text><text x="1015" y="305">+</text><text x="1015" y="375">+</text></g>
+  <g class="induced"><line x1="990" y1="260" x2="810" y2="260"/><line x1="990" y1="365" x2="810" y2="365"/></g>
+  <text class="small" x="790" y="505">E⃗induced cancels E⃗applied inside</text><text class="label" x="900" y="565" text-anchor="middle">E⃗inside = 0, V = constant</text>
+  <text class="small" x="600" y="625" text-anchor="middle">The external field may remain nonzero outside the conductor.</text>
+</svg>

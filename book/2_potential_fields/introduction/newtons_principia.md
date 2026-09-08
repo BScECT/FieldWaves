@@ -64,7 +64,7 @@ This provides a bridge from Newton's mechanics to potential fields. The physics 
 
 Equation {eq}`eq:two-body-gravity-force` describes the force between two *point masses*. It seems reasonable to approximate an extended body as a point when we observe it from a distance much greater than its size. It is far less obvious that the same expression should apply close to the body, for example to a satellite in low Earth orbit.
 
-We can formulate the extended-body problem by dividing the Earth into infinitesimal mass elements and adding their contributions. Let $\vec{r}$ be the position at which we evaluate the force, let $\vec{r'}$ locate a mass element inside the Earth, and let $\rho(\vec{r'})$ be the mass density there. Since $dm'=\rho(\vec{r'})\,dV'$, the total force on a test mass $m$ is
+We can formulate the extended-body problem by dividing the Earth into infinitesimal mass elements, $dM$, and add their contributions. Let $\vec{r}$ be the position at which we evaluate the force, let $\vec{r'}$ locate a mass element inside the Earth, and let $\rho(\vec{r'})$ be the mass density there. Since $dM'=\rho(\vec{r'})\,dV'$, the total force on a test mass $m$ is
 
 $$
 \vec{F}(\vec{r})
@@ -148,6 +148,10 @@ exactly as if the entire mass of the Earth were concentrated at its centre.
 
 Thus, treating the Earth as a point mass is not merely an approximation that improves with distance. Outside a perfectly spherically symmetric Earth, it is an exact consequence of the inverse-square law. These examples leave us with a general problem: how can we describe and calculate gravitational fields produced by distributed sources efficiently? To answer that question, we will develop the concept of a scalar potential. 
 %This result justifies the gravitational field used in the examples that follow and gives us a concrete setting in which to introduce work and potential. -->
+
+```{note}
+The fact that only the enclosed mass appears anticipates **Gauss's law for gravity**. Later, we will express this result in terms of the gravitational flux through a closed surface. For now, it follows from Newton's shell theorem and spherical symmetry.
+```
 
 ## Example: gravity inside and outside a thick shell
 

@@ -40,6 +40,14 @@ parts:
         sections:
         - file: 2_potential_fields/introduction/earth_gravity_work.ipynb
         - file: 2_potential_fields/gravity_field/uniform_cylinder_laplacian.ipynb
+    - file: 2_potential_fields/electrostatic_field/intro.md
+      sections:
+      - file: 2_potential_fields/electrostatic_field/poisson_laplace.md
+      - file: 2_potential_fields/electrostatic_field/point_charges.md
+      - file: 2_potential_fields/electrostatic_field/potential_energy_work.md
+      - file: 2_potential_fields/electrostatic_field/conductors.md
+      - file: 2_potential_fields/electrostatic_field/atmospheric_field.md
+      - file: 2_potential_fields/electrostatic_field/making_of.md
     - file: 2_potential_fields/magnetic_field/intro.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md

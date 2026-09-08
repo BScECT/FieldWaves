@@ -12,6 +12,19 @@ $$
 
 Earth's gravitational field is an example of a conservative field: the work depends only on the starting and ending positions, not on the detailed route taken between them.
 
+Path independence also means that the work around every closed path is zero. Go from $P_0$ to $P_1$ along one path and return along another. Reversing a path reverses the sign of its line integral; because the two forward paths give the same work, the outward and return contributions cancel:
+
+$$
+\oint\vec F\cdot\mathrm d\vec s=0.
+$$
+
+Conversely, if every closed-path integral vanishes, joining one path to the reverse of another shows that their work integrals agree. A single loop with nonzero work is therefore enough to disprove conservativeness.
+
+<!-- Phil: I found this example quite confusing. Perhaps start with something easier? 
+I also don't like how this solution mixes a circular parametrization with Cartesian unit vectors. -->
+
+
+
 ```{admonition} Exercise: a non-conservative field
 Show that the two-dimensional vector field
 
@@ -24,8 +37,8 @@ is not conservative.
 To do this, calculate the work done by the field around a circle of radius $R$ centered at the origin:
 
 $$
-  \vec{r}(\theta) = R\cos\theta\,\hat{x} + R\sin\theta\,\hat{y},
-  \qquad 0 \leq \theta \leq 2\pi.
+  \vec{r}(\varphi) = R\cos\varphi\,\hat{x} + R\sin\varphi\,\hat{y},
+  \qquad 0 \leq \varphi \leq 2\pi.
 $$
 
 1. Calculate the differential displacement $d\vec{s}$ along the circle.
@@ -45,9 +58,9 @@ Along the circle,
 $$
   d\vec{s}
   =
-  -R\sin\theta\,d\theta\,\hat{x}
+  -R\sin\varphi\,d\varphi\,\hat{x}
   +
-  R\cos\theta\,d\theta\,\hat{y}.
+  R\cos\varphi\,d\varphi\,\hat{y}.
 $$
 
 The field evaluated on the circle is
@@ -55,9 +68,9 @@ The field evaluated on the circle is
 $$
   \vec{F}
   =
-  -R\sin\theta\,\hat{x}
+  -R\sin\varphi\,\hat{x}
   +
-  R\cos\theta\,\hat{y}.
+  R\cos\varphi\,\hat{y}.
 $$
 
 Therefore,
@@ -65,7 +78,7 @@ Therefore,
 $$
   \vec{F}\cdot d\vec{s}
   =
-  R^2\,d\theta.
+  R^2\,d\varphi.
 $$
 
 The work around the closed path is
@@ -73,7 +86,7 @@ The work around the closed path is
 $$
   \oint \vec{F}\cdot d\vec{s}
   =
-  \int_0^{2\pi} R^2\,d\theta
+  \int_0^{2\pi} R^2\,d\varphi
   =
   2\pi R^2.
 $$
@@ -81,61 +94,24 @@ $$
 This is not zero. A conservative field must have zero work around any closed path, so this field is not conservative.
 ```
 
-```{admonition} Physical example: magnetic field around a wire
-We will come back to magnetic fields later in the course, so for now we simply postulate the following result.
+## From work along a path to a function of position
 
-An infinitely long straight wire along the $z$ axis, carrying a steady current $I$, produces a magnetic field that circles around the wire:
+Choose one reference point $P_0$ and **keep it fixed**. Path independence now lets us assign a single number to each endpoint $P$: the work done by the conservative force in reaching it from $P_0$,
 
-$$
-  \vec{B}(\rho) = \frac{\mu_0 I}{2\pi \rho}\,\hat{\phi}.
-$$
-
-Here $\rho$ is the distance from the $z$ axis. The direction $\hat{\phi}$ is the direction tangent to a circle around the wire. If you look along the positive $z$ direction, $\hat{\phi}$ points counterclockwise around the wire.
-
-For a circular path of radius $\rho$ centered on the wire, the small displacement along the path is
-
-$$
-  d\vec{s} = \rho\,d\phi\,\hat{\phi}.
-$$
-
-Therefore,
-
-$$
-  \vec{B}\cdot d\vec{s}
-  =
-  \frac{\mu_0 I}{2\pi \rho}\,\hat{\phi}
-  \cdot
-  \rho\,d\phi\,\hat{\phi}
-  =
-  \frac{\mu_0 I}{2\pi}\,d\phi.
-$$
-
-Integrating once around the circle gives
-
-$$
-  \oint \vec{B}\cdot d\vec{s}
-  =
-  \int_0^{2\pi} \frac{\mu_0 I}{2\pi}\,d\phi
-  =
-  \mu_0 I.
-$$
-
-This result is not zero, so this magnetic field is not conservative. This equation is a preview of Ampere's law, which we will study properly when we discuss electromagnetic fields.
-```
-
-Let is now consider the work done by a conservative force field to go from $P_0$ to an arbitrary point $P$,
 
 $$
 W(P_0,P) = \int_{P_0}^P \vec{F}(x,y,z) \cdot \vec{ds},
 $$
 
-and to a point desplaced in the x-direction,
+This endpoint function is measured in joules. It exists because the work is independent of the route; for a general force field, specifying the endpoints alone would not determine the work. In the derivatives below, only the endpoint $P$ varies.
+
+For a point displaced in the x-direction,
 
 $$
 W(P_0,P+\Delta x \cdot \hat{x}) = \int_{P_0}^{P+\Delta x \cdot \hat{x}} \vec{F}(x,y,z) \cdot \vec{ds}.
 $$
 
-Becase the path does not matter, we can go first from $P_0$ to $P$ and from there to $P+\Delta x \cdot \hat{x}$, so we have
+Because the path does not matter, we can go first from $P_0$ to $P$ and from there to $P+\Delta x \cdot \hat{x}$, so we have
 
 $$
 W(P_0,P+\Delta x \cdot \hat{x}) = W(P_0,P) + W(P,P+\Delta x \cdot \hat{x}),
@@ -147,7 +123,7 @@ $$
 W(P_0,P+\Delta x \cdot \hat{x}) - W(P_0,P) = W(P,P+\Delta x \cdot \hat{x}) = \int_{P}^{P+\Delta x \cdot \hat{x}} \vec{F}(x,y,z) \cdot \vec{ds}.
 $$
 
-If we go in a straight line to $P+\Delta x \cdot \hat{x}$, the path diferencial becomes 
+If we go in a straight line to $P+\Delta x \cdot \hat{x}$, the path differential becomes 
 
 $$
 \vec{ds} = dx\cdot \hat{x}.
@@ -198,9 +174,6 @@ $$
 \vec{\nabla} W = \vec{F}.
 $$ (eq:work_is_gradient_of_work)
 
-In *words*, {eq}`eq:work_is_gradient_of_work` tells us:
+Equation {eq}`eq:work_is_gradient_of_work` says that the force is the gradient of the endpoint function $W(P_0,P)$, with $P_0$ held fixed. The spatial variation of this scalar function determines the force vector at each point.
 
-- The force field is the gradient of the work;
-- The vector field, $\vec{F}$, is fully determined by the scalar field, $W$.
-
-Any vector field that can be constructed as the gradient of a *work* function, i.e. by {eq}`eq:work_is_gradient_of_work`, is a **conservative field**..
+Conversely, if a force is the gradient of a single-valued scalar function throughout the domain, integrating along a path gives the difference of that function's endpoint values. Its work is therefore path independent. In the next section we give the endpoint function an energy interpretation, taking care with the sign.

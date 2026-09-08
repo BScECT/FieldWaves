@@ -22,6 +22,13 @@ $$
 s=|\vec r-\vec d|.
 $$
 
+```{figure} figures/off_centre_spherical_cavity.svg
+:name: fig:off-centre-spherical-cavity
+:width: 100%
+
+A two-dimensional slice through the centre $O$ of the complete sphere and the centre $C$ of the spherical cavity. The cavity centre is located by $\vec d$, while the observation point $P$ is located by $\vec r$. Its position relative to the cavity centre is $\vec r-\vec d$, with magnitude $s=|\vec r-\vec d|$. The radii of the complete sphere and cavity are $R$ and $a$, respectively.
+```
+
 We will reuse the potential of a uniform sphere. For a sphere of radius $b$, density $\rho$, and distance $s$ from its centre, with the potential chosen to vanish at infinity,
 
 $$
