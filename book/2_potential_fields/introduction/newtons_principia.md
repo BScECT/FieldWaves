@@ -149,7 +149,9 @@ exactly as if the entire mass of the Earth were concentrated at its centre.
 Thus, treating the Earth as a point mass is not merely an approximation that improves with distance. Outside a perfectly spherically symmetric Earth, it is an exact consequence of the inverse-square law. These examples leave us with a general problem: how can we describe and calculate gravitational fields produced by distributed sources efficiently? To answer that question, we will develop the concept of a scalar potential. 
 %This result justifies the gravitational field used in the examples that follow and gives us a concrete setting in which to introduce work and potential. -->
 
-<!-- Phil: do we want to discuss Gauss's Law as well? -->
+```{note}
+The fact that only the enclosed mass appears anticipates **Gauss's law for gravity**. Later, we will express this result in terms of the gravitational flux through a closed surface. For now, it follows from Newton's shell theorem and spherical symmetry.
+```
 
 ## Example: gravity inside and outside a thick shell
 

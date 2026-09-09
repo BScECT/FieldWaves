@@ -39,7 +39,7 @@ $$
 $$ (eq:work-integrated-work)
 
 ```{admonition} Example: work in Earth's gravity field
-Consider a spacecraft of mass $m$ moving from Earth's surface to a circular orbit at radius $r_o$. Earth's gravitational force is radial:
+Consider a spacecraft of mass $m$ moving from Earth's surface to a greater distance $r_o$ from Earth's centre. Earth's gravitational force is radial:
 
 $$
   \vec{F}_g(r) = -\frac{GMm}{r^2}\hat{r},
@@ -61,18 +61,20 @@ $$
 
 Only the radial displacement $dr$ contributes. Sideways motion along a circular path has $dr = 0$, so gravity does no work during that part of the motion.
 
-The work done by gravity from Earth's radius $R_E$ to the orbit radius $r_o$ is
+The work done by gravity from Earth's radius $R_E$ to the final radius $r_o$ is
 
 $$
   W_g = \int_{R_E}^{r_o} -\frac{GMm}{r^2}\,dr
       = GMm\left(\frac{1}{r_o} - \frac{1}{R_E}\right).
 $$
 
-The negative sign tells us that gravity removes energy as the spacecraft moves outward. The external work needed to lift it slowly to orbit is the opposite:
+Gravity does negative work during the outward displacement. If an external force lifts the spacecraft slowly to that height, with negligible change in kinetic energy and no other forces doing work, its work is the opposite:
 
 $$
   W_{\mathrm{ext}} = GMm\left(\frac{1}{R_E} - \frac{1}{r_o}\right).
 $$
+
+This is the work for a slow lift to that radius. Establishing a circular orbit also requires kinetic energy; the expression above is not the total work needed to launch a spacecraft into orbit.
 ```
 
 ```{figure} figures/earth_gravity_work.png
