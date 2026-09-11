@@ -42,6 +42,7 @@ parts:
         - file: 2_potential_fields/gravity_field/uniform_cylinder_laplacian.ipynb
     - file: 2_potential_fields/electrostatic_field/intro.md
       sections:
+      - file: 2_potential_fields/electrostatic_field/coulombs_law.md
       - file: 2_potential_fields/electrostatic_field/poisson_laplace.md
       - file: 2_potential_fields/electrostatic_field/point_charges.md
       - file: 2_potential_fields/electrostatic_field/potential_energy_work.md

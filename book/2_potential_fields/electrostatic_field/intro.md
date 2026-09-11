@@ -8,11 +8,11 @@ The following *dictionary* gives us the equivalences between the gravity field a
 
 | Gravity | Electrostatics |
 |---|---|
-| source mass $M$ | source charge $Q$ |
-| mass density $\rho$ | charge density $\rho_q$ |
-| gravity field $\vec g$ | electric field $\vec E$ |
-| potential per unit mass $\Phi$ | potential per unit charge $V$ |
-| $\vec F=m\vec g$ | $\vec F=q\vec E$ |
+| source mass $M$ [kilograms, kg] | source charge $Q$ [Coulombs, C]|
+| mass density $\rho$ [kg/m$^3$] | charge density $\rho_q$ [C/m$^3$] |
+| gravity field $\vec g$ [N/kg] | electric field $\vec E$ [V/m]|
+| potential energy per unit mass $\Phi$ [J/kg] | potential energy per unit charge $V$ [Volts, V = J/C] |
+| $\vec F=m\vec g$ [N] | $\vec F=q\vec E$ [N] |
 | gravitational constant $G$ | Coulomb constant $1/(4\pi\epsilon_0)$ |
 
 The analogy is useful, but the signs must be read with care. Ordinary mass is positive and gravity is attractive. Electric charge has either sign, and the force on a test charge also depends on the sign of that test charge.
