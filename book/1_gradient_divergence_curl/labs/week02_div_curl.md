@@ -1172,13 +1172,43 @@ with $\boldsymbol{\omega}_v = 2\boldsymbol{\omega}$ the vorticity of Task 6. The
 
 ### Formative assessment — Chapters 1 and 2
 
-Not graded, and not handed in. It exists so you can find out what you do not yet know, while there is still time to fix it. Allow about **45 minutes**.
+Around **30 mins** for Part A. Write your answers on paper and hand them in when finished.
 
-#### Part A — six questions, no code
+#### Part A — seven questions, no code
 
-Handed out at the start of the session.
+Answer these in writing, without running anything.
 
-#### Part B — a buried heating panel
+1. Can any function have a Taylor series expansion that always converges?
+
+2. In the bouncing ball problem we found that the time it takes to make infinitely many bounces was found to be $T_\infty = T_0\sum_{m=0}^\infty (1-\gamma)^{m/2}= \sqrt{\frac{8H}{g}}\frac{1}{1-\sqrt{1-\gamma}}$, and $\gamma$ is the fraction of energy loss at each bounce. Now, suppose we assume fully elastic bounces, then there is no energy loss in each bounce and $\gamma=0$. Can we still use these two expressions for the time it takes to make infinitely many bounces?
+
+3. In the Cartesian reference frame, we found that the base vectors can be found from taking the derivative of the distance vector to one of the coordinates, e.g., $\partial_x \boldsymbol{r}=\partial_x (x,y,z)=(1,0,0)=\hat{\boldsymbol{x}}$. How does it work for cylindrical and spherical coordinate systems?
+
+4. Evaluate $\nabla |\boldsymbol{r}-\boldsymbol{r}'|^{-2}$, with $|\boldsymbol{r}|=\sqrt{x^2+y^2+z^2}$.
+
+5. If $\boldsymbol{E}=-\nabla V$, with $V$ being the electric potential field, explain why
+   (a) $\nabla\times\boldsymbol{E}=\boldsymbol{0}$
+   (b) $\partial_zE_x=\partial_xE_z$
+
+6. Use your understanding of the divergence operator to explain why an incompressible flow field $\boldsymbol{v}$ satisfies $\nabla\cdot\boldsymbol{v}=0$.
+
+7. Let us take a 2D incompressible flow field that is symmetric around the $z$-axis, $\boldsymbol{v}(x,y)=v_x(x,y)\hat{\boldsymbol{x}}+v_y(x,y)\hat{\boldsymbol{y}}$, and $v_z(x,y)=0$.
+
+   (a) Show that $\boldsymbol{w}=\nabla\times\boldsymbol{v}=(\partial_xv_y-\partial_yv_x)\hat{\boldsymbol{z}}$.
+
+   Because the flow does not depend on $z$ and has cylindrical symmetry, we know that the components $v_\varrho,v_\phi$ can depend only on the radial distance $\varrho$. In cylindrical coordinates, the divergence of $\boldsymbol{v}$ is given by
+
+   $$ \nabla\cdot\boldsymbol{v}=\frac{1}{\varrho}\partial_\varrho(\varrho v_\varrho)+\frac{1}{\varrho}\partial_\phi v_\phi+\partial_zv_z. $$
+
+   (b) Show that for incompressible flow, where $\nabla\cdot\boldsymbol{v}=0$ everywhere, $v_\varrho=0$.
+
+   In cylindrical coordinates, the curl of the vector field $\boldsymbol{v}$ is given by
+
+   $$ \nabla\times\boldsymbol{v}=\hat{\boldsymbol{\varrho}}\left(\frac{1}{\varrho}\partial_\phi v_z- \partial_z v_\phi\right)+\hat{\boldsymbol{\phi}}\left(\partial_z v_\varrho- \partial_\varrho v_z\right) + \hat{\boldsymbol{z}}\frac{1}{\varrho}\left(\partial_\varrho(\varrho v_\phi)- \partial_\phi v_\varrho\right) $$
+
+   (c) Show that $\nabla\times\boldsymbol{v}=(\partial_\varrho v_\phi+v_\phi/\varrho)\hat{\boldsymbol{z}}$.
+
+#### Part B (optional) — a buried heating panel
 
 Continue with your Part A answers in mind. A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
 
