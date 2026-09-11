@@ -112,5 +112,9 @@ dmypy.json
 _build/
 .teachbooks/
 
+# macOS metadata
+.DS_Store
+book/.DS_Store
+
 # poetry files
 pyproject.toml
