@@ -1208,6 +1208,34 @@ Answer these in writing, without running anything.
 
    (c) Show that $\nabla\times\boldsymbol{v}=(\partial_\varrho v_\phi+v_\phi/\varrho)\hat{\boldsymbol{z}}$.
 
+:::{admonition} Solutions — Part A
+:class: dropdown
+
+**1.** No, Taylor series expansions exist only for functions that are differentiable infinitely many times and their convergence depends on the function to be expanded or is valid within a so-called region of convergence.
+
+**2.** When there is no energy loss in each bounce, $\gamma=0$. The expression $T_\infty = T_0\sum_{m=0}^\infty (1-\gamma)^{m/2}$ can still be used because it describes all the bounces that actually take place, but the contraction to a fraction is not allowed because the series does not converge.
+
+**3.** In cylindrical and spherical coordinate systems, it works the same way, albeit that normalisation constants must be introduced to make sure the base vectors have unit length.
+
+**4.** $\nabla [(x-x')^2+(y-y')^2+(z-z')^2]^{-1}=-2(\boldsymbol{r}-\boldsymbol{r}')/[(x-x')^2+(y-y')^2+(z-z')^2]^{2}$.
+
+**5.**
+(a) $\nabla\times\boldsymbol{E}=\boldsymbol{0}$ because the gradient is curl-free.
+(b) $\partial_zE_x=\partial_xE_z$, which is another expression of the fact that the gradient is curl-free. The expression here is the $y$-component of the curl of $\boldsymbol{E}$.
+
+**6.** The divergence operator evaluates the total outward flow through a volume. An incompressible flow field moves as a rigid body, which means that what goes in also goes out, so the net outward flow is zero.
+
+*Note: incompressible means volume-preserving, not shape-preserving. Rigid-body motion is one way to conserve volume, and it is not the only one. Field (c) of Task 3, $x\,\hat{\boldsymbol{x}} - y\,\hat{\boldsymbol{y}}$, stretches a parcel along $x$ and squeezes it along $y$ at equal rates: it changes shape, conserves volume, and has zero divergence.*
+
+**7.**
+(a) The $x$- and $y$-components of $\boldsymbol{w}$ are zero because either $v_x$ or $v_y$ is differentiated to the $z$-coordinate on which they do not depend and $v_z=0$. $w_z=\partial_xv_y-\partial_yv_x$ according to the definition of curl.
+
+(b) We find $\nabla\cdot\boldsymbol{v}=0$ and the vector components can depend only on $\varrho$ and the derivatives to $\phi$ and $z$ are zero. What is left is $\frac{1}{\varrho}\partial_\varrho(\varrho v_\varrho)=0$, so $\varrho v_\varrho$ is constant and $v_\varrho = C/\varrho$. That is divergence-free everywhere except on the axis, where it would be a line source. There is no source there, so $C=0$ and $v_\varrho$ must be zero. Hence, there can be no net flow in radial direction.
+
+(c) Also for the curl we find that all derivatives to $\phi$ and $z$ are zero and only the vertical component is non-zero, $w_z=\partial_\varrho v_\phi+v_\phi/\varrho$, which is the same result as under (a) but in cylindrical coordinates.
+:::
+
+
 #### Part B (optional) — a buried heating panel
 
 Continue with your Part A answers in mind. A rectangular electrical heating element, $1.0 \times 0.6$ m, is buried in soil and dissipates $P = 100$ W. Nothing here has been solved for you; the tools are the ones you built.
