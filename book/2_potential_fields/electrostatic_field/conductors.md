@@ -1,15 +1,15 @@
 # Mobile Charge, Conductors and Boundary Conditions
 
-So far, the source charge distributions we have used were prescribed: the charges remained where we placed them. In a conductor, the neagively charged electrons are mobile. If an electric field is present, these charges experience a force and move. Their motion changes the charge distribution, which in turn changes the field.
+So far, the source charge distributions we have used were prescribed: the charges remained where we placed them. In a conductor, the negatively charged electrons are mobile. If an electric field is present, these charges experience a force and move. Their motion changes the charge distribution, which in turn changes the field.
 
-This feedback is the origin of electrostatic conductor boundary conditions, which is important for solving field and wave equations later on.
+This feedback is the origin of electrostatic conductor boundary conditions, which are important for solving field and wave equations later on.
 
 ## Electrostatic equilibrium
 
 Imagine placing a neutral conductor in an external electric field. At first, the field acts on its mobile charges. 
 <!-- Charges of opposite sign move in opposite directions and accumulate on different parts of the surface. 
-Phil: for the sake of clarity, lets assume we are talking about normal metal conductors where the positve charges are fixed in place-->
-The negatively charged electrons will accumulate on the surface as guided by the external field. This separated surface charge creates its own field, which opposes the applied field inside the conductor.
+Phil: for the sake of clarity, let's assume we are talking about normal metal conductors where the positive charges are fixed in place. even in plasma this is a common assumption-->
+The negatively charged electrons will accumulate in one region while being depleted from another, producing both negative and positive induced surface charge. This separated surface charge creates its own field, which opposes the applied field inside the conductor.
 
 Electrostatic equilibrium is reached when the macroscopic charge distribution no longer changes. In an ordinary conductor allowed to settle, this means that there is no net current. It does not mean that every charge is motionless: microscopic thermal motion continues, but there is no systematic drift. The equilibrium charge distribution produces
 
@@ -23,9 +23,9 @@ $$
 \vec\nabla V=\vec 0,
 $$
 
-so the potential is constant throughout each connected conductor. Note, constant does not mean zero: the value depends the chosen reference. Typically, the Earth itself is taken as $V=0$ reference. Conductors connected to it are referred to as being *grounded*. 
+so the potential is constant throughout each connected conductor. Note, constant does not mean zero: the value depends the chosen reference. Typically, the Earth itself is taken as reference for $V=0$. Conductors connected to it are referred to as being *grounded*. 
 
-This also tells us another important fact; a certain potential on it's own will not drive an electric current. A *potential difference* is needed to drive an electric current. 
+This also tells us another important fact; a certain potential on its own will not drive an electric current. A *potential difference* is needed to produce an electric field.
 
 
 ```{figure} figures/conductor_redistribution.svg
