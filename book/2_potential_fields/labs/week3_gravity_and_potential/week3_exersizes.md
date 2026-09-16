@@ -1,0 +1,31 @@
+# Lab 3: Gravity and Potential Fields
+
+## Warm-up
+
+### 1. Equipotentials and field geometry
+A space probe measured the following gravitational potential of an asteroid. a) Sketch the corresponding field lines.
+b) On which side is the field strongest?
+
+### 2. Conservative fields
+A ball is rolling on a frictionless surface. At point $P$ it has velocity $v_0$. What is the velocity at point $P'$ for cases a), b) and c)?
+
+## Problems
+
+### 3. Potential and work
+Three identical point masses of 1000kg are in a line, separated by a distance $a/2$, where $a=5$m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
+
+### 4. Gauss's Law and divergence
+A radial gravitational field distribution is given in spherical coordinates as
+```{math}
+\vec{g}(r) =
+\begin{cases}
+-\dfrac{8\pi G\rho_0}{3}r\,\hat{r}, & r \leq a, \\
+-\dfrac{4\pi G\rho_0}{3}
+\left(r + \dfrac{a^3}{r^2}\right)\hat{r}, & a \leq r \leq b, \\
+-\dfrac{4\pi G\rho_0}{3}
+\dfrac{a^3+b^3}{r^2}\,\hat{r}, & r \geq b, \\
+\end{cases}
+```
+where $\rho_0$, $a$ and $b$ are constants.
+(a) Determine the volumetric mass density in the entire region $(0 \leq r \lt \infty)$.
+(b) Find the total mass, $M$, within a sphere of radius $r$ where $r \gt b$. 
