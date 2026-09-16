@@ -41,6 +41,7 @@ parts:
         - file: 2_potential_fields/introduction/earth_gravity_work.ipynb
         - file: 2_potential_fields/gravity_field/uniform_cylinder_laplacian.ipynb
       - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
+      - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
     - file: 2_potential_fields/electrostatic_field/intro.md
       sections:
       - file: 2_potential_fields/electrostatic_field/coulombs_law.md
