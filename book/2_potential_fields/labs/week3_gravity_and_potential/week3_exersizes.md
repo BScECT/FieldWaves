@@ -15,15 +15,29 @@ A ball with mass $m$ is rolling on a frictionless surface. At point $P$ it has v
 :width: 50%
 ```
 
+### 3. Inside a hollow asteroid
+A hollow, non-rotating asteroid is modelled as a thin uniform spherical shell of mass $M$ and radius $R$. A small loose pebble lies at rest inside the cavity at point $P$, closer to one side of the shell.
+```{figure} figures/hollow_asteroid_spherical.png
+:width: 35%
+```
+a) Will the pebble start to move toward the nearer wall? In which direction does the shell pull it?
+
+b) Sketch the potential $\Phi(r)$ and the field strength $|\vec{g}|(r)$ as functions of the distance $r$ from the centre of the asteroid. Draw both inside the cavity ($r<R$) and outside the asteroid, up to a few times $R$. Take $\Phi \to 0$ at infinity.
+
+c) The asteroid actually has the irregular shape shown below. The cavity is still a sphere of radius $R$ centred at $O$, and the rock has the same uniform density everywhere. Would your answers to a) and change? Answer yes or no for each, and explain briefly.
+```{figure} figures/irregular_asteroid.png
+:width: 40%
+```
+
 ## Problems
 
-### 3. Potential and work
+### 5. Potential and work
 Three identical point masses of $m=1000$kg are in a line, separated by a distance $a/2$, where $a=5$m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
 ```{figure} figures/masses_triangle.png
 :width: 50%
 ```
 
-### 4. Gauss's Law and divergence
+### 6. Gauss's Law and divergence
 A radial gravitational field distribution is given in spherical coordinates as
 ```{math}
 \vec{g}(r) =

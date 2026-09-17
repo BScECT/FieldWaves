@@ -24,6 +24,48 @@ A ball with mass $m$ is rolling on a frictionless surface. At point $P$ it has v
 ```
 $v=v_0$ in all cases because gravity is a conservative field. The route from $P$ to $P'$ does not matter (ignoring friction, and assuming $v_0$ is enough to make it over the hill in case b)). 
 
+### 3. Inside a hollow asteroid
+A hollow, non-rotating asteroid is modelled as a thin uniform spherical shell of mass $M$ and radius $R$. A small loose pebble lies at rest inside the cavity at point $P$, closer to one side of the shell.
+```{figure} figures/hollow_asteroid_spherical.png
+:width: 35%
+```
+a) Will the pebble start to move toward the nearer wall? In which direction does the shell pull it?
+
+b) Sketch the potential $\Phi(r)$ and the field strength $|\vec{g}|(r)$ as functions of the distance $r$ from the centre of the asteroid. Draw both inside the cavity ($r<R$) and outside the asteroid, up to a few times $R$. Take $\Phi \to 0$ at infinity.
+
+c) The asteroid actually has the irregular shape shown below. The cavity is still a sphere of radius $R$ centred at $O$, and the rock has the same uniform density everywhere. Would your answers to a) and b) change? Answer yes or no for each, and explain briefly.
+```{figure} figures/irregular_asteroid.png
+:width: 40%
+```
+ 
+a) No. The shell exerts no net pull anywhere inside it, so the pebble stays at rest. Draw a thin double cone through $P$: it cuts a small patch on the near side and a larger patch on the far side. The mass of each patch grows as the square of its distance from $P$, while its pull falls off as one over that distance squared, so the two pulls are equal and opposite. The nearer wall is closer but has less mass inside the cone; This exact cancellation relies on the inverse-square law. 
+ 
+b)
+```{figure} figures/hollow_asteroid_spherical_solution.png
+:width: 90%
+```
+```{math}
+\Phi(r) =
+\begin{cases}
+-\dfrac{GM}{R}, & r < R, \\
+-\dfrac{GM}{r}, & r > R,
+\end{cases}
+\qquad
+|\vec{g}|(r) =
+\begin{cases}
+0, & r < R, \\
+\dfrac{GM}{r^2}, & r > R.
+\end{cases}
+```
+Inside, $\Phi$ is flat, so its slope, and therefore $\vec{g} = -\vec{\nabla}\Phi$, is zero. Outside, the shell acts as a point mass at the centre. The field strength jumps from $0$ to $GM/R^2$ at the shell; the potential is continuous.
+ 
+c) Split the asteroid into two parts: a spherical shell centred at $O$ (inside the dashed circle) plus the extra material outside that shell.
+```{figure} figures/irregular_asteroid_solution.png
+:width: 40%
+```
+- a) **Yes.** The spherical shell still exerts no net pull in the cavity. The extra material, however, is not spherically symmetric, so its pulls do not cancel. The pebble starts to move toward the bulge on the left, which is *away* from its nearer wall: what matters is how the mass is distributed, not the distance to the nearest wall. The shell result requires spherical symmetry.
+- b) **Yes.** Inside the cavity, $\vec{g} \neq \vec{0}$ and $\Phi$ is no longer constant: it varies from point to point. Outside, $\Phi$ and $\vec{g}$ depend on the direction as well as on the distance, so a single curve $\Phi(r)$ no longer describes them. Only far from the asteroid do they approach $-GM/r$ and $GM/r^2$, with $M$ the total mass.
+
 ## Problems
 
 ### 3. Potential and work
