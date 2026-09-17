@@ -51,7 +51,7 @@ parts:
       - file: 2_potential_fields/electrostatic_field/making_of.md
     - file: 2_potential_fields/magnetic_field/intro.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
-    - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
+   # - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
