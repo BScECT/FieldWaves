@@ -52,3 +52,14 @@ A radial gravitational field distribution is given in spherical coordinates as
 where $\rho_0$, $a$ and $b$ are constants.
 (a) Determine the volumetric mass density, $\rho$, in the entire region $(0 \leq r \lt \infty)$.
 (b) Find the total mass, $M$, within a sphere of radius $r$ where $r \gt b$. 
+
+### 7. A conservative field: integrating around a rectangle
+The potential of $\vec{F}$ is given by $\left(x^2+y^2\right)^{-1}$.
+
+(a) Find $\vec{F}$.
+
+(b) Describe the field lines of $\vec{F}$.
+
+(c) Describe the equipotential surfaces of $\vec{F}$.
+
+(d) Demonstrate by integration around the perimeter of a rectangle in the $x,y$ plane that $\vec{F}$ is conservative. Let the rectangle extend from $x_1$ to $x_2$ in the $x$ direction and from $y_1$ to $y_2$ in the $y$ direction, and let $x_1 > 0$.
