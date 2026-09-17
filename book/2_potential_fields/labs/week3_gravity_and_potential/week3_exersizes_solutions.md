@@ -3,7 +3,7 @@
 ## Warm-ups
 
 ### 1. Equipotentials and field geometry
-A probe measured the following gravitational potential in a region of space around an asteroid. a) Sketch the corresponding field lines.
+A probe measured the following gravitational potential in a region of space around an asteroid (in arbitrary units). a) Sketch the corresponding field lines.
 b) On which side is the field strongest?
 ```{figure} figures/equipotentials_with_lines.jpg
 :width: 95%
