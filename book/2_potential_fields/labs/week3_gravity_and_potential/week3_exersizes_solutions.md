@@ -33,12 +33,12 @@ a) Will the pebble start to move toward the nearer wall? In which direction does
 
 b) Sketch the potential $\Phi(r)$ and the field strength $|\vec{g}|(r)$ as functions of the distance $r$ from the centre of the asteroid. Draw both inside the cavity ($r<R$) and outside the asteroid, up to a few times $R$. Take $\Phi \to 0$ at infinity.
 
-c) The asteroid actually has the irregular shape shown below. The cavity is still a sphere of radius $R$ centred at $O$, and the rock has the same uniform density everywhere. Would your answers to a) and b) change? Answer yes or no for each, and explain briefly.
+c) The asteroid actually has the irregular shape shown below. The cavity is a sphere of radius $R$ centred at $O$, and the rock has the same uniform density everywhere. Would your answers to a) and b) change? Answer yes or no for each, and explain briefly.
 ```{figure} figures/irregular_asteroid.png
 :width: 40%
 ```
  
-a) No. The shell exerts no net pull anywhere inside it, so the pebble stays at rest. Draw a thin double cone through $P$: it cuts a small patch on the near side and a larger patch on the far side. The mass of each patch grows as the square of its distance from $P$, while its pull falls off as one over that distance squared, so the two pulls are equal and opposite. The nearer wall is closer but has less mass inside the cone; This exact cancellation relies on the inverse-square law. 
+a) No. The shell exerts no net pull anywhere inside it, so the pebble stays at rest. Draw a thin double cone through $P$: it cuts a small patch on the near side and a larger patch on the far side. The mass of each patch grows as the square of its distance from $P$, while its pull falls off as one over that distance squared, so the two pulls are equal and opposite. The nearer wall is closer, but it has less mass inside the cone. This exact cancellation relies on the inverse-square law. 
  
 b)
 ```{figure} figures/hollow_asteroid_spherical_solution.png
@@ -69,7 +69,7 @@ c) Split the asteroid into two parts: a spherical shell centred at $O$ (inside t
 ## Problems
 
 ### 4. Potential and work
-Three identical point masses of $m=1000$kg are in a line, separated by a distance $a/2$, where $a=5$m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
+Three identical point masses of $m=1000$ kg are in a line, separated by a distance $a/2$, where $a=5$ m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
 ```{figure} figures/masses_triangle.png
 :width: 50%
 ```
@@ -112,7 +112,7 @@ A radial gravitational field distribution is given in spherical coordinates as
 \begin{cases}
 -\dfrac{8\pi G\rho_0}{3}r\,\hat{r}, & r \leq a, \\
 -\dfrac{4\pi G\rho_0}{3}
-\dfrac{r^3+b^3}{r^2}\,\hat{r}, & a \leq r \leq b, \\
+\dfrac{r^3+a^3}{r^2}\,\hat{r}, & a \leq r \leq b, \\
 -\dfrac{4\pi G\rho_0}{3}
 \dfrac{a^3+b^3}{r^2}\,\hat{r}, & r > b, \\
 \end{cases}
@@ -125,7 +125,7 @@ where $\rho_0$, $a$ and $b$ are constants.
 ```{math}
 \vec{\nabla} \cdot \vec{g} = -4\pi G\rho.
 ```
-In this case, the field has only a dependance on $r$ (spherical symmetry). Thus the divergence operator becomes:
+In this case, the field has only a dependence on $r$ (spherical symmetry). Thus the divergence operator becomes:
 ```{math}
 \vec{\nabla} \cdot \vec{g} = \frac{1}{r^2} \frac{\partial}{\partial r} (r^2 g)
 ```
@@ -144,7 +144,7 @@ In region $a \leq r \leq b$:
 ```{math}
 \begin{aligned}
 -4\pi G\rho &= \frac{1}{r^2} \frac{\partial}{\partial r} (r^2 g) \\
-       \rho &= \frac{-1}{4\pi G}\frac{1}{r^2} \frac{\partial}{\partial r} \left(r^2 \frac{-4\pi G\rho_0}{3} \frac{r^3+b^3}{r^2} \right) \\
+       \rho &= \frac{-1}{4\pi G}\frac{1}{r^2} \frac{\partial}{\partial r} \left(r^2 \frac{-4\pi G\rho_0}{3} \frac{r^3+a^3}{r^2} \right) \\
             &= \frac{-1}{4\pi G}\frac{1}{r^2} \left(-4\pi G\rho_0 r^2 \right) \\
             &= \boxed{\rho_0}
 \end{aligned}
@@ -194,7 +194,10 @@ M   &= \iiint_V \rho(r) dV \\
 ```
 
 ### 6. A conservative field: integrating around a rectangle
+
 The potential of $\vec{F}$ is given by $\left(x^2+y^2\right)^{-1}$.
+
+Note: This is an abstract conservative vector field; it is not intended to represent a gravitational field.
 
 (a) Find $\vec{F}$.
 
@@ -202,352 +205,212 @@ The potential of $\vec{F}$ is given by $\left(x^2+y^2\right)^{-1}$.
 
 (c) Describe the equipotential surfaces of $\vec{F}$.
 
-(d) Demonstrate by integration around the perimeter of a rectangle in the $x,y$ plane that $\vec{F}$ is conservative. Let the rectangle extend from $x_1$ to $x_2$ in the $x$ direction and from $y_1$ to $y_2$ in the $y$ direction, and let $x_1 > 0$.
- 
+(d) Verify by integration around the perimeter of a rectangle in the $x,y$ plane that the circulation of $\vec{F}$ around this rectangle vanishes. Let the rectangle extend from $x_1$ to $x_2$ in the $x$ direction and from $y_1$ to $y_2$ in the $y$ direction, and let $x_1 > 0$.
+
 (a) Write the potential as $\Phi = \left(x^2+y^2\right)^{-1}$ and use $\vec{F} = -\vec{\nabla}\Phi$. The partial derivatives of $\Phi$ are
+
 ```{math}
 \frac{\partial\Phi}{\partial x} = -\frac{2x}{\left(x^2+y^2\right)^2}, \qquad
+
 \frac{\partial\Phi}{\partial y} = -\frac{2y}{\left(x^2+y^2\right)^2}, \qquad
+
 \frac{\partial\Phi}{\partial z} = 0.
 ```
+
 Therefore
+
 ```{math}
 F_x = \frac{2x}{\left(x^2+y^2\right)^2}, \qquad F_y = \frac{2y}{\left(x^2+y^2\right)^2}, \qquad F_z = 0,
+
 \qquad
+
 \boxed{\vec{F} = \frac{2\left(x\,\hat{x} + y\,\hat{y}\right)}{\left(x^2+y^2\right)^2}}
 ```
+
 With $s = \sqrt{x^2+y^2}$, the distance from the $z$-axis, the magnitude is
+
 ```{math}
 |\vec{F}| = \frac{2\sqrt{x^2+y^2}}{\left(x^2+y^2\right)^2} = \frac{2s}{s^4} = \frac{2}{s^3}.
 ```
- 
+
 (b) $\vec{F}$ is parallel to $x\,\hat{x} + y\,\hat{y}$, which points directly away from the $z$-axis. The field lines follow the direction of $\vec{F}$, so in a plane $z = $ constant
+
 ```{math}
 \frac{dy}{dx} = \frac{F_y}{F_x} = \frac{y}{x}
+
 \quad\Rightarrow\quad
+
 \frac{dy}{y} = \frac{dx}{x}
+
 \quad\Rightarrow\quad
+
 \boxed{y = Cx}
 ```
+
 The field lines are **straight radial lines in planes $z = $ constant, directed outward from the $z$-axis**. The field becomes weaker as $1/s^3$ away from the axis, and it is undefined on the $z$-axis itself.
- 
+
 (c) An equipotential surface is where $\Phi$ has a constant value $\Phi_0$:
+
 ```{math}
 \frac{1}{x^2+y^2} = \Phi_0 \quad\Rightarrow\quad x^2+y^2 = \frac{1}{\Phi_0}.
 ```
+
 In a plane $z = $ constant this is a circle around the $z$-axis. There is no restriction on $z$, so the circle extends along the $z$-direction: the equipotential surfaces are **circular cylinders $x^2+y^2 = $ constant around the $z$-axis**.
+
 The gradient of $\Phi$ is perpendicular to any surface of constant $\Phi$, and $\vec{F} = -\vec{\nabla}\Phi$. The field is therefore normal to the cylinders: the radial field lines cross them at right angles.
- 
+
 (d) Along the path, a small displacement is $d\vec{s} = dx\,\hat{x} + dy\,\hat{y}$, so
+
 ```{math}
 \vec{F}\cdot d\vec{s} = F_x\,dx + F_y\,dy.
 ```
+
 - On a horizontal side, $dy = 0$, so only $F_x\,dx$ contributes.
+
 - On a vertical side, $dx = 0$, so only $F_y\,dy$ contributes.
+
 Go around the rectangle counterclockwise, as in the figure. The condition $x_1 > 0$ keeps the rectangle away from the $z$-axis, where $\vec{F}$ is undefined, so every integral exists.
+
 ```{figure} figures/rectangle_conservative.png
-:width: 45%
+:width: 32%
 ```
+
 Each integral uses the antiderivative $\int \dfrac{2u\,du}{(u^2+c^2)^2} = -\dfrac{1}{u^2+c^2}$.
- 
+
 Bottom side, $y = y_1$, from $x_1$ to $x_2$:
+
 ```{math}
 I_1 = \int_{x_1}^{x_2} \frac{2x\,dx}{\left(x^2+y_1^2\right)^2} = \left[-\frac{1}{x^2+y_1^2}\right]_{x_1}^{x_2} = \frac{1}{x_1^2+y_1^2} - \frac{1}{x_2^2+y_1^2}
 ```
+
 Right side, $x = x_2$, from $y_1$ to $y_2$:
+
 ```{math}
 I_2 = \int_{y_1}^{y_2} \frac{2y\,dy}{\left(x_2^2+y^2\right)^2} = \frac{1}{x_2^2+y_1^2} - \frac{1}{x_2^2+y_2^2}
 ```
+
 Top side, $y = y_2$, from $x_2$ back to $x_1$:
+
 ```{math}
 I_3 = \int_{x_2}^{x_1} \frac{2x\,dx}{\left(x^2+y_2^2\right)^2} = \frac{1}{x_2^2+y_2^2} - \frac{1}{x_1^2+y_2^2}
 ```
+
 Left side, $x = x_1$, from $y_2$ back to $y_1$:
+
 ```{math}
 I_4 = \int_{y_2}^{y_1} \frac{2y\,dy}{\left(x_1^2+y^2\right)^2} = \frac{1}{x_1^2+y_2^2} - \frac{1}{x_1^2+y_1^2}
 ```
+
 Adding the four sides:
+
 ```{math}
 \begin{aligned}
+
 \oint \vec{F}\cdot d\vec{s} = I_1 + I_2 + I_3 + I_4
+
 ={}& \left(\frac{1}{x_1^2+y_1^2} - \frac{1}{x_2^2+y_1^2}\right)
+
 + \left(\frac{1}{x_2^2+y_1^2} - \frac{1}{x_2^2+y_2^2}\right) \\
+
 &+ \left(\frac{1}{x_2^2+y_2^2} - \frac{1}{x_1^2+y_2^2}\right)
+
 + \left(\frac{1}{x_1^2+y_2^2} - \frac{1}{x_1^2+y_1^2}\right) \\
+
 ={}& 0.
+
 \end{aligned}
 ```
+
 Every term appears once with a plus sign and once with a minus sign, so
+
 ```{math}
 \boxed{\oint \vec{F}\cdot d\vec{s} = 0}
 ```
-This explicit calculation demonstrates the path independence expected for a conservative field: the contributions from the four sides cancel, giving zero circulation around the closed rectangle.
+
+This explicit calculation verifies that the circulation around this rectangle vanishes: the contributions from the four sides cancel.
+
 The zero result is expected because the field is generated by the potential $\Phi$. Along any path from $A$ to $B$,
+
 ```{math}
 \int_A^B \vec{F}\cdot d\vec{s} = \Phi(A) - \Phi(B),
 ```
+
 and for a closed path $A = B$, so the integral is zero. Each $I_k$ above has exactly this form: the potential at the start of the side minus the potential at its end.
- 
+
 *Alternative check.* Since $\vec{F} = -\vec{\nabla}\Phi$, we must have $\vec{\nabla}\times\vec{F} = \vec{0}$ wherever $\Phi$ is smooth, which is everywhere except on the $z$-axis.
 
 ### 7. Laplace equation and physical meaning
-
 A thin metal plate is in steady-state thermal conduction. The thermal conductivity $k$ is constant, and there are no internal heat sources or sinks within the plate. The temperature distribution is proposed to be
-
 ```{math}
-
 T(x,y)=T_0+A(x^2-y^2),
-
 ```
-
 where $T_0$ and $A$ are constants.
 
-(a) Show that the temperature distribution satisfies Laplace's equation,
-
-```{math}
-
-\nabla^2 T=0.
-
-```
+(a) Show that the temperature distribution satisfies Laplace's equation, $\nabla^2 T = 0$.
 
 (b) Is the temperature uniform throughout the plate? Explain briefly.
 
 (c) What does $\nabla^2T=0$ mean physically in this problem? Does it mean that there is no heat flow?
 
-(d) The heat flux is given by Fourier's law,
+(d) The heat flux is given by Fourier's law, $\vec{q}=-k\vec{\nabla}T$, where $k$ is the thermal conductivity. Find $\vec{q}$ and describe its direction.
+ 
 
+(a) In the two-dimensional plate the Laplacian is
 ```{math}
-
-\vec{q}=-k\nabla T,
-
+\nabla^2T = \frac{\partial^2T}{\partial x^2} + \frac{\partial^2T}{\partial y^2}.
 ```
-
-where $k$ is the thermal conductivity. Find $\vec{q}$ and describe its direction.
-
-(a) The Laplacian of the temperature in the two-dimensional plate is
-
+Differentiating $T = T_0 + A(x^2-y^2)$ once, and remembering that $T_0$ and $A$ are constants,
 ```{math}
-
-\nabla^2T
-=
-\frac{\partial^2T}{\partial x^2}
-+
-\frac{\partial^2T}{\partial y^2}.
-
-```
-
-First, calculate the first derivatives:
-
-```{math}
-
-\frac{\partial T}{\partial x}=2Ax,
+\frac{\partial T}{\partial x} = \frac{\partial}{\partial x}\left[T_0 + A(x^2-y^2)\right] = 2Ax,
 \qquad
-\frac{\partial T}{\partial y}=-2Ay.
-
+\frac{\partial T}{\partial y} = \frac{\partial}{\partial y}\left[T_0 + A(x^2-y^2)\right] = -2Ay.
 ```
-
-Taking the second derivatives gives
-
+Differentiating a second time,
 ```{math}
-
-\frac{\partial^2T}{\partial x^2}=2A,
+\frac{\partial^2T}{\partial x^2} = \frac{\partial}{\partial x}\left(2Ax\right) = 2A,
 \qquad
-\frac{\partial^2T}{\partial y^2}=-2A.
-
+\frac{\partial^2T}{\partial y^2} = \frac{\partial}{\partial y}\left(-2Ay\right) = -2A.
 ```
-
-Therefore,
-
+Adding the two second derivatives,
 ```{math}
-
-\begin{aligned}
-
-\nabla^2T
-&=
-\frac{\partial^2T}{\partial x^2}
-+
-\frac{\partial^2T}{\partial y^2} \\
-&=
-2A-2A \\
-&=
-\boxed{0}.
-
-\end{aligned}
-
+\nabla^2T = 2A + (-2A) = \boxed{0}
 ```
-
-Thus, the proposed temperature distribution satisfies Laplace's equation.
-
-(b) **No.** The temperature is not uniform throughout the plate because it depends on the position $(x,y)$:
-
+The proposed temperature distribution therefore satisfies Laplace's equation.
+ 
+(b) No. The temperature depends on position through the term $A(x^2-y^2)$, so it varies across the plate. A uniform temperature would require the much stronger condition $\vec{\nabla}T = \vec{0}$. The gradient describes how $T$ changes from one point to another, while the Laplacian describes its curvature. Here the two curvatures, $+2A$ and $-2A$, cancel, giving a zero Laplacian even though the temperature varies throughout the plate.
+ 
+(c) In steady state, with constant $k$ and a heat production $H$ per unit volume,
 ```{math}
-
-T(x,y)=T_0+A(x^2-y^2).
-
+k\nabla^2T + H = 0.
 ```
-
-For example, if we move in the $x$ direction, the temperature changes as $x^2$, while moving in the $y$ direction changes it as $-y^2$.
-
-Therefore,
-
+Here $H=0$, so $\nabla^2T=0$. Physically, no heat is produced or absorbed inside the plate: whatever flows into a small region also flows out of it,
 ```{math}
-
-\boxed{\nabla^2T=0
-\quad\text{does not mean}\quad
-T=\text{constant}.}
-
+\vec{\nabla}\cdot\vec{q} = -k\nabla^2T = 0.
 ```
-
-A uniform temperature would instead require the temperature gradient to be zero:
-
-```{math}
-
-\boxed{\nabla T=\vec{0}.}
-
-```
-
-The Laplacian and the gradient describe different properties of the temperature field. The gradient describes how the temperature changes from one point to another, while the Laplacian describes the local curvature of the temperature distribution.
-
-(c) In steady-state thermal conduction, the heat equation is
-
-```{math}
-
-\nabla\cdot(k\nabla T)+\dot{q}=0,
-
-```
-
-where $\dot{q}$ represents the rate of internal heat generation per unit volume.
-
-In this problem, $k$ is constant and there are no internal heat sources or sinks, so $\dot{q}=0$. Therefore,
-
-```{math}
-
-k\nabla^2T=0,
-
-```
-
-which gives
-
-```{math}
-
-\boxed{\nabla^2T=0.}
-
-```
-
-Physically, this means that there is **no net generation or removal of heat inside the plate**. Heat can still enter the plate through one boundary and leave through another boundary.
-
-Therefore, $\nabla^2T=0$ does **not** mean that there is no heat flow.
-
-The important distinction is
-
-```{math}
-
-\boxed{
-\nabla^2T=0
-\quad\Rightarrow\quad
-\text{no internal heat generation or absorption}
-}
-
-```
-
-whereas
-
-```{math}
-
-\boxed{
-\nabla T=\vec{0}
-\quad\Rightarrow\quad
-\text{no temperature gradient and therefore no heat flux}.
-}
-
-```
-
-Thus, a temperature field can satisfy Laplace's equation while still varying from point to point and producing a non-zero heat flux.
-
-This is analogous to the gravitational potential. In a region containing no mass,
-
-```{math}
-
-\nabla^2\Phi=0,
-
-```
-
-but the gravitational field can still be non-zero because masses outside the region can produce a gravitational field within it.
-
+This does **not** mean that there is no heat flow. Heat enters through one part of the boundary and leaves through another; only $\vec{\nabla}T=\vec{0}$ would give $\vec{q}=\vec{0}$.
+The same holds for gravity: in a region without mass $\nabla^2\Phi = 0$, yet $\vec{g}$ can be large there, because the masses lie outside the region.
+ 
 (d) The temperature gradient is
-
 ```{math}
-
+\vec{\nabla}T = \frac{\partial T}{\partial x}\hat{x} + \frac{\partial T}{\partial y}\hat{y} = 2Ax\,\hat{x} - 2Ay\,\hat{y},
+```
+and substituting it into Fourier's law gives
+```{math}
 \begin{aligned}
-
-\nabla T
-&=
-\frac{\partial T}{\partial x}\hat{x}
-+
-\frac{\partial T}{\partial y}\hat{y} \\
-&=
-2Ax\,\hat{x}-2Ay\,\hat{y}.
-
+\vec{q} &= -k\vec{\nabla}T \\
+        &= -k\left(2Ax\,\hat{x} - 2Ay\,\hat{y}\right) \\
+        &= \boxed{-2kAx\,\hat{x} + 2kAy\,\hat{y}}
 \end{aligned}
-
 ```
+The heat flux points **opposite to the temperature gradient**, in the direction of decreasing temperature. For example, taking $A>0$: where $x>0$ we have $q_x = -2kAx < 0$, so heat flows in the negative $x$ direction, toward the $y$ axis; where $y>0$ we have $q_y = 2kAy > 0$, so heat flows in the positive $y$ direction, away from the $x$ axis.
 
-Using Fourier's law,
-
+```{figure} figures/plate_heat_flux.png
+:width: 45%
+```
+The isotherms $x^2-y^2=$ constant are hyperbolas, and the flux crosses them at right angles, running from the warmer parts of the plate to the cooler ones. The flux vanishes only at the origin, where $\vec{\nabla}T=\vec{0}$.
+The flux is generally non-zero even though the Laplacian is zero:
 ```{math}
-
-\vec{q}=-k\nabla T,
-
+\boxed{\nabla^2T = 0 \quad\not\Rightarrow\quad \vec{q} = \vec{0}}
 ```
-
-we obtain
-
-```{math}
-
-\begin{aligned}
-
-\vec{q}
-&=
--k\left(2Ax\,\hat{x}-2Ay\,\hat{y}\right) \\
-&=
-\boxed{-2kAx\,\hat{x}+2kAy\,\hat{y}}.
-
-\end{aligned}
-
-```
-
-The heat flux points in the direction of decreasing temperature, so it is opposite to the temperature gradient.
-
-For example, if $A>0$ and $x>0$, then
-
-```{math}
-
-q_x=-2kAx<0,
-
-```
-
-so heat flows in the negative $x$ direction.
-
-Similarly, if $A>0$ and $y>0$, then
-
-```{math}
-
-q_y=2kAy>0,
-
-```
-
-so heat flows in the positive $y$ direction.
-
-The heat flux is therefore generally non-zero even though the Laplacian is zero:
-
-```{math}
-
-\boxed{
-\nabla^2T=0
-\quad\not\Rightarrow\quad
-\vec{q}=\vec{0}.
-}
-
-```
-
-The main physical lesson is that **Laplace's equation describes a source-free region, not necessarily a region with a uniform temperature or zero heat flow**.
+Laplace's equation therefore describes a **source-free region**, not a region with uniform temperature or zero heat flow.
+ 

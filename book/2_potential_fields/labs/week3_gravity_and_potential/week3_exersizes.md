@@ -32,7 +32,7 @@ c) The asteroid actually has the irregular shape shown below. The cavity is stil
 ## Problems
 
 ### 4. Potential and work
-Three identical point masses of $m=1000$kg are in a line, separated by a distance $a/2$, where $a=5$m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
+Three identical point masses of $m=1000$ kg are in a line, separated by a distance $a/2$, where $a=5$ m. How much work must be done to move the centre mass from point $P$ to point $P'$, such that all three masses form an equilateral triangle? 
 ```{figure} figures/masses_triangle.png
 :width: 50%
 ```
@@ -44,7 +44,7 @@ A radial gravitational field distribution is given in spherical coordinates as
 \begin{cases}
 -\dfrac{8\pi G\rho_0}{3}r\,\hat{r}, & r \leq a, \\
 -\dfrac{4\pi G\rho_0}{3}
-\dfrac{r^3+b^3}{r^2}\,\hat{r},, & a \leq r \leq b, \\
+\dfrac{r^3+a^3}{r^2}\,\hat{r}, & a \leq r \leq b, \\
 -\dfrac{4\pi G\rho_0}{3}
 \dfrac{a^3+b^3}{r^2}\,\hat{r}, & r \geq b, \\
 \end{cases}
@@ -54,7 +54,7 @@ where $\rho_0$, $a$ and $b$ are constants.
 (b) Find the total mass, $M$, within a sphere of radius $r$ where $r \gt b$. 
 
 ### 6. A conservative field: integrating around a rectangle
-The potential of $\vec{F}$ is given by $\left(x^2+y^2\right)^{-1}$.
+A vector field $\vec{F}$ has the potential $\Phi = \left(x^2+y^2\right)^{-1}$, with $\vec{F} = -\vec{\nabla}\Phi$ as usual. This is an abstract field rather than a gravity field, so do not expect it to point inward towards a source.
 
 (a) Find $\vec{F}$.
 
@@ -62,16 +62,14 @@ The potential of $\vec{F}$ is given by $\left(x^2+y^2\right)^{-1}$.
 
 (c) Describe the equipotential surfaces of $\vec{F}$.
 
-(d) Demonstrate by integration around the perimeter of a rectangle in the $x,y$ plane that $\vec{F}$ is conservative. Let the rectangle extend from $x_1$ to $x_2$ in the $x$ direction and from $y_1$ to $y_2$ in the $y$ direction, and let $x_1 > 0$.
+(d) Show by integration around the perimeter of a rectangle in the $x,y$ plane that the circulation of $\vec{F}$ vanishes, as it must for a conservative field. Let the rectangle extend from $x_1$ to $x_2$ in the $x$ direction and from $y_1$ to $y_2$ in the $y$ direction, and let $x_1 > 0$.
 
 ### 7. Laplace equation and physical meaning
 
 A thin metal plate is in steady-state thermal conduction. The thermal conductivity $k$ is constant, and there are no internal heat sources or sinks within the plate. The temperature distribution is proposed to be
 
 ```{math}
-
 T(x,y)=T_0+A(x^2-y^2),
-
 ```
 
 where $T_0$ and $A$ are constants.
@@ -79,9 +77,7 @@ where $T_0$ and $A$ are constants.
 (a) Show that the temperature distribution satisfies Laplace's equation,
 
 ```{math}
-
 \nabla^2 T=0.
-
 ```
 
 (b) Is the temperature uniform throughout the plate? Explain briefly.
@@ -91,9 +87,7 @@ where $T_0$ and $A$ are constants.
 (d) The heat flux is given by Fourier's law,
 
 ```{math}
-
-\vec{q}=-k\nabla T,
-
+\vec{q}=-k\vec{\nabla}T,
 ```
 
 where $k$ is the thermal conductivity. Find $\vec{q}$ and describe its direction.
