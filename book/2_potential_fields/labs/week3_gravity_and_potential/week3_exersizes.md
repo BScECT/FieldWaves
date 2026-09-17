@@ -11,6 +11,9 @@ b) On which side is the field strongest?
 
 ### 2. Conservative fields
 A ball is rolling on a frictionless surface. At point $P$ it has velocity $v_0$. What is the velocity at point $P'$ for cases a), b) and c)?
+```{figure} figures/rolling_ball.png
+:width: 50%
+```
 
 ## Problems
 

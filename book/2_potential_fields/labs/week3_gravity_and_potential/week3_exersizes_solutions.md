@@ -5,12 +5,24 @@
 ### 1. Equipotentials and field geometry
 A probe measured the following gravitational potential in a region of space around an asteroid. a) Sketch the corresponding field lines.
 b) On which side is the field strongest?
-```{figure} figures/equipotentials.png
-:width: 50%
+```{figure} figures/equipotentials_with_lines.jpg
+:width: 95%
 ```
+
+Approximate field lines are shown above. According to 
+```{math}
+\vec{g} = -\vec{\nabla}\Phi,
+```
+field lines are always perpendicular to the equipotentials. The field is stronger on the right-hand side where the gradient is steeper. (Note that this is an exaggeration, in real life the differences would not be very large). 
+
+
 
 ### 2. Conservative fields
 A ball is rolling on a frictionless surface. At point $P$ it has velocity $v_0$. What is the velocity at point $P'$ for cases a), b) and c)?
+```{figure} figures/rolling_ball.png
+:width: 50%
+```
+$v=v_0$ in all cases because gravity is a conservative field. The route from $P$ to $P'$ does not matter (ignoring friction, and assuming $v_0$ is enough to make it over the hill in case b)). 
 
 ## Problems
 
