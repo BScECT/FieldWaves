@@ -41,7 +41,7 @@ c) The asteroid actually has the irregular shape shown below. The cavity is a sp
 a) No. The shell exerts no net pull anywhere inside it, so the pebble stays at rest. Draw a thin double cone through $P$: it cuts a small patch on the near side and a larger patch on the far side. The mass of each patch grows as the square of its distance from $P$, while its pull falls off as one over that distance squared, so the two pulls are equal and opposite. The nearer wall is closer, but it has less mass inside the cone. This exact cancellation relies on the inverse-square law. 
  
 b)
-```{figure} figures/hollow_asteroid_spherical_solution.png
+```{figure} figures/hollow_asteroid_spherical_solution2.png
 :width: 90%
 ```
 ```{math}
@@ -229,7 +229,21 @@ With $s = \sqrt{x^2+y^2}$, the distance from the $z$-axis, the magnitude is
 |\vec{F}| = \frac{2\sqrt{x^2+y^2}}{\left(x^2+y^2\right)^2} = \frac{2s}{s^4} = \frac{2}{s^3}.
 ```
 
-(b) $\vec{F}$ is parallel to $x\,\hat{x} + y\,\hat{y}$, which points directly away from the $z$-axis. The field lines follow the direction of $\vec{F}$, so in a plane $z = $ constant
+(b) A field line is a curve whose direction at every point matches $\vec{F}$. In the $x,y$-plane, the direction of a curve is given by its slope, $dy/dx$. The direction of the vector $\vec{F} = (F_x, F_y)$ is also a slope ("rise over run"), namely $F_y/F_x$. For the curve to follow the field, the two slopes must be equal:
+
+```{math}
+\underbrace{\frac{dy}{dx}}_{\text{slope of the curve}} = \underbrace{\frac{F_y}{F_x}}_{\text{slope of the field}}
+```
+
+Equivalently, a small step $(dx, dy)$ along the field line must point in the same direction as $\vec{F}$, so its components are in the same ratio:
+
+```{math}
+\frac{dy}{dx} = \frac{F_y}{F_x}.
+```
+
+This is a differential equation, and its solutions are the field lines.
+
+$\vec{F}$ is parallel to $x\,\hat{x} + y\,\hat{y}$, which points directly away from the $z$-axis. The field lines follow the direction of $\vec{F}$, so in a plane $z = $ constant
 
 ```{math}
 \frac{dy}{dx} = \frac{F_y}{F_x} = \frac{y}{x}
@@ -268,7 +282,7 @@ The gradient of $\Phi$ is perpendicular to any surface of constant $\Phi$, and $
 Go around the rectangle counterclockwise, as in the figure. The condition $x_1 > 0$ keeps the rectangle away from the $z$-axis, where $\vec{F}$ is undefined, so every integral exists.
 
 ```{figure} figures/rectangle_conservative.png
-:width: 32%
+:width: 55%
 ```
 
 Each integral uses the antiderivative $\int \dfrac{2u\,du}{(u^2+c^2)^2} = -\dfrac{1}{u^2+c^2}$.
