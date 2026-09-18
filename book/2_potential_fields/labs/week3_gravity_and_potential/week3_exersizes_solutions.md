@@ -211,9 +211,7 @@ Note: This is an abstract conservative vector field; it is not intended to repre
 
 ```{math}
 \frac{\partial\Phi}{\partial x} = -\frac{2x}{\left(x^2+y^2\right)^2}, \qquad
-
 \frac{\partial\Phi}{\partial y} = -\frac{2y}{\left(x^2+y^2\right)^2}, \qquad
-
 \frac{\partial\Phi}{\partial z} = 0.
 ```
 
@@ -221,9 +219,7 @@ Therefore
 
 ```{math}
 F_x = \frac{2x}{\left(x^2+y^2\right)^2}, \qquad F_y = \frac{2y}{\left(x^2+y^2\right)^2}, \qquad F_z = 0,
-
 \qquad
-
 \boxed{\vec{F} = \frac{2\left(x\,\hat{x} + y\,\hat{y}\right)}{\left(x^2+y^2\right)^2}}
 ```
 
@@ -237,17 +233,17 @@ With $s = \sqrt{x^2+y^2}$, the distance from the $z$-axis, the magnitude is
 
 ```{math}
 \frac{dy}{dx} = \frac{F_y}{F_x} = \frac{y}{x}
-
 \quad\Rightarrow\quad
-
 \frac{dy}{y} = \frac{dx}{x}
-
 \quad\Rightarrow\quad
-
 \boxed{y = Cx}
 ```
 
 The field lines are **straight radial lines in planes $z = $ constant, directed outward from the $z$-axis**. The field becomes weaker as $1/s^3$ away from the axis, and it is undefined on the $z$-axis itself.
+
+```{figure} figures/conservativefield_lines_ex6.png
+:width: 80%
+```
 
 (c) An equipotential surface is where $\Phi$ has a constant value $\Phi_0$:
 
@@ -305,19 +301,12 @@ Adding the four sides:
 
 ```{math}
 \begin{aligned}
-
 \oint \vec{F}\cdot d\vec{s} = I_1 + I_2 + I_3 + I_4
-
 ={}& \left(\frac{1}{x_1^2+y_1^2} - \frac{1}{x_2^2+y_1^2}\right)
-
 + \left(\frac{1}{x_2^2+y_1^2} - \frac{1}{x_2^2+y_2^2}\right) \\
-
 &+ \left(\frac{1}{x_2^2+y_2^2} - \frac{1}{x_1^2+y_2^2}\right)
-
 + \left(\frac{1}{x_1^2+y_2^2} - \frac{1}{x_1^2+y_1^2}\right) \\
-
 ={}& 0.
-
 \end{aligned}
 ```
 
