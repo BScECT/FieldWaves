@@ -159,6 +159,11 @@ In region $r > b$:
 \end{aligned}
 ```
 
+A revision of spherical coordinates. In the left image you can see the three unit vectors of spherical coordinates. In the right image you can see the differential volume element in the spherical coordinate system (figures from {cite:t}`hayt_buck_electromagnetics`, *Engineering Electromagnetics*, 8th edition).
+```{figure} figures/sphericalcoordinates_ex5.png
+:width: 95%
+```
+
 (b) The total mass, $M$, can be found in two ways; either by applying Gauss's Law to the external field ($r >$ b), or by simply integrating $\rho$ over the spherical volume:
 
 Gauss's Law method:
