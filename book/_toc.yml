@@ -44,6 +44,7 @@ parts:
       - file: 2_potential_fields/gravity_field/exercises.md
     - file: 2_potential_fields/electrostatic_field/intro.md
       sections:
+      - file: 2_potential_fields/electrostatic_field/coulombs_law.md
       - file: 2_potential_fields/electrostatic_field/poisson_laplace.md
       - file: 2_potential_fields/electrostatic_field/point_charges.md
       - file: 2_potential_fields/electrostatic_field/potential_energy_work.md
@@ -62,37 +63,39 @@ parts:
       - file: 2_potential_fields/magnetic_field/currents_and_waves.md
       - file: 2_potential_fields/magnetic_field/making_of.md
       - file: 2_potential_fields/magnetic_field/exercises.md
+    - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
+    - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
-  - caption: Exercises
-    chapters:
-    - file: exercises.md
-      sections:
-      - file: exercises/001.md
-      - file: exercises/002.md
-      - file: exercises/003.md
-      - file: exercises/004.md
-      - file: exercises/005.md
-      - file: exercises/005a.md
-      - file: exercises/006.md
-      - file: exercises/summary
-    - file: syntax_exercises.md
-      sections:
-      - file: syntax_exercises/007.md
-      - file: syntax_exercises/008.md
-      - file: syntax_exercises/009.md
-      - file: syntax_exercises/010.md
-      - file: syntax_exercises/011.md
-      - file: syntax_exercises/012.md
-      - file: syntax_exercises/013.md
-    - file: extensions.md
-      sections:
-      - file: exercises/007.md
-      - file: extension_exercises/017.md
-      - file: extension_exercises/014.md
-      - file: extension_exercises/015.md
-      - file: extension_exercises/016.md
+  # - caption: Exercises
+  #   chapters:
+  #   - file: exercises.md
+  #     sections:
+  #     - file: exercises/001.md
+  #     - file: exercises/002.md
+  #     - file: exercises/003.md
+  #     - file: exercises/004.md
+  #     - file: exercises/005.md
+  #     - file: exercises/005a.md
+  #     - file: exercises/006.md
+  #     - file: exercises/summary
+  #   - file: syntax_exercises.md
+  #     sections:
+  #     - file: syntax_exercises/007.md
+  #     - file: syntax_exercises/008.md
+  #     - file: syntax_exercises/009.md
+  #     - file: syntax_exercises/010.md
+  #     - file: syntax_exercises/011.md
+  #     - file: syntax_exercises/012.md
+  #     - file: syntax_exercises/013.md
+  #   - file: extensions.md
+  #     sections:
+  #     - file: exercises/007.md
+  #     - file: extension_exercises/017.md
+  #     - file: extension_exercises/014.md
+  #     - file: extension_exercises/015.md
+  #     - file: extension_exercises/016.md
   - caption: Miscellaneous
     chapters:
     - file: references.md

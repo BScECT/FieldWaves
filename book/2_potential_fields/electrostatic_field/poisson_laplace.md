@@ -16,34 +16,15 @@ $$
 \boxed{\vec E=-\vec\nabla V.}
 $$ (eq:electric-field-from-potential)
 
-Gauss's law relates the outward electric flux to the enclosed charge,
+As we saw previously, Gauss's law relates the outward electric flux to the enclosed charge,
 
 $$
-\boxed{
 \oint_{\partial \mathcal V}\vec E\cdot\mathrm d\vec A
 =\frac{Q_{\mathrm{enc}}}{\epsilon_0}.
-}
-$$ (eq:gauss-law-electric-integral)
-
-Here $\epsilon_0$ is the **vacuum permittivity**. It sets the strength of the electrical interaction in vacuum. The more familiar Coulomb constant is
-
 $$
-k_{\mathrm e}=\frac{1}{4\pi\epsilon_0}.
-$$ (eq:coulomb-constant)
+Note, the factor $4\pi$ has not disappeared; it is included in the relation between $k_{\mathrm e}$ and $\epsilon_0$.
 
-The factor $4\pi$ has therefore not disappeared; it is included in the relation between $k_{\mathrm e}$ and $\epsilon_0$.
-
-## Sources, sinks, and signs
-
-The area vector $\mathrm d\vec A$ points out of a closed surface. A positive charge produces an outward field and positive flux. A negative charge produces an inward field and negative flux. This contrasts with gravity, where positive mass produces inward flux.
-
-```{figure} figures/gravity_electric_flux_comparison.svg
-:name: gravity-electric-flux-comparison
-:width: 100%
-
-The same outward-oriented surface surrounds a positive mass and a positive charge. Gravity points inward, giving negative flux, while the electric field of positive charge points outward, giving positive flux.
-```
-
+## Gauss's Law in differential form
 Using the divergence theorem already developed in {doc}`../gravity_field/poisson_laplace_equations`, Gauss's law becomes
 
 $$
