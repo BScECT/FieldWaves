@@ -277,6 +277,16 @@ The supposedly different solutions are the same. The key step is that the square
 
 If instead the **normal derivative** of the potential is specified on the whole boundary, we have a **Neumann boundary condition**. For two solutions with the same prescribed normal derivative, $\vec\nabla u\cdot\hat n=0$, so the boundary integral in the proof again vanishes. Their difference is therefore constant, but its value is not fixed. The potential is unique up to an additive constant; the field $-\vec\nabla\Phi$ is unique. This is a uniqueness statement assuming a solution exists; the prescribed sources and boundary flux must also be consistent with Gauss's law.
 
+```{admonition} Carl Neumann: mathematics shaped by physical questions
+:class: note
+
+These boundary conditions are named after **Carl Neumann (1832–1925)**, whose work on potential theory included methods for determining a potential from boundary data. His interests connected mathematics with physical problems: his inaugural lecture at Tübingen discussed applications of potential theory to electrodynamics, optics and heat {cite}`oconnor_robertson_carl_neumann`.
+
+Our boundary conditions express physical information in mathematical language. Prescribing the potential and prescribing its normal derivative describe different things we might know at a boundary; for gravity, the latter specifies the normal component of the field, with a minus sign.
+
+This illustrates a recurring theme in this course: **the need to describe physical problems helps drive the development of mathematics**. Once developed, that mathematical language can serve other problems too, as we will see when we carry potential theory from gravity into electric and magnetic fields.
+```
+
 The proof above concerns a bounded domain. For an unbounded domain, behaviour at infinity also matters: appropriate conditions there are needed to exclude additional solutions. We must include those conditions when checking a proposed potential.
 
 ```{admonition} The practical consequence
@@ -321,7 +331,7 @@ where $\alpha>0$ describes how rapidly the potential perturbation decreases with
 ```{admonition} Interpreting the wavenumber
 :class: tip
 
-The **wavenumber** $k$ measures how rapidly a periodic pattern varies in space. It is related to the horizontal wavelength by
+The **angular wavenumber** $k$ measures how rapidly the phase of a periodic pattern varies in space. We express it in $\mathrm{rad/m}$, so $kx$ is a phase in radians. Radians are dimensionless in SI, so this is dimensionally equivalent to inverse metres; writing rad/m makes the angular meaning explicit. It is related to the horizontal wavelength by
 
 $$
 \lambda=\frac{2\pi}{k},
@@ -416,7 +426,7 @@ $$ (eq:upward-continuation-transfer-function)
 
 The function $H_z(k)$ is a **spatial transfer function**. It tells us how the amplitude of each horizontal spatial-frequency component changes between the reference surface and the observation height. Since $H_z(k)$ is close to one for small $k$ but rapidly approaches zero for large $k$, observing the field at altitude acts as a **spatial low-pass filter**: broad features pass more easily than fine details.
 
-This is directly analogous to the frequency response of a system, which you may encounter in another course. There, a transfer function describes how different temporal frequencies are amplified or attenuated. Here the independent frequency variable is the spatial wavenumber $k$, measured in inverse metres, rather than a temporal frequency measured in hertz. Components of the gravity field and its gradients acquire additional factors of $k$ when we differentiate the potential, but they retain the same exponential attenuation with height.
+This is directly analogous to the frequency response of a system, which you may encounter in another course. There, a transfer function describes how different temporal frequencies are amplified or attenuated. Here the independent frequency variable is the angular spatial wavenumber $k$, measured in radians per metre, rather than a temporal frequency measured in hertz. Components of the gravity field and its gradients acquire additional factors of $k$ when we differentiate the potential, but they retain the same exponential attenuation with height.
 ```
 
 ```{admonition} More than gravity

@@ -1,0 +1,39 @@
+{
+  "epoch": 2025.0,
+  "reference_radius_km": 6371.2,
+  "dipole_mean_square_fraction": 0.9286161093384627,
+  "dipole_equatorial_microtesla": 29.733365371918467,
+  "axis_tilt_deg": 9.210639266265746,
+  "full_vector_rms_microtesla": 43.63560067891819,
+  "residual_vector_rms_microtesla": 11.658456755934727,
+  "surface_samples": [
+    {
+      "latitude_deg": 0,
+      "longitude_deg": 0,
+      "Br_full_microtesla": 16.08807242647397,
+      "Br_dipole_microtesla": -2.8206000000000033,
+      "Br_residual_microtesla": 18.908672426473974
+    },
+    {
+      "latitude_deg": 45,
+      "longitude_deg": 0,
+      "Br_full_microtesla": -41.07429160346794,
+      "Br_dipole_microtesla": -43.50163344266512,
+      "Br_residual_microtesla": 2.427341839197172
+    },
+    {
+      "latitude_deg": -45,
+      "longitude_deg": 0,
+      "Br_full_microtesla": 21.185502735673722,
+      "Br_dipole_microtesla": 39.51270266863556,
+      "Br_residual_microtesla": -18.327199932961836
+    },
+    {
+      "latitude_deg": 52,
+      "longitude_deg": 4,
+      "Br_full_microtesla": -45.51118945394989,
+      "Br_dipole_microtesla": -47.59811040078582,
+      "Br_residual_microtesla": 2.0869209468359333
+    }
+  ]
+}
