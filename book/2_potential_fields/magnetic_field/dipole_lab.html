@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:12px;font:14px system-ui,sans-serif;color:#203541;background:#fff}h2{font-size:21px;margin:0 0 8px}p{line-height:1.45;margin:8px 0}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:15px 0}label{display:block;font-weight:600}input[type=range]{width:100%;accent-color:#007da5}select,button{font:inherit;padding:6px;background:white;border:1px solid #8a9da7;border-radius:4px}output{font-variant-numeric:tabular-nums;font-weight:400}.scroll{overflow-x:auto}.panels{display:grid;grid-template-columns:repeat(3,1fr);min-width:0;gap:6px}.panel{margin:0}.panel figcaption{text-align:center;font-weight:600;font-size:13px;margin:6px 0}canvas{display:block;width:100%;height:auto;border:1px solid #d6dfe4;touch-action:manipulation}.legend{font-size:12px;color:#415764}.probe{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid #d6dfe4;text-align:right;padding:5px}th:first-child,td:first-child{text-align:left}#vectors{max-width:350px}.status{padding:8px;background:#eef6f8}button{cursor:pointer}button:hover{background:#eef6f8}@media(max-width:580px){.controls,.probe{grid-template-columns:1fr}body{font-size:13px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head><body>
+<h2>Two charges: contributions and cancellation</h2>
+<p>Positive charge at <b>z = +d/2</b>, negative charge at <b>z = −d/2</b>. Coordinates and values use the dimensionless units defined in the notebook. Start with fixed charge and move farther away by increasing the viewing half-width L.</p>
+<div class="controls">
+<div><label for="d">Separation d: <output id="dv"></output></label><input id="d" type="range" min="0.2" max="2" step="0.1" value="1"></div>
+<div><label for="L">Viewing half-width L: <output id="Lv"></output></label><input id="L" type="range" min="1.5" max="12" step="0.5" value="3"></div>
+<div><label for="mode">What stays fixed?</label><select id="mode"><option value="charge">Charge magnitude Q = 1</option><option value="moment">Dipole moment p = Qd = 1</option></select></div>
+<div><label for="gain">Field-arrow gain: <output id="gainv"></output></label><input id="gain" type="range" min="-1" max="2" step="0.1" value="0"></div>
+<div><label for="px">Probe horizontal position x/L: <output id="pxv"></output></label><input id="px" type="range" min="-0.9" max="0.9" step="0.025" value="0.5"></div>
+<div><label for="pz">Probe vertical position z/L: <output id="pzv"></output></label><input id="pz" type="range" min="-0.9" max="0.9" step="0.025" value="0.5"></div>
+</div>
+<button id="reset" type="button">Reset</button> <label style="display:inline;font-weight:400"><input id="approx" type="checkbox"> Show ideal dipole at the probe</label>
+<p class="legend">Click any panel to move the probe. Top: signed potential, blue negative and red positive; white is zero. All three panels use the same fixed colour scale, with a nonlinear asinh stretch; colours saturate at |V| = 4. Bottom: arrow lengths are linear in field magnitude with the same gain in every panel; arrows longer than 22 pixels are capped and marked by a dot. Small disks of radius 0.08 around the source locations are masked.</p>
+<div class="scroll"><div class="panels">
+<figure class="panel"><figcaption>Potential from +Q</figcaption><canvas id="v0" width="300" height="300" aria-label="Potential of positive charge"></canvas></figure>
+<figure class="panel"><figcaption>Potential from −Q</figcaption><canvas id="v1" width="300" height="300" aria-label="Potential of negative charge"></canvas></figure>
+<figure class="panel"><figcaption>Potential: sum</figcaption><canvas id="v2" width="300" height="300" aria-label="Sum of the two potentials"></canvas></figure>
+<figure class="panel"><figcaption>Field from +Q</figcaption><canvas id="e0" width="300" height="300" aria-label="Electric field of positive charge"></canvas></figure>
+<figure class="panel"><figcaption>Field from −Q</figcaption><canvas id="e1" width="300" height="300" aria-label="Electric field of negative charge"></canvas></figure>
+<figure class="panel"><figcaption>Field: vector sum</figcaption><canvas id="e2" width="300" height="300" aria-label="Vector sum of electric fields"></canvas></figure>
+</div></div>
+<p class="status" id="status" aria-live="polite"></p>
+<div class="probe"><div><h3>At the probe</h3><table><thead><tr><th>Contribution</th><th>V</th><th>Eₓ</th><th>E𝓏</th></tr></thead><tbody id="values"></tbody></table><p class="legend" id="error"></p></div><div><h3>Add the vectors head to tail</h3><canvas id="vectors" width="350" height="240" aria-label="Head-to-tail vector addition at the probe"></canvas><p class="legend">Orange: E₊. Blue: E₋, starting at E₊'s tip. Black: the sum. Probe arrows share one scale, automatically fitted to this diagram. Dashed green: ideal dipole, if selected.</p></div></div>
+<p><b>Predict:</b> keep Q fixed and halve d. What happens to the distant field? Then reset, keep d fixed and increase L. Compare r/d and the dipole error at the probe. Finally keep p fixed: are you still changing only the separation?</p>
+<script>
+(()=>{'use strict';const $=id=>document.getElementById(id);const ids=['d','L','mode','gain','px','pz','approx'];
+function contribution(x,z,zq,q){const dz=z-zq,r=Math.hypot(x,dz);return [q/r,q*x/r**3,q*dz/r**3]}
+function pair(x,z,d,q){const a=contribution(x,z,d/2,q),b=contribution(x,z,-d/2,-q);return [a,b,a.map((v,i)=>v+b[i])]}
+function dipole(x,z,p){const r=Math.hypot(x,z);return [p*z/r**3,3*p*z*x/r**5,p*(3*z*z/r**5-1/r**3)]}
+function arrow(c,x,y,dx,dy,color,dashed=false){const n=Math.hypot(dx,dy);if(n<.15)return;c.strokeStyle=color;c.fillStyle=color;c.lineWidth=1.4;c.setLineDash(dashed?[5,3]:[]);c.beginPath();c.moveTo(x,y);c.lineTo(x+dx,y+dy);c.stroke();c.setLineDash([]);const a=Math.atan2(dy,dx),h=Math.min(6,n*.4);c.beginPath();c.moveTo(x+dx,y+dy);c.lineTo(x+dx-h*Math.cos(a-.45),y+dy-h*Math.sin(a-.45));c.lineTo(x+dx-h*Math.cos(a+.45),y+dy-h*Math.sin(a+.45));c.closePath();c.fill()}
+function color(v){let t=Math.min(1,Math.asinh(Math.abs(v)/.2)/Math.asinh(4/.2));const end=v<0?[25,87,160]:[185,35,50];return `rgb(${end.map(a=>Math.round(255+(a-255)*t)).join(',')})`}
+function drawPanel(canvas,index,potential,s){const c=canvas.getContext('2d'),m=25,w=250,h=250;c.clearRect(0,0,300,300);const to=(x,z)=>[m+(x/s.L+1)*w/2,m+(1-z/s.L)*h/2];
+ if(potential){const n=60;for(let j=0;j<n;j++)for(let i=0;i<n;i++){let x=(2*(i+.5)/n-1)*s.L,z=(1-2*(j+.5)/n)*s.L;let masked=Math.min(Math.hypot(x,z-s.d/2),Math.hypot(x,z+s.d/2))<.08;c.fillStyle=masked?'#ddd':color(pair(x,z,s.d,s.q)[index][0]);c.fillRect(m+i*w/n,m+j*h/n,w/n+.5,h/n+.5)}}
+ else{c.fillStyle='#fafcfd';c.fillRect(m,m,w,h);for(let j=0;j<15;j++)for(let i=0;i<15;i++){let x=(2*(i+.5)/15-1)*s.L,z=(1-2*(j+.5)/15)*s.L;if(Math.min(Math.hypot(x,z-s.d/2),Math.hypot(x,z+s.d/2))<.08)continue;let e=pair(x,z,s.d,s.q)[index],dx=e[1]*16*s.gain,dy=-e[2]*16*s.gain,len=Math.hypot(dx,dy),cap=len>22;if(cap){dx*=22/len;dy*=22/len}let [xp,zp]=to(x,z);arrow(c,xp-dx/2,zp-dy/2,dx,dy,'#1769aa');if(cap){c.fillStyle='#bd561b';c.beginPath();c.arc(xp,zp,1.6,0,7);c.fill()}}}
+ c.strokeStyle='#7b8d96';c.lineWidth=.6;c.strokeRect(m,m,w,h);c.font='11px system-ui';c.fillStyle='#203541';c.textAlign='center';c.fillText('x',150,298);c.fillText((-s.L).toFixed(1),m,289);c.fillText(s.L.toFixed(1),m+w,289);c.fillText('z',10,18);c.textAlign='left';
+ for(let sign of [-1,1]){let [x,y]=to(0,sign*s.d/2);c.beginPath();c.arc(x,y,7,0,7);c.fillStyle='white';c.fill();c.strokeStyle=sign>0?'#bd561b':'#1769aa';c.stroke();c.fillStyle=c.strokeStyle;c.textAlign='center';c.fillText(sign>0?'+':'−',x,y+4)}
+ let [x,y]=to(s.x,s.z);c.strokeStyle='#000';c.lineWidth=1.5;c.beginPath();c.arc(x,y,5,0,7);c.stroke();c.fillStyle='#000';c.fillText('P',x+10,y-6)
+}
+function render(){let s={d:+$('d').value,L:+$('L').value,gain:10**+$('gain').value};s.q=$('mode').value==='charge'?1:1/s.d;s.x=+$('px').value*s.L;s.z=+$('pz').value*s.L;
+for(let id of ['d','L','px','pz'])$(id+'v').textContent=(+$ (id).value).toFixed(2);$('gainv').textContent=s.gain.toFixed(2);
+for(let i=0;i<3;i++){drawPanel($('v'+i),i,true,s);drawPanel($('e'+i),i,false,s)}
+const r=Math.hypot(s.x,s.z),near=Math.min(Math.hypot(s.x,s.z-s.d/2),Math.hypot(s.x,s.z+s.d/2))<.08;
+$('status').textContent=`Q = ${s.q.toFixed(3)}, p = Qd = ${(s.q*s.d).toFixed(3)}. Probe (x,z) = (${s.x.toFixed(2)}, ${s.z.toFixed(2)}); r/d = ${(r/s.d).toFixed(2)}.`;
+const ctx=$('vectors').getContext('2d');ctx.clearRect(0,0,350,240);
+if(near){$('values').innerHTML='<tr><td colspan="4">Probe lies in a masked source region. Move it away.</td></tr>';$('error').textContent='Point charges are singular; no softened source is substituted.';return}
+let vals=pair(s.x,s.z,s.d,s.q),approx=r>.08?dipole(s.x,s.z,s.q*s.d):null;
+let names=['+Q','−Q','Sum'];if($('approx').checked&&approx){vals.push(approx);names.push('Ideal dipole')}
+$('values').innerHTML=vals.map((row,i)=>'<tr><td>'+names[i]+'</td>'+row.map(v=>'<td>'+v.toPrecision(3)+'</td>').join('')+'</tr>').join('');
+let e=vals[2],mag=Math.hypot(e[1],e[2]);$('error').textContent=$('approx').checked?(approx?`Relative vector-field error of dipole: ${(100*Math.hypot(approx[1]-e[1],approx[2]-e[2])/mag).toFixed(2)}%. Potential may vanish by symmetry even when the field does not.`:'Ideal dipole is singular at the origin.'):'';
+let pts=[[0,0],[vals[0][1],vals[0][2]],[e[1],e[2]]];if($('approx').checked&&approx)pts.push([approx[1],approx[2]]);
+let xs=pts.map(p=>p[0]),zs=pts.map(p=>p[1]),xmin=Math.min(...xs),xmax=Math.max(...xs),zmin=Math.min(...zs),zmax=Math.max(...zs),scale=Math.min(270/Math.max(xmax-xmin,1e-9),170/Math.max(zmax-zmin,1e-9));const to=p=>[40+(p[0]-xmin)*scale,205-(p[1]-zmin)*scale];let o=to(pts[0]),a=to(pts[1]),end=to(pts[2]);arrow(ctx,...o,a[0]-o[0],a[1]-o[1],'#bd561b');arrow(ctx,...a,end[0]-a[0],end[1]-a[1],'#1769aa');arrow(ctx,...o,end[0]-o[0],end[1]-o[1],'#111');if(pts.length>3){let b=to(pts[3]);arrow(ctx,...o,b[0]-o[0],b[1]-o[1],'#228452',true)}ctx.font='12px system-ui';ctx.fillStyle='#203541';ctx.fillText('Common scale for all probe vectors',10,16);
+}
+for(const id of ids)$(id).addEventListener('input',render);
+for(const c of document.querySelectorAll('.panels canvas'))c.addEventListener('click',e=>{let b=c.getBoundingClientRect(),x=(e.clientX-b.left)*300/b.width,z=(e.clientY-b.top)*300/b.height;$('px').value=Math.max(-.9,Math.min(.9,2*(x-25)/250-1));$('pz').value=Math.max(-.9,Math.min(.9,1-2*(z-25)/250));render()});
+$('reset').addEventListener('click',()=>{for(let [id,v] of Object.entries({d:1,L:3,mode:'charge',gain:0,px:.5,pz:.5}))$(id).value=v;$('approx').checked=false;render()});render();
+})();
+</script></body></html>

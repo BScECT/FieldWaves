@@ -29,6 +29,7 @@ parts:
       - file: 2_potential_fields/introduction/conservative_fields.md
       - file: 2_potential_fields/introduction/potential.md
       - file: 2_potential_fields/introduction/helmholtz_decomposition.md
+      - file: 2_potential_fields/introduction/exercises.md
     - file: 2_potential_fields/gravity_field/intro.md
       sections:
       - file: 2_potential_fields/gravity_field/the_gravity_field.md
@@ -40,6 +41,7 @@ parts:
         sections:
         - file: 2_potential_fields/introduction/earth_gravity_work.ipynb
         - file: 2_potential_fields/gravity_field/uniform_cylinder_laplacian.ipynb
+      - file: 2_potential_fields/gravity_field/exercises.md
     - file: 2_potential_fields/electrostatic_field/intro.md
       sections:
       - file: 2_potential_fields/electrostatic_field/poisson_laplace.md
@@ -48,7 +50,18 @@ parts:
       - file: 2_potential_fields/electrostatic_field/conductors.md
       - file: 2_potential_fields/electrostatic_field/atmospheric_field.md
       - file: 2_potential_fields/electrostatic_field/making_of.md
+      - file: 2_potential_fields/electrostatic_field/exercises.md
     - file: 2_potential_fields/magnetic_field/intro.md
+      sections:
+      - file: 2_potential_fields/magnetic_field/from_currents_to_dipoles.md
+      - file: 2_potential_fields/magnetic_field/dipole_explorer.ipynb
+      - file: 2_potential_fields/magnetic_field/dipole_model.md
+      - file: 2_potential_fields/magnetic_field/beyond_the_dipole.md
+      - file: 2_potential_fields/magnetic_field/forces_and_protection.md
+      - file: 2_potential_fields/magnetic_field/potential_and_sources.md
+      - file: 2_potential_fields/magnetic_field/currents_and_waves.md
+      - file: 2_potential_fields/magnetic_field/making_of.md
+      - file: 2_potential_fields/magnetic_field/exercises.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
