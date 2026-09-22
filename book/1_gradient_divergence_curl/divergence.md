@@ -55,6 +55,140 @@ We have just derived Gauss' integral theorem, or divergence theorem, and we foun
 The divergence of a vector field is the outward flux of the vector field per unit volume.
 :::
 
+### Gauss' theorem in one, two and three dimensions
+
+In one dimension the vector function can have only one component, say $v_x$, and it can depend on the spatial variable $x$ only. A finite volume in one dimension is a line segment, and its surface consists of the two end points of that segment. Let the line run from $x=x_b$ to $x=x_e$, from beginning to end. The divergence is $\nabla\cdot\boldsymbol v = \partial_x v_x$ and Gauss' theorem reads
+
+$$
+\int_{x_b}^{x_e}\partial_x v_x\,\mathrm{d}x = v_x(x_e) - v_x(x_b).
+$$ (eq:gauss1d)
+
+You will recognise this as the fundamental theorem of calculus, stating that integration reverses differentiation. How do we know that it is the term $v_x(x_b)$ that should be given the minus sign?
+
+In two dimensions a vector field can have two components and depend on two spatial variables. Take the $(x,y)$-plane as our two-dimensional space. The vector field is written as $\boldsymbol v(x,y) = v_x(x,y)\hat{\boldsymbol x} + v_y(x,y)\hat{\boldsymbol y}$, and we evaluate the outward flow out of the rectangular domain $x_b<x<x_e$, $y_b<y<y_e$. Gauss' theorem becomes
+
+$$
+\int_{x_b}^{x_e}\!\!\int_{y_b}^{y_e}\left(\partial_x v_x + \partial_y v_y\right)\mathrm{d}y\,\mathrm{d}x
+= \int_{x_b}^{x_e}\left[v_y(x,y_e) - v_y(x,y_b)\right]\mathrm{d}x
++ \int_{y_b}^{y_e}\left[v_x(x_e,y) - v_x(x_b,y)\right]\mathrm{d}y .
+$$ (eq:gauss2d)
+
+Here too we recognise the fundamental theorem of calculus. The $x$-component is integrated only along the $y$-direction and the $y$-component only along the $x$-direction, which shows that it is the normal component that contributes to the outward flow.
+
+In three dimensions all components are available and each one can depend on all three coordinates. Take the rectangular volume defined by $x_b<x<x_e$, $y_b<y<y_e$ and $z_b<z<z_e$. Gauss' theorem becomes
+
+$$
+\begin{aligned}
+\int_{x_b}^{x_e}\!\!\int_{y_b}^{y_e}\!\!\int_{z_b}^{z_e}&\left(\partial_x v_x + \partial_y v_y + \partial_z v_z\right)\mathrm{d}z\,\mathrm{d}y\,\mathrm{d}x \\
+&= \int_{x_b}^{x_e}\!\!\int_{y_b}^{y_e}\left[v_z(x,y,z_e) - v_z(x,y,z_b)\right]\mathrm{d}y\,\mathrm{d}x \\
+&\quad + \int_{x_b}^{x_e}\!\!\int_{z_b}^{z_e}\left[v_y(x,y_e,z) - v_y(x,y_b,z)\right]\mathrm{d}z\,\mathrm{d}x \\
+&\quad + \int_{y_b}^{y_e}\!\!\int_{z_b}^{z_e}\left[v_x(x_e,y,z) - v_x(x_b,y,z)\right]\mathrm{d}z\,\mathrm{d}y .
+\end{aligned}
+$$ (eq:gauss3d)
+
+Again we recognise the fundamental theorem of calculus, and each surface integral has a perpendicular vector component as integrand. For a general unspecified volume we use the domain $\mathbb{D}$ and the surface $\mathbb{S}$, understood as the boundary of $\mathbb{D}$, as in {eq}`eq:gauss`.
+
+### Gauss' theorem in cylindrical and spherical coordinates
+
+Deriving the divergence of $\boldsymbol v$ in cylindrical and spherical coordinates is left as an exercise below. The results are
+
+$$
+\begin{aligned}
+\nabla\cdot\boldsymbol v(\varrho,\phi,z) &= \frac{1}{\varrho}\left[\partial_\varrho(\varrho v_\varrho) + \partial_\phi v_\phi\right] + \partial_z v_z, \\
+\nabla\cdot\boldsymbol v(r,\phi,\theta) &= \frac{1}{r^2}\partial_r(r^2 v_r) + \frac{1}{r\sin(\theta)}\left[\partial_\theta(\sin(\theta)v_\theta) + \partial_\phi v_\phi\right].
+\end{aligned}
+$$ (eq:divcurvi)
+
+Remember that in cylindrical coordinates $\varrho=\sqrt{x^2+y^2}$ and in spherical coordinates $r=\sqrt{x^2+y^2+z^2}$.
+
+The volume integral must be transformed as well. We want to write the infinitesimal $\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z$ in cylindrical and spherical coordinates. The Jacobian of that transformation is the determinant of the three vectors spanning the curvilinear volume element. For cylindrical coordinates these vectors are $\partial_\varrho\boldsymbol r\,\mathrm{d}\varrho$, $\partial_\phi\boldsymbol r\,\mathrm{d}\phi$ and $\hat{\boldsymbol z}\,\mathrm{d}z$, so that
+
+$$
+\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
+= \det\left(\partial_\varrho\boldsymbol r,\ \partial_\phi\boldsymbol r,\ \hat{\boldsymbol z}\right)\mathrm{d}\varrho\,\mathrm{d}\phi\,\mathrm{d}z
+= \left[(\partial_\varrho x)(\partial_\phi y) - (\partial_\phi x)(\partial_\varrho y)\right]\mathrm{d}\varrho\,\mathrm{d}\phi\,\mathrm{d}z ,
+$$
+
+and for spherical coordinates they are $\partial_r\boldsymbol r\,\mathrm{d}r$, $\partial_\theta\boldsymbol r\,\mathrm{d}\theta$ and $\partial_\phi\boldsymbol r\,\mathrm{d}\phi$, so that
+
+$$
+\begin{aligned}
+\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
+&= \det\left(\partial_r\boldsymbol r,\ \partial_\theta\boldsymbol r,\ \partial_\phi\boldsymbol r\right)\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}\phi, \\
+&= \Big\{(\partial_r x)\left[(\partial_\theta y)(\partial_\phi z) - (\partial_\theta z)(\partial_\phi y)\right]
+ + (\partial_r y)\left[(\partial_\theta z)(\partial_\phi x) - (\partial_\theta x)(\partial_\phi z)\right] \\
+&\qquad + (\partial_r z)\left[(\partial_\theta x)(\partial_\phi y) - (\partial_\theta y)(\partial_\phi x)\right]\Big\}\,\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}\phi .
+\end{aligned}
+$$
+
+These derivatives were carried out in the section on coordinate systems, and we collect the results here,
+
+$$
+\begin{aligned}
+\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z &= \varrho\,\mathrm{d}\varrho\,\mathrm{d}\phi\,\mathrm{d}z, &&\text{cylindrical coordinate transformation},\\
+\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z &= r^2\sin(\theta)\,\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}\phi, &&\text{spherical coordinate transformation}.
+\end{aligned}
+$$ (eq:jacobians)
+
+Inserting this in Gauss' theorem in spherical coordinates gives
+
+$$
+\begin{aligned}
+\int_{r_b}^{r_e}\!\!\int_{\theta_b}^{\theta_e}\!\!\int_{\phi_b}^{\phi_e}&\left\{\frac{1}{r^2}\partial_r(r^2 v_r) + \frac{1}{r\sin(\theta)}\left[\partial_\theta(\sin(\theta)v_\theta) + \partial_\phi v_\phi\right]\right\}r^2\sin(\theta)\,\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}\phi \\
+&= \int_{\theta_b}^{\theta_e}\!\!\int_{\phi_b}^{\phi_e}\left[r_e^2 v_r(r_e,\theta,\phi) - r_b^2 v_r(r_b,\theta,\phi)\right]\sin(\theta)\,\mathrm{d}\theta\,\mathrm{d}\phi \\
+&\quad + \int_{r_b}^{r_e}\!\!\int_{\phi_b}^{\phi_e} r\left[\sin(\theta_e)v_\theta(r,\theta_e,\phi) - \sin(\theta_b)v_\theta(r,\theta_b,\phi)\right]\mathrm{d}r\,\mathrm{d}\phi \\
+&\quad + \int_{r_b}^{r_e}\!\!\int_{\theta_b}^{\theta_e} r\left[v_\phi(r,\theta,\phi_e) - v_\phi(r,\theta,\phi_b)\right]\mathrm{d}r\,\mathrm{d}\theta .
+\end{aligned}
+$$ (eq:gauss-sphereseg)
+
+When Gauss' theorem is applied to a whole spherical ball we have $r_b=0$ and $r_e=R$, with $0<\theta<\pi$ and $0<\phi<2\pi$. The last two surface terms then vanish, because $\sin(0)=\sin(\pi)=0$ and because $v_\phi$ returns to its starting value after a full turn. Only the radial component contributes to the outward flow, and {eq}`eq:gauss-sphereseg` reduces to
+
+$$
+\begin{aligned}
+\int_{0}^{R}\!\!\int_{\theta=0}^{\pi}\!\!\int_{\phi=0}^{2\pi}&\left\{\sin(\theta)\,\partial_r(r^2 v_r) + r\left[\partial_\theta(\sin(\theta)v_\theta) + \partial_\phi v_\phi\right]\right\}\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}\phi \\
+&= R^2\int_{\theta=0}^{\pi}\!\!\int_{\phi=0}^{2\pi} v_r(R,\theta,\phi)\sin(\theta)\,\mathrm{d}\theta\,\mathrm{d}\phi .
+\end{aligned}
+$$ (eq:gauss-sphere)
+
+Let us check both sides on an example. Take the vector function
+
+$$
+\boldsymbol v(r,\theta,\phi) = r\sin(\theta)\,\hat{\boldsymbol r} + r\cos(\theta)\,\hat{\boldsymbol\theta} + r\,\hat{\boldsymbol\phi} .
+$$ (eq:gauss-example)
+
+The three terms in the volume integral on the left-hand side of {eq}`eq:gauss-sphere` are
+
+$$
+\begin{aligned}
+\sin(\theta)\,\partial_r(r^2 v_r) &= \sin(\theta)\,\partial_r\!\left(r^3\sin(\theta)\right) = 3r^2\sin^2(\theta), \\
+r\,\partial_\theta(\sin(\theta)v_\theta) &= r\,\partial_\theta\!\left[r\sin(\theta)\cos(\theta)\right] = \tfrac{1}{2}r^2\,\partial_\theta\!\left[\sin(2\theta)\right] = r^2\cos(2\theta), \\
+r\,\partial_\phi v_\phi &= r\,\partial_\phi r = 0 .
+\end{aligned}
+$$
+
+The volume integral is taken over the sum of these three terms,
+
+$$
+\int_{0}^{R} r^2\,\mathrm{d}r\int_{\theta=0}^{\pi}\left[3\sin^2(\theta) + \cos(2\theta)\right]\mathrm{d}\theta\int_{\phi=0}^{2\pi}\mathrm{d}\phi
+= 2\pi\int_{0}^{R} r^2\,\mathrm{d}r\int_{\theta=0}^{\pi}\left[3\sin^2(\theta) + \cos(2\theta)\right]\mathrm{d}\theta .
+$$
+
+The radial integral is elementary. The $\theta$-integral is evaluated by writing $3\sin^2(\theta) = \tfrac{3}{2} - \tfrac{3}{2}\cos(2\theta)$. The remaining $\cos(2\theta)$ terms integrate to zero from $0$ to $\pi$, because that covers a whole period and the average of a cosine over a whole period is zero. Only the factor $\tfrac{3}{2}$ is left to integrate, hence
+
+$$
+2\pi\int_{0}^{R} r^2\,\mathrm{d}r\int_{\theta=0}^{\pi}\left[3\sin^2(\theta) + \cos(2\theta)\right]\mathrm{d}\theta
+= \pi\int_{0}^{R} 3r^2\,\mathrm{d}r\int_{\theta=0}^{\pi}\mathrm{d}\theta = \pi^2 R^3 .
+$$
+
+Now the surface integral on the right-hand side of {eq}`eq:gauss-sphere`,
+
+$$
+R^2\int_{\theta=0}^{\pi}\!\!\int_{\phi=0}^{2\pi} v_r(R,\theta,\phi)\sin(\theta)\,\mathrm{d}\theta\,\mathrm{d}\phi
+= 2\pi R^3\int_{\theta=0}^{\pi}\left(\tfrac{1}{2} - \tfrac{1}{2}\cos(2\theta)\right)\mathrm{d}\theta = \pi^2 R^3 ,
+$$
+
+which demonstrates that Gauss' theorem works in spherical coordinates in the same way as in Cartesian coordinates.
+
 ## Incompressible flow
 
 For fluid flow under constant density and away from locations that have generated the flow, sometimes the approximation of the fluid to be incompressible can be made. Let the source or sink be located at $\boldsymbol r=\boldsymbol 0$. When the fluid is incompressible there cannot be any net outward flow, because what goes out on one side must come in on the other; otherwise the fluid would be compressible. We can state that
@@ -223,25 +357,17 @@ For this particular solution $\nabla\cdot\boldsymbol B = 0$ for all points in sp
 4. Evaluate the gradient of the potential expressed in {eq}`eq:Vpdp` and give the expression for the electric current density in the ground at and below the ground surface. Write a Python script that computes the electric potential and the electric current density on the ground surface and in a vertical cross-section, and reproduce the plots of {numref}`fig-dcpoth` and {numref}`fig-dcpotv`. Normalise distance to the electrode spacing $a$ and avoid the points $x=\pm a/2$. You can choose any colour map you like for the potential and choose a contrasting colour for the arrows representing the current lines and directions.
 5. The electric field associated with the electric potential given in {eq}`eq:Vpdp` can be evaluated by taking the gradient of the potential, because of {eq}`eq:EgradV`. Give an argument why the flux integral of the electric field $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol E\,\mathrm{d}S = 0$ for every closed and piecewise smooth surface that does not include the current injection and extraction points $x=\pm a/2$.
 6. Verify that the magnetic field expressed in {eq}`eq:magB` is divergence free for all points in space.
-7. Show that the divergence of a vector field in cylindrical and in spherical coordinates is given by
-
-    $$
-    \begin{aligned}
-    \nabla\cdot\boldsymbol v(\varrho,\phi,z) &= \frac{1}{\varrho}\left[\partial_\varrho(\varrho v_\varrho) + \partial_\phi v_\phi\right] + \partial_z v_z, \\
-    \nabla\cdot\boldsymbol v(r,\phi,\theta) &= \frac{1}{r^2}\partial_r(r^2 v_r) + \frac{1}{r\sin(\theta)}\left[\partial_\theta(\sin(\theta)v_\theta) + \partial_\phi v_\phi\right].
-    \end{aligned}
-    $$
-
-    Please remember that in cylindrical coordinates $\varrho=\sqrt{x^2+y^2}$ and in spherical coordinates $r=\sqrt{x^2+y^2+z^2}$!
-8. Consider a general flow field $\boldsymbol v(\boldsymbol r) = \left(v_x(y,z),\,v_y(x,z),\,v_z(x,y)\right)$ flowing in an open space containing a closed surface $\mathbb{S}$. Evaluate the flux integral $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol v\,\mathrm{d}S$.
-9. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Gauss' integral theorem gives
+7. Show that the divergence of a vector field in cylindrical and in spherical coordinates is given by {eq}`eq:divcurvi`. Remember that in cylindrical coordinates $\varrho=\sqrt{x^2+y^2}$ and in spherical coordinates $r=\sqrt{x^2+y^2+z^2}$!
+8. Derive the expressions for Gauss' theorem in cylindrical coordinates, in analogy with {eq}`eq:gauss-sphereseg` and {eq}`eq:gauss-sphere`.
+9. Consider a general flow field $\boldsymbol v(\boldsymbol r) = \left(v_x(y,z),\,v_y(x,z),\,v_z(x,y)\right)$ flowing in an open space containing a closed surface $\mathbb{S}$. Evaluate the flux integral $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol v\,\mathrm{d}S$.
+10. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Gauss' integral theorem gives
 
     $$
     \int_{\mathbb{S}}p\,\hat{\boldsymbol n}\,\mathrm{d}S = \int_{\mathbb{D}}\nabla p\,\mathrm{d}V,
     $$
 
     which is Gauss' theorem for the gradient.
-10. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Gauss' integral theorem gives
+11. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Gauss' integral theorem gives
 
     $$
     \int_{\mathbb{S}}\hat{\boldsymbol n}\times\boldsymbol w\,\mathrm{d}S = \int_{\mathbb{D}}\nabla\times\boldsymbol w\,\mathrm{d}V,
