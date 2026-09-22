@@ -35,30 +35,38 @@ def _fmt(v, fmt):
 def show_profiles(x, frames, values, *, value_name="t", value_fmt="{:.3g}",
                   unit="", reference=None, reference_name="initial condition",
                   xlabel="x [m]", ylabel="", title="", ylim=None, height=430,
-                  ms_per_frame=90):
+                  ms_per_frame=90, colors=("#00A6D6", "#EC6842", "#7B61FF")):
     """Profiles over time, with a play button and a draggable progress bar.
 
-    ``frames`` has shape (len(values), nx): row k is drawn at ``values[k]``.
-    Press play to run from the start, or drag the bar to any instant. Both
-    run in the browser; nothing here needs the kernel once the figure exists.
+    ``frames`` is either one array of shape (len(values), nx), or a dict
+    ``{name: array}`` to draw several curves that evolve together. Press play
+    to run from the start, or drag the bar to any instant. Both run in the
+    browser; nothing here needs the kernel once the figure exists.
     """
-    frames = np.asarray(frames, float)
+    if not isinstance(frames, dict):
+        frames = {"profile": frames}
+    frames = {k: np.asarray(v, float) for k, v in frames.items()}
     x = np.asarray(x, float)
-    lo, hi = (np.nanmin(frames), np.nanmax(frames)) if ylim is None else ylim
+    allv = np.concatenate([v.ravel() for v in frames.values()])
+    lo, hi = (np.nanmin(allv), np.nanmax(allv)) if ylim is None else ylim
     pad = 0.06 * (hi - lo if hi > lo else 1.0)
 
     fig = go.Figure()
     if reference is not None:
         fig.add_trace(go.Scatter(x=x, y=reference, mode="lines", name=reference_name,
                                  line=dict(color="#8a9199", dash="dash", width=1.5)))
-    fig.add_trace(go.Scatter(x=x, y=frames[0], mode="lines", name="profile",
-                             line=dict(color="#00A6D6", width=2.5)))
-    live = len(fig.data) - 1
+    live = []
+    for k, (name, arr) in enumerate(frames.items()):
+        fig.add_trace(go.Scatter(x=x, y=arr[0], mode="lines", name=name,
+                                 line=dict(color=colors[k % len(colors)],
+                                           width=2.5 if k == 0 else 2.0)))
+        live.append(len(fig.data) - 1)
 
-    # One frame per instant. The slider steps address the frames by name, so
-    # dragging and playing drive the same thing and stay in step.
-    fig.frames = [go.Frame(name=str(k), data=[go.Scatter(y=row)], traces=[live])
-                  for k, row in enumerate(frames)]
+    n_steps = len(values)
+    fig.frames = [go.Frame(name=str(k),
+                           data=[go.Scatter(y=arr[k]) for arr in frames.values()],
+                           traces=live)
+                  for k in range(n_steps)]
     still = dict(mode="immediate", frame=dict(duration=0, redraw=False),
                  transition=dict(duration=0))
     steps = [dict(method="animate", label=_fmt(v, value_fmt), args=[[str(k)], still])
@@ -83,7 +91,8 @@ def show_profiles(x, frames, values, *, value_name="t", value_fmt="{:.3g}",
 
 
 def show_spacetime(x, t, T, *, t_label="t [s]", x_label="x [m]", c_label="T [K]",
-                   title="", signed=None, log_t=True, marks=None):
+                   title="", signed=None, log_t=True, marks=None, curve=None,
+                   curve_label="prediction", deeper_down=False):
     """Colour map of T(x, t): time along the horizontal axis, position vertical.
 
     A signed field gets a diverging colour map centred on zero; a positive one
@@ -100,12 +109,18 @@ def show_spacetime(x, t, T, *, t_label="t [s]", x_label="x [m]", c_label="T [K]"
                            norm=TwoSlopeNorm(0.0, -vmax, vmax))
     else:
         im = ax.pcolormesh(t, x, T.T, cmap="inferno", shading="auto", vmin=0)
+    if curve is not None:
+        ax.plot(curve[0], curve[1], "--", color="#00A6D6", lw=2, label=curve_label)
+        ax.legend(loc="upper left", fontsize=8)
     if marks is not None:
         mt, mx = zip(*marks)
         ax.plot(mt, mx, "o", mfc="none", mec="#00A6D6", mew=1.5, ms=7, label="predicted peak")
         ax.legend(loc="upper left", fontsize=8)
     if log_t:
         ax.set_xscale("log")
+    ax.set_xlim(np.min(t), np.max(t))    # an overlaid curve must not stretch the axis
+    if deeper_down:                      # depth axes read downward
+        ax.invert_yaxis()
     ax.set_xlabel(t_label); ax.set_ylabel(x_label); ax.set_title(title)
     fig.colorbar(im, ax=ax, label=c_label, pad=0.02)
     fig.tight_layout()

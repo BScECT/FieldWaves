@@ -26,11 +26,9 @@ Everything you write here is plain NumPy. The module `fwtools` only draws and ch
 
 ## Learning objectives
 
-By the end of this lab you should be able to:
-
-- **Read a separated solution as a set of decaying modes.** Build an initial temperature from a Fourier series, and explain why mode $n$ decays at the rate $\kappa(n\pi/L)^2$, so that fine structure disappears first.
-- **Relate the boundary condition to the fate of the heat.** Show that ends held at a fixed temperature let heat leave, while insulated ends conserve it and drive the bar to its mean temperature.
-- **Interpret the spreading Gaussian as a measurement.** Predict when and how strongly a thermometer at distance $x$ responds, and quantify how diffusion blurs two sources into one.
+- **Decaying modes.** Build an initial temperature from a Fourier series and explain why mode $n$ decays at $\kappa(n\pi/L)^2$, so fine structure goes first.
+- **Boundaries.** Ends held at a fixed temperature let heat leave; insulated ends conserve it and drive the bar to its mean.
+- **Superposition.** Evolve any initial temperature with the Green's function, and turn the $t\propto x^2$ it implies into a measurement: of $\kappa$ in a bar, of depth in the Earth.
 
 ---
 
@@ -421,15 +419,129 @@ Once $w^2>2a^2$ the profile has a single maximum, and it becomes ever harder to 
 
 ---
 
-## Part 3 — The same kernel in the Earth (optional)
+## Part 3 — When does the bar discover its ends?
 
-This part looks ahead to the lecture on electromagnetic diffusion. A horizontal current sheet at the surface is switched on at $t=0$ with current $I$ per unit width. In the diffusive approximation the electric field at depth $z$ is
+A point of heat released at $x'$ at $t=0$ spreads on an infinite line as
+
+$$ G(x-x',t) = \frac{1}{\sqrt{4\pi\kappa t}}\exp\!\left(-\frac{(x-x')^2}{4\kappa t}\right), $$
+
+the Green's function of the heat equation. It is the Gaussian of Part 2 in the limit of a source
+squeezed to a point, and it carries unit heat at every time. Because the equation is linear, an
+arbitrary initial temperature is a continuous superposition of such points,
+
+$$ T_{\text{free}}(x,t) = \int_0^L G(x-x',t)\,h(x')\,\mathrm{d}x' , $$
+
+which is how the lecture notes build the electromagnetic field from its impulse response.
+
+This solution knows nothing about the ends of the bar, while the series of Part 1 holds $T=0$ at
+both of them. Early on the heat has not reached the ends, so the two must agree. **They part when
+the bar discovers that it is finite**, and that gives a way to measure $\kappa$.
+
+### Task 6 — the same heat, with and without ends
+
+The initial temperature is now a narrow Gaussian bump of width $w=3$ cm, centred a distance $x_c$
+from the near end. Build the free-space solution by superposition: `d2[i, j]` holds the squared
+distance between grid points $i$ and $j$, so the kernel is a matrix and the integral is a
+matrix-vector product.
+
+```{code-cell} ipython3
+w_b = 0.03                                  # width of the initial bump [m]
+xs = x[::4]                                 # every fourth cell: 300 points is enough here
+dxs = xs[1] - xs[0]
+d2 = (xs[:, None] - xs[None, :])**2         # squared distance between grid points [m^2]
+t6 = np.logspace(-1, 2.5, 150)              # 0.1 s .. 316 s
+
+# Task 6 -- two blanks.
+def T_free(tv, h_on_grid):
+    """The initial temperature h_on_grid, evolved as if the bar had no ends."""
+    G = ___        # the kernel above, evaluated for every pair of points: shape (300, 300)
+    return ___     # superpose: integrate G against h_on_grid over the bar
+
+# --- given: the same bump evolved both ways, and where they part company ---
+def both_ways(xc):
+    """(free-space solution, series solution) for a bump centred at xc, on the grid xs."""
+    h_b = np.exp(-(x - xc)**2 / w_b**2)
+    C_b = (2 / L) * np.sum(h_b * S, axis=1) * dx
+    bar = (C_b * np.exp(-kappa * (n * np.pi / L)**2 * t6[:, None])) @ S
+    return np.array([T_free(tv, h_b[::4]) for tv in t6]), bar[:, ::4]
+
+free, bar = both_ways(0.15)
+fw.show_profiles(xs, {"the bar, with ends": bar[::3], "no ends": free[::3]}, t6[::3],
+                 value_name="t", value_fmt="{:.3g}", unit=" s", ylabel="T [K]",
+                 title="The same heat, with and without ends")
+fw.show_spacetime(xs, t6, np.abs(free - bar), t_label="t [s]", x_label="x [m]",
+                  c_label="|difference| [K]", signed=False,
+                  title="What the ends cost: the two solutions differ from the near end inwards")
+
+# The instant the two differ by 1% of the peak, for five positions of the bump.
+xcs = np.array([0.10, 0.125, 0.15, 0.20, 0.25])
+t_dep = []
+for xc in xcs:
+    f, b = both_ways(xc)
+    rel = np.max(np.abs(f - b), axis=1) / np.max(np.abs(f), axis=1)
+    t_dep.append(t6[np.argmax(rel > 0.01)])
+t_dep = np.array(t_dep)
+
+slope, intercept = np.polyfit(xcs**2, t_dep, 1)
+kappa_fit = 1 / (4 * slope * np.log(100))
+plt.figure(figsize=(5.2, 3.2))
+plt.plot(xcs**2, t_dep, "o", color="#00A6D6", label="measured")
+plt.plot(xcs**2, slope * xcs**2 + intercept, "-", color="#8a9199",
+         label=f"fit: $\\kappa$ = {kappa_fit:.2e} m$^2$/s")
+plt.xlabel("$x_c^2$ [m$^2$]"); plt.ylabel("departure time [s]")
+plt.grid(alpha=0.3); plt.legend(fontsize=8); plt.tight_layout(); plt.show()
+print(f"departure times [s]: {np.round(t_dep, 2)}")
+print(f"kappa from the fit: {kappa_fit:.3e} m^2/s   (the bar was built with {kappa:.3e})")
+
+# --- self-check (leave this alone) ---
+_h_check = np.exp(-(x - 0.15)**2 / w_b**2)[::4]
+fw.check_abs("at t = 0.1 s the superposition reproduces the series solution",
+             T_free(t6[0], _h_check) - bar[0], 1e-6,
+             hint="the kernel must carry unit heat: check the 1/sqrt(4 pi kappa t) factor "
+                  "and that the sum over x' is multiplied by dxs")
+fw.check_scalar("kappa recovered from the departure times", kappa_fit, kappa, rtol=0.05,
+                unit=" m^2/s")
+```
+
+:::{admonition} Solution — Task 6
+:class: dropdown
+
+```python
+def T_free(tv, h_on_grid):
+    G = np.exp(-d2 / (4 * kappa * tv)) / np.sqrt(4 * np.pi * kappa * tv)
+    return G @ h_on_grid * dxs
+```
+:::
+
+:::{admonition} The ends are felt when the tail reaches them, and that measures $\kappa$
+:class: important dropdown
+
+The bump spreads to width $\sqrt{4\kappa t + w^2}$, so the fraction of it that has reached the
+near end is $\exp[-x_c^2/(4\kappa t + w^2)]$. Setting that fraction to the 1% threshold gives
+
+$$ 4\kappa\,t_{\text{dep}} = \frac{x_c^2}{\ln(1/0.01)} - w^2 , $$
+
+a straight line in $x_c^2$, which is what the second figure shows. Its slope is
+$1/(4\kappa\ln 100)$, so the fit returns $\kappa$ to about 1%, and its intercept is the small
+correction $-w^2/(4\kappa)$ for the width the bump started with.
+
+Two things are worth taking from this. A boundary makes itself felt through the tail of the
+distribution, long before the diffusion length $\sqrt{4\kappa t}$ equals the distance to it.
+And the same $t\propto x^2$ that set the peak time in Task 4 sets this departure time, because
+a diffusive field has only one way to convert a distance into a time.
+:::
+
+---
+
+## Part 4 — The same kernel in the Earth
+
+A horizontal current sheet at the surface is switched on at $t=0$ with current $I$ per unit width. In the diffusive approximation the electric field at depth $z$ is
 
 $$ E_x(z,t) = -I\sqrt{\frac{\mu}{4\pi\sigma t}}\exp\!\left(-\frac{\sigma\mu z^2}{4t}\right), \qquad t>0 . $$
 
-This is the kernel of Part 2 with $\kappa$ replaced by $1/(\sigma\mu)$. The approximation neglects $\varepsilon\,\partial_t\boldsymbol{E}$, which is justified when $t$ is much longer than the charge relaxation time $\tau_r = \varepsilon/\sigma$.
+This is the kernel of Part 2 with $\kappa$ replaced by $1/(\sigma\mu)$, so the field soaks into the ground exactly as heat spreads along a wire. The approximation neglects $\varepsilon\,\partial_t\boldsymbol{E}$, which is justified when $t$ is much longer than the charge relaxation time $\tau_r = \varepsilon/\sigma$. This is the field a time-domain electromagnetic sounding records.
 
-### Task 6 — when does the field arrive at depth?
+### Task 7 — when does the field arrive at depth?
 
 Write the time at which $\lvert E_x\rvert$ at depth $z$ peaks, from $\partial_t\lvert E_x\rvert = 0$.
 
@@ -442,12 +554,26 @@ _depths = [100.0, 300.0, 1000.0]           # [m]
 def E_step(z, t):
     return -I_s * np.sqrt(mu_0 / (4*np.pi*sigma*t)) * np.exp(-sigma*mu_0*z**2 / (4*t))
 
-# Task 6 -- one blank.
+# Task 7 -- one blank.
 def t_peak_em(z):
     """Time at which |E_x| at depth z peaks [s]."""
     return ___
 
-# --- given: normalised records at three depths ---
+# --- given, 1: the field soaking downward. Drag the bar, or press play ---
+_zs = np.linspace(1.0, 2000.0, 400)                     # depth [m]
+_tp = np.logspace(-6, -1.3, 60)                         # [s]
+_prof = np.array([np.abs(E_step(_zs, tv)) / np.abs(E_step(1.0, tv)) for tv in _tp])
+fw.show_profiles(_zs, _prof, _tp, value_name="t", value_fmt="{:.2g}", unit=" s",
+                 xlabel="depth z [m]", ylabel=r"$|E_x|$ / its value at the surface",
+                 title="The field diffuses into the Earth", ylim=(0.0, 1.05))
+
+# --- given, 2: depth against time, with your arrival-time curve over it ---
+fw.show_spacetime(_zs, _tp, _prof, t_label="t [s]", x_label="depth z [m]",
+                  c_label=r"$|E_x|$ / surface value", signed=False,
+                  curve=(t_peak_em(_zs), _zs), curve_label=r"your $t_p(z)$", deeper_down=True,
+                  title=r"Deeper means later: $t_p \propto z^2$")
+
+# --- given, 3: what a receiver records at three depths ---
 fw.show_records(t_em, {f"z = {z:g} m": np.abs(E_step(z, t_em)) / np.max(np.abs(E_step(z, t_em)))
                        for z in _depths},
                 peaks={f"z = {z:g} m": (t_peak_em(z), 1.0) for z in _depths},
@@ -462,7 +588,7 @@ for z in _depths:
                     t_em[np.argmax(np.abs(E_step(z, t_em)))], rtol=0.01, unit=" s")
 ```
 
-:::{admonition} Solution — Task 6
+:::{admonition} Solution — Task 7
 :class: dropdown
 
 ```python
@@ -474,5 +600,5 @@ def t_peak_em(z):
 :::{admonition} Depth maps onto arrival time, as $t_p\propto z^2$
 :class: important dropdown
 
-A layer ten times deeper answers a hundred times later: 63 µs at 100 m, 6.3 ms at 1 km, for $\sigma=0.01$ S/m. Time-domain electromagnetic soundings rest on this: the later part of a record senses the deeper Earth. In a more conductive Earth the arrival is later, since $t_p\propto\sigma$. The ratio $t_p/\tau_r$ is 7000 at 100 m and grows as $z^2$, so neglecting $\varepsilon\,\partial_t\boldsymbol{E}$ is well justified at these depths. The blurring of Task 5 applies here too: deep structure arrives late, and therefore blurred.
+A layer ten times deeper answers a hundred times later: 63 µs at 100 m, 6.3 ms at 1 km, for $\sigma=0.01$ S/m. On the map your curve $t_p(z)$ runs along the shoulder of the diffusing field, because $|E_x|$ has fallen to $1/\sqrt e$ of its surface value exactly where $t = \sigma\mu z^2/2$. Time-domain electromagnetic soundings rest on this: the later part of a record senses the deeper Earth. In a more conductive Earth the arrival is later, since $t_p\propto\sigma$. The ratio $t_p/\tau_r$ is 7000 at 100 m and grows as $z^2$, so neglecting $\varepsilon\,\partial_t\boldsymbol{E}$ is well justified at these depths. The blurring of Task 5 applies here too: deep structure arrives late, and therefore blurred.
 :::
