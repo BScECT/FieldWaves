@@ -96,6 +96,12 @@ parts:
   #     - file: extension_exercises/014.md
   #     - file: extension_exercises/015.md
   #     - file: extension_exercises/016.md
+  - caption: Diffusive fields
+    chapters:
+    - file: 3_diffusion_fields/intro.md
+      sections:
+      - file: 3_diffusion_fields/heat_equation_1d.md
+      - file: 3_diffusion_fields/em_diffusion.md
   - caption: Miscellaneous
     chapters:
     - file: references.md
