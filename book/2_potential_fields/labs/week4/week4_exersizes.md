@@ -10,9 +10,9 @@ kernelspec:
   name: python3
 ---
 
-# Exercises Week 4
+# Lab 4: Electrostatic and Magnetic Fields
 
-## Explore a spherical capacitor
+## 1. Explore a spherical capacitor
 
 Two concentric conducting shells with free space between them, an **inner shell** of radius $R_E=6370\ \text{km}$ (the Earth) held at $V=0$, and an **outer shell** of radius $R_I$ (the ionosphere) held at $V=V_o$, is the same setup as the Earth-ionosphere model in the {doc}`week 4 quiz <week4_quiz>`. Between the shells, the potential takes the form
 
@@ -97,3 +97,96 @@ display({"text/html": '<iframe title="Interactive spherical capacitor explorer" 
 2. **Move the outer shell farther away.** Keep $V_o$ fixed and increase $R_I$. Does $|B|$ grow or shrink? Explain why the field between the shells changes even though $V_o$ has not.
 3. **Increase $V_o$ toward 200 kV.** What happens to the field magnitude at a fixed altitude? Is the relationship linear?
 4. **Move the probe outside $R_I$ and inside $R_E$.** Confirm that $V$ is constant and $E=0$ in both regions, consistent with each shell being an equipotential conductor.
+
+## 2. Charges in the fair-weather field
+
+On a clear day, the air above flat, open ground carries a downward electric field (W4L1, slides 16–17):
+```{math}
+\vec{E} \approx -E_0\,\hat{z}, \qquad E_0 \approx 100\ \mathrm{V/m}, \qquad V(z) = E_0 z \quad \text{with } V(0) = 0.
+```
+Cosmic rays continuously ionise the air, producing free electrons and positive ions such as $\mathrm{N_2^+}$. Wind also lifts charged mineral dust from deserts into the atmosphere. Use $e = 1.602\cdot 10^{-19}\ \mathrm{C}$, $g = 9.81\ \mathrm{m/s^2}$ and $1\ \mathrm{eV} = 1.602\cdot 10^{-19}\ \mathrm{J}$ (the energy an elementary charge gains across $1\ \mathrm{V}$).
+ 
+(a) Sketch the equipotentials and field lines for $0 \leq z \leq 10\ \mathrm{m}$. What is the electric potential $V$ at $z = 2\ \mathrm{m}$, given the reference $V(0) = 0$ ?
+ 
+(b) An electron ($q=-e$) and an $\mathrm{N_2^+}$ ion ($q=+e$) are each moved from the ground to $z = 10\ \mathrm{m}$. For each, find $\Delta V$, $\Delta U$ (in J and in eV) and the work done by the field, $W_\mathrm{field}$.
+ 
+(c) Both particles are released from rest. Which one accelerates upward? In which direction does the resulting current flow?
+ 
+(d) A Saharan dust grain (radius $1\ \mu\mathrm{m}$, density $2650\ \mathrm{kg/m^3}$) carries a negative charge. How many excess electrons does it need for the electric force to balance gravity? Does the answer depend on its height in this model?
+ 
+(e) In the undisturbed fair-weather field, the potential difference between $z=0$ and $z=2\ \mathrm{m}$  is $200\ \mathrm{V}$. Now consider a person standing on the ground, approximated as a conductor connected to the ground. Would there be a $200\ \mathrm{V}$ potential difference between their feet and head? Sketch the equipotentials around the person and explain your reasoning. *Hint:* you are a conductor connected to the ground (W4L1, slide 14).
+ 
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for (a), (b) and (d).
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+
+import numpy as np
+ 
+e  = 1.602e-19     # elementary charge [C]
+E0 = 100.0         # fair-weather field strength [V/m]
+g  = 9.81          # gravitational acceleration [m/s^2]
+ 
+def V_fair(z):
+    """Fair-weather potential above flat ground, V(0) = 0."""
+    return ___
+ 
+# (b), (c): move each particle from z = 0 to z = 10 m
+dV = V_fair(10.0) - V_fair(0.0)
+for name, q in [("electron", -e), ("N2+ ion ", +e)]:
+    dU = ___                 # change in potential energy [J]
+    W  = ___                 # work done by the field [J]
+    Fz = ___                 # z-component of F = qE, with E = -E0 z_hat [N]
+    print(f"{name}: dV = {dV:.0f} V, dU = {dU:+.2e} J = {dU/e:+.0f} eV, "
+          f"W_field = {W:+.2e} J, F_z = {Fz:+.1e} N")
+ 
+# (d): dust grain levitated by the fair-weather field
+a_d, rho_d = 1e-6, 2650.0    # radius [m], density [kg/m^3]
+m_d = ___                    # mass of the grain [kg]
+q_d = ___                    # charge magnitude for |qE| = mg [C]
+print(f"m = {m_d:.2e} kg, |q| = {q_d:.2e} C = {q_d/e:.0f} excess electrons")
+ 
+# self-check
+assert np.isclose(V_fair(2.0), 200.0), "V(2 m) should be 200 V"
+assert np.isclose(q_d / e, 6.8e3, rtol=0.02), "check the mass or the force balance"
+print("Self-check passed.")
+```
+ 
+The explorer below shows the fair-weather field over flat ground. You can add a grounded conducting hemisphere of radius $a$, a crude model of a person, a tree or a small hill. Its potential is
+```{math}
+V(\vec{r}) = E_0 z\left(1 - \frac{a^3}{r^3}\right), \qquad z \geq 0,\ r \geq a.
+```
+The upper panel shows the field strength $|\vec{E}|/E_0$ in colour, the equipotentials in white (every $E_0\cdot 1\ \mathrm{m}$), the field lines in grey, and the force $\vec{F} = q\vec{E}$ on the test charge as an arrow. The lower panel shows $V(z)$ and $U(z)/e$ along the vertical line through the test charge.
+ 
+1. With $a = 0$, move the test charge up and down. Check your answers to (a) and (b).
+2. Switch between the electron and the ion. Which quantities change, and which stay the same? (W4L1, slide 9)
+3. Set $a = 1\ \mathrm{m}$. Where do the equipotentials crowd together? Read $|\vec{E}|$ just above the top of the object and near its base. Use this to check your sketch for (e).
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+
+for _candidate in (
+    Path("fair_weather_lab.html"),
+    Path("book/2_potential_fields/labs/week4/fair_weather_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("fair_weather_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+
+display({"text/html": '<iframe title="Interactive fair-weather field explorer" '
+             'style="width:100%;height:820px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
