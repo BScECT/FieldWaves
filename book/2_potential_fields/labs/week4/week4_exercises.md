@@ -80,8 +80,34 @@ The left panel shows the field strength $|\vec{E}|/E_0$ in colour, the equipoten
 1. With $a = 0$, move the test charge up and down. Check your answers to (a) and (b).
 2. Switch between the electron and the ion. Which quantities change, and which stay the same? (W4L1, slide 9)
 3. Set $a = 1\ \mathrm{m}$. Where do the equipotentials crowd together? Read $|\vec{E}|$ just above the top of the object and near its base. Use this to check your sketch for (e).
+
 ```{code-cell} ipython3
-%matplotlib inline
+# --- Live Code housekeeping (no physics): make ipywidgets available -------
+try:
+    import micropip                      # only exists in the browser kernel
+    await micropip.install("ipywidgets")
+except ImportError:                      # regular Jupyter: nothing to install
+    pass
+import io
+import matplotlib.pyplot as plt
+import ipywidgets as widgets
+from IPython.display import display
+ 
+def live_explorer(draw, **controls):
+    """Show the sliders; redraw the figure returned by draw(**values) as an image."""
+    image = widgets.Image(format="png",
+                          layout=widgets.Layout(width="100%", max_width="1000px"))
+    def update(change=None):
+        fig = draw(**{name: c.value for name, c in controls.items()})
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=100)
+        plt.close(fig)
+        image.value = buf.getvalue()
+    for c in controls.values():
+        c.observe(update, names="value")
+    update()
+    display(widgets.VBox(list(controls.values()) + [image]))
+# ---------------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
 import ipywidgets as widgets
@@ -151,10 +177,10 @@ def explore(E0=100, a=0.0, charge="electron (−e)", x_p=3.0, z_p=4.0):
     ax2.set_xlabel("V [V]   or   U/e [eV]"); ax2.set_ylabel("z [m]")
     ax2.set_title(f"Profile along x = {x_p:.1f} m", fontsize=10)
     ax2.legend(loc="upper left", fontsize=8, frameon=False)
-    plt.show()
+    return fig
  
 style = {"description_width": "150px"}
-widgets.interact(
+live_explorer(
     explore,
     E0=widgets.FloatSlider(value=100, min=50, max=300, step=10, style=style,
                            description="E₀ [V/m]", continuous_update=False),
@@ -168,4 +194,3 @@ widgets.interact(
                             description="charge z [m]", continuous_update=False),
 );
 ```
- 
