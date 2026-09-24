@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:12px;font:14px system-ui,sans-serif;color:#203541;background:#fff}
+h2{font-size:21px;margin:0 0 8px}
+p{line-height:1.45;margin:8px 0}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:15px 0}
+label{display:block;font-weight:600}
+input[type=range]{width:100%;accent-color:#007da5}
+button{font:inherit;padding:6px;background:white;border:1px solid #8a9da7;border-radius:4px;cursor:pointer}
+button:hover{background:#eef6f8}
+output{font-variant-numeric:tabular-nums;font-weight:400}
+.scroll{overflow-x:auto}
+.plots{display:grid;grid-template-columns:1fr;gap:6px}
+figure{margin:0}
+figure figcaption{text-align:center;font-weight:600;font-size:13px;margin:6px 0}
+canvas{display:block;width:100%;height:auto;border:1px solid #d6dfe4;touch-action:manipulation}
+.legend{font-size:12px;color:#415764}
+.status{padding:8px;background:#eef6f8;font-variant-numeric:tabular-nums}
+@media(max-width:580px){.controls{grid-template-columns:1fr}body{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="controls">
+<div><label for="ro">Outer radius R<sub>I</sub> (km): <output id="rov"></output></label><input id="ro" type="range" min="6380" max="8370" step="10" value="6470"></div>
+<div><label for="vo">Outer voltage V<sub>o</sub> (kV): <output id="vov"></output></label><input id="vo" type="range" min="0" max="200" step="5" value="100"></div>
+<div><label for="rp">Probe position (drags through interior, gap, space): <output id="rpv"></output></label><input id="rp" type="range" min="0" max="100" step="0.5" value="34"></div>
+</div>
+<button id="reset" type="button">Reset</button>
+<div class="scroll"><div class="plots">
+<figure><figcaption>Potential V(r) (kV)</figcaption><canvas id="vplot" width="640" height="160" aria-label="Potential versus radius"></canvas></figure>
+<figure><figcaption>Field E(r) = &minus;dV/dr (V/m)</figcaption><canvas id="eplot" width="640" height="160" aria-label="Field versus radius"></canvas></figure>
+</div></div>
+<p class="status" id="status" aria-live="polite"></p>
+<script>
+(()=>{
+'use strict';
+const $ = id => document.getElementById(id);
+const ids = ['ro','vo','rp'];
+const R_E = 6370; // km, fixed inner (Earth) radius
+
+function coefficients(ri, ro, vo) {
+  const b = vo / (1/ro - 1/ri);
+  const a = -b / ri;
+  return [a, b];
+}
+
+function potential(r, ri, ro, vo, a, b) {
+  if (r < ri) return 0;
+  if (r > ro) return vo;
+  return a + b/r;
+}
+
+function field(r, ri, ro, b) {
+  if (r < ri || r > ro) return 0;
+  return b / (r*r);
+}
+
+// Piecewise-linear radial axis: fixed screen-space fractions for the interior,
+// the shell gap, and the exterior, so the thin gap stays visible regardless of scale.
+function xFraction(r, ri, ro, rmax) {
+  if (r <= ri) return 0.12 * (r / ri);
+  if (r <= ro) return 0.12 + 0.43 * (r - ri) / (ro - ri);
+  return 0.55 + 0.45 * Math.min(1, (r - ro) / (rmax - ro));
+}
+
+// Inverse of xFraction: maps the probe slider's [0, 1] fraction back to a radius in km.
+function fractionToR(frac, ri, ro, rmax) {
+  if (frac <= 0.12) return ri * frac / 0.12;
+  if (frac <= 0.55) return ri + (frac - 0.12) / 0.43 * (ro - ri);
+  return ro + (frac - 0.55) / 0.45 * (rmax - ro);
+}
+
+// Fixed y-axis bounds so that dragging the voltage slider visibly moves the
+// trace within a stable frame; only changing R_I (a different geometry)
+// legitimately rescales the axes. Bounds are set from the full V_o slider
+// range (0-200 kV) evaluated at the current shell radii.
+function axisBounds(ri, ro) {
+  const voMaxV = 200000;
+  const [, bMax] = coefficients(ri, ro, voMaxV);
+  const eMaxVm = Math.abs(bMax) / (ri * ri) / 1000;
+  return { vLo: 0, vHi: 200 * 1.05, eLo: -eMaxVm * 1.05, eHi: 0 };
+}
+
+function drawPlot(canvas, ri, ro, vo, a, b, rp, rmax, yLo, yHi, isField) {
+  const c = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height, m = 36;
+  c.clearRect(0, 0, W, H);
+  const n = 300;
+  const rs = [], ys = [];
+  const breakpoints = [0, ri, ro, rmax];
+  for (let seg = 0; seg < 3; seg++) {
+    for (let i = 0; i <= n / 3; i++) {
+      const r = breakpoints[seg] + (breakpoints[seg + 1] - breakpoints[seg]) * i / (n / 3);
+      rs.push(r);
+      ys.push(isField ? field(r, ri, ro, b) / 1000 : potential(r, ri, ro, vo, a, b) / 1000);
+    }
+  }
+  const toX = r => m + xFraction(r, ri, ro, rmax) * (W - 2*m);
+  const toY = y => H - m - ((y - yLo) / (yHi - yLo)) * (H - 2*m);
+
+  // conductor shading
+  c.fillStyle = '#e3e8ea';
+  c.fillRect(toX(0), m, toX(ri) - toX(0), H - 2*m);
+  c.fillRect(toX(ro), m, toX(rmax) - toX(ro), H - 2*m);
+
+  // axes
+  c.strokeStyle = '#7b8d96'; c.lineWidth = 0.6;
+  c.strokeRect(m, m, W - 2*m, H - 2*m);
+  c.strokeStyle = '#c3ccd1';
+  c.beginPath(); c.moveTo(m, toY(0)); c.lineTo(W - m, toY(0)); c.stroke();
+
+  // curve
+  c.strokeStyle = isField ? '#c43c39' : '#2764ae';
+  c.lineWidth = 1.8;
+  c.beginPath();
+  rs.forEach((r, i) => {
+    const x = toX(r), y = toY(ys[i]);
+    if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+  });
+  c.stroke();
+
+  // shell boundaries
+  c.strokeStyle = '#415764'; c.setLineDash([4, 3]); c.lineWidth = 1;
+  [ri, ro].forEach(r => {
+    c.beginPath(); c.moveTo(toX(r), m); c.lineTo(toX(r), H - m); c.stroke();
+  });
+
+  // probe
+  c.strokeStyle = '#228452';
+  c.beginPath(); c.moveTo(toX(rp), m); c.lineTo(toX(rp), H - m); c.stroke();
+  c.setLineDash([]);
+  const py = isField ? field(rp, ri, ro, b) / 1000 : potential(rp, ri, ro, vo, a, b) / 1000;
+  c.fillStyle = '#228452';
+  c.beginPath(); c.arc(toX(rp), toY(py), 4, 0, 2*Math.PI); c.fill();
+
+  // probe value on the y-axis
+  const pyClamped = Math.max(yLo, Math.min(yHi, py));
+  c.fillStyle = '#228452'; c.font = '11px system-ui'; c.textAlign = 'left';
+  c.fillText(py.toPrecision(3), 4, toY(pyClamped) + 4);
+
+  // labels
+  c.fillStyle = '#203541'; c.font = '11px system-ui'; c.textAlign = 'center';
+  c.fillText('r (km, not to scale)', W/2, H - 6);
+  c.fillText(`${ri}`, toX(ri), H - m + 14);
+  c.fillText(`${ro}`, toX(ro), H - m + 14);
+  c.textAlign = 'left';
+  c.fillText(yHi.toPrecision(3), 4, m + 4);
+  c.fillText(yLo.toPrecision(3), 4, H - m);
+}
+
+function render() {
+  const ri = R_E;
+  const ro = +$('ro').value;
+  const vo = +$('vo').value * 1000; // kV -> V
+  const rmax = ro + 3000;
+  const rp = fractionToR(+$('rp').value / 100, ri, ro, rmax);
+  const [a, b] = coefficients(ri, ro, vo);
+
+  $('rov').textContent = ro.toFixed(0);
+  $('vov').textContent = (vo / 1000).toFixed(0);
+  $('rpv').textContent = `${rp.toFixed(0)} km`;
+
+  const bounds = axisBounds(ri, ro);
+  drawPlot($('vplot'), ri, ro, vo, a, b, rp, rmax, bounds.vLo, bounds.vHi, false);
+  drawPlot($('eplot'), ri, ro, vo, a, b, rp, rmax, bounds.eLo, bounds.eHi, true);
+
+  const vAtP = potential(rp, ri, ro, vo, a, b) / 1000;
+  const eAtP = field(rp, ri, ro, b) / 1000;
+  $('status').textContent =
+    `Altitude of outer shell: ${(ro - ri).toFixed(0)} km. A = ${a.toFixed(1)} V, B = ${b.toExponential(3)} V·km ` +
+    `At the probe r = ${rp.toFixed(0)} km (altitude ${(rp - ri).toFixed(0)} km): V = ${vAtP.toFixed(2)} kV, E = ${eAtP.toFixed(3)} V/m.`;
+}
+
+for (const id of ids) $(id).addEventListener('input', render);
+$('reset').addEventListener('click', () => {
+  for (const [id, v] of Object.entries({ro: 6470, vo: 100, rp: 34})) $(id).value = v;
+  render();
+});
+render();
+})();
+</script>
+</body>
+</html>
