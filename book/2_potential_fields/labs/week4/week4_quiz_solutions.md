@@ -1,7 +1,7 @@
 # Quiz Week 4 (Solutions)
 
 
-## 1. 
+## 1. Earth-ionosphere system
 The Earth-ionosphere system can be modeled in a simple way by assuming the Earth to be a perfectly conducting sphere of radius $R_E$, surrounded by a thin, perfectly conducting spherical shell with radius $R_I = R_E + 100\ \text{km}$, with free space between them. The surface of the Earth has a potential $\Phi(r=R_E)=0\ \text{V}$, and the ionosphere has potential $\Phi(r=R_I)=V_I$.
 
 ```{figure} figures/simple_ionosphere.png
@@ -81,7 +81,7 @@ A &= \frac{-(-4.12 \cdot 10^{13})}{(6370\cdot 10^3)} \\
 The field points radially inward (ie. down), from high potential to low.
 
 
-## 2. 
+## 2. The fair-weather field
 On a clear day, the air above flat, open ground carries a downward electric field (W4L1, slides 16–17):
 ```{math}
 \vec{E} \approx -E_0\,\hat{z}, \qquad E_0 \approx 100\ \mathrm{V/m}, \qquad V(z) = E_0 z \quad \text{with } V(0) = 0.
@@ -130,3 +130,68 @@ A negative charge feels an upward force (see (c)), so it can balance gravity whe
 \qquad N = \frac{|q|}{e} \approx \boxed{6.8\cdot 10^{3}\ \text{electrons}}.
 ```
 In this model, $\vec{E}$ is uniform, so the answer **does not depend on height**. The linear potential is only valid near the ground (W4L1, slide 17). In real dust storms, the field near the ground can be much stronger than $E_0$, so far less charge is needed.
+
+## 3. Earth's magnetic field
+Far from a compact current system, its magnetic field is that of a dipole (W4L2, slides 14–15). Earth's main field is modelled as a dipole at Earth's centre. As in the lecture, let $\hat m=\hat z$, let $\theta$ be the angle measured from $\hat m$, and work in the $x$–$z$ plane with $\hat r=\sin\theta\,\hat x+\cos\theta\,\hat z$ (slide 22). The field is
+```{math}
+\vec B = B_*\left(\frac{R}{r}\right)^3\left[3(\hat m\cdot\hat r)\,\hat r-\hat m\right],
+\qquad B_*=\frac{\mu_0|\vec m|}{4\pi R^3}.
+```
+For Earth, take $R=a=6371\ \mathrm{km}$ and $B_*\approx 29.7\ \mu\mathrm{T}$ (called $B_0$ in the teachbook section *Earth as a Magnetic Dipole*). For the present polarity, $\hat m$ points toward the **southern** end of the dipole axis: $\theta=0$ is the southern end, $\theta=\pi$ the northern end, and $\theta=\pi/2$ the dipole equator.
+ 
+```{figure} figures/earth_dipole_setup.png
+:width: 45%
+ 
+Geometry of the dipole model, as in W4L2, slides 17 and 22: $\hat m=\hat z$ points up the page, $\theta$ is measured from $\hat m$, and the grey arrows show $\hat r$ at the points used in (a) and (b). The dashed circle is Earth's surface, $r=a$.
+```
+ 
+(a) At the surface, $r=a$, find $\vec B/B_*$ at $\theta=0$, $\pi/2$ and $\pi$, and give $|\vec B|$ in $\mu\mathrm{T}$. At each point, does the field point out of the ground, into it, or along it? In which hemisphere does the field enter Earth?
+ 
+(b) At $r=a$ and $\theta=3\pi/4$ (dipole latitude $45^\circ$ N), construct $\vec B/B_*$ head to tail from $3(\hat m\cdot\hat r)\hat r$ and $-\hat m$ (W4L2, slide 16). Find $|\vec B|$ in $\mu\mathrm{T}$ and the angle between $\vec B$ and the local horizontal. *Hint:* use $\vec B\cdot\hat r=|\vec B|\cos\alpha$, where $\alpha$ is the angle between $\vec B$ and $\hat r$.
+ 
+(c) ESA's Swarm satellites measure the field at about $450\ \mathrm{km}$ altitude. What is $|\vec B|$ directly above the point in (b)? Does the direction of $\vec B$ change?
+ 
+(d) At what distance from Earth's centre, above the northern end of the axis, has $|\vec B|$ dropped to $1\%$ of its surface value?
+ 
+**(a)** At $r=a$ the factor $(R/r)^3$ equals 1.
+- $\theta=0$: $\hat r=\hat z$, $\hat m\cdot\hat r=1$, so $\vec B/B_*=3\hat z-\hat z=2\hat z=2\hat r$. The field points **out of the ground**, with $|\vec B|=2B_*=\boxed{59.4\ \mu\mathrm{T}}$.
+- $\theta=\pi/2$: $\hat r=\hat x$, $\hat m\cdot\hat r=0$, so $\vec B/B_*=-\hat z$. The field is **along the ground** (horizontal), pointing from the southern toward the northern end of the axis, with $|\vec B|=B_*=\boxed{29.7\ \mu\mathrm{T}}$.
+- $\theta=\pi$: $\hat r=-\hat z$, $\hat m\cdot\hat r=-1$, so $\vec B/B_*=3(-1)(-\hat z)-\hat z=2\hat z=-2\hat r$. The field points **into the ground**, with $|\vec B|=\boxed{59.4\ \mu\mathrm{T}}$.
+The field leaves Earth in the southern hemisphere and **enters Earth in the northern hemisphere**. The field at the poles is twice as strong as at the equator (W4L2, slide 17).
+ 
+**(b)** At $\theta=3\pi/4$: $\hat r=\tfrac{1}{\sqrt2}(\hat x-\hat z)$ and $\hat m\cdot\hat r=\cos\tfrac{3\pi}{4}=-\tfrac{1}{\sqrt2}$. Then
+```{math}
+3(\hat m\cdot\hat r)\hat r=-\tfrac32(\hat x-\hat z)=-\tfrac32\hat x+\tfrac32\hat z,
+\qquad
+\frac{\vec B}{B_*}=-\tfrac32\hat x+\tfrac32\hat z-\hat z=\boxed{-\tfrac32\hat x+\tfrac12\hat z}.
+```
+This is the $\theta=3\pi/4$ arrow of the slide 22 practice. Its magnitude equals that of the slide 16 example:
+```{math}
+|\vec B|=B_*\sqrt{\tfrac94+\tfrac14}=1.58\,B_*=\boxed{47.0\ \mu\mathrm{T}}.
+```
+For the direction, $\vec B\cdot\hat r=B_*\tfrac{1}{\sqrt2}\left(-\tfrac32-\tfrac12\right)=-\sqrt2\,B_*$, so
+```{math}
+\cos\alpha=\frac{-\sqrt2}{1.58}=-0.894,\qquad \alpha=153.4^\circ.
+```
+$\vec B$ makes $153.4^\circ-90^\circ=\boxed{63.4^\circ}$ with the horizontal and points **into the ground** ($\vec B\cdot\hat r<0$). It is twice as steep as the $45^\circ$ radius.
+ 
+```{figure} figures/earth_dipole_vectors_solution.png
+:width: 95%
+ 
+Left: $\vec B/B_*$ at the four points of (a) and (b), drawn with one arrow scale (compare W4L2, slide 17). Right: the head-to-tail construction at $\theta=3\pi/4$ (compare slide 16). The field points into the ground, $63.4^\circ$ below the local horizontal.
+```
+ 
+**(c)** The bracket depends only on directions; the distance enters only through $(R/r)^3$ (W4L2, slide 15). With $r=6371+450=6821\ \mathrm{km}$,
+```{math}
+|\vec B|=47.0\ \mu\mathrm{T}\times\left(\frac{6371}{6821}\right)^3=47.0\times0.815=\boxed{38.3\ \mu\mathrm{T}}.
+```
+The **direction does not change**: at the same $\theta$, $\hat r$ and the bracket are the same.
+ 
+**(d)** Along the axis, $|\vec B|=2B_*(a/r)^3$, so the ratio to the surface value is $(a/r)^3$:
+```{math}
+\left(\frac{a}{r}\right)^3=0.01
+\quad\Longrightarrow\quad
+r=100^{1/3}a=4.64\,a\approx\boxed{2.96\cdot10^{4}\ \mathrm{km}}.
+```
+Each doubling of the distance reduces the field by a factor of 8 (W4L2, slide 18), and $2^{2.2}\approx4.6$. The same distance holds at every $\theta$, because the ratio depends only on $r$.
+ 

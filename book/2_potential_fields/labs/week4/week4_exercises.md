@@ -184,3 +184,110 @@ display({"text/html": '<iframe title="Interactive fair-weather field explorer" '
              'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
              + '"></iframe>'}, raw=True)
 ```
+
+
+## 3. Explore Earth's dipole field
+ 
+Far from a compact current system, its magnetic field is that of a dipole (W4L2, slides 14–15). Earth's main field is modelled as a dipole at Earth's centre. As in the lecture, let $\hat m=\hat z$, let $\theta$ be the angle measured from $\hat m$, and work in the $x$–$z$ plane with $\hat r=\sin\theta\,\hat x+\cos\theta\,\hat z$ (slide 22). The field is
+```{math}
+\vec B = B_*\left(\frac{R}{r}\right)^3\left[3(\hat m\cdot\hat r)\,\hat r-\hat m\right],
+\qquad B_*=\frac{\mu_0|\vec m|}{4\pi R^3}.
+```
+For Earth, take $R=a=6371\ \mathrm{km}$ and $B_*\approx 29.7\ \mu\mathrm{T}$ (called $B_0$ in the teachbook section *Earth as a Magnetic Dipole*). For the present polarity, $\hat m$ points toward the **southern** end of the dipole axis: $\theta=0$ is the southern end, $\theta=\pi$ the northern end, and $\theta=\pi/2$ the dipole equator.
+ 
+Parts (a)–(d) of this exercise are question 3 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
+ 
+(e) Repeat part (b) of the quiz for a general $\theta$ at $r=a$.
+1. Write $\hat z=\cos\theta\,\hat r-\sin\theta\,\hat\theta$, with $\hat\theta=\cos\theta\,\hat x-\sin\theta\,\hat z$ pointing along the ground toward the northern end of the axis. Show that the field has a radial component $B_r=2B_*\cos\theta$ and a horizontal component $B_\theta=B_*\sin\theta$.
+2. Use the dipole latitude $\lambda_m=\theta-\pi/2$ (positive in the northern hemisphere) to show that the angle $I$ below the horizontal satisfies $\tan I=2\tan\lambda_m$. Check it against quiz part (b).
+3. A navigator measures $I=70^\circ$. What is the dipole latitude? Near which latitudes does a small error in $I$ matter least?
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for parts (a)–(d) of the quiz and part (e).
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+ 
+import numpy as np
+ 
+B_star = 29.7e-6                 # B_* for Earth [T]
+a      = 6371e3                  # R = a, Earth's reference radius [m]
+m_hat  = np.array([0.0, 1.0])    # (x, z): m_hat = z_hat, toward the SOUTHERN end of the axis
+ 
+def B_dipole(theta, r):
+    """Dipole field (Bx, Bz) [T] at polar angle theta (from m_hat) and distance r [m]."""
+    r_hat = np.array([np.sin(theta), np.cos(theta)])
+    return ___                   # B_* (a/r)^3 [3 (m.r) r - m]
+ 
+def below_horizontal(theta, r):
+    """Angle [deg] between B and the local horizontal, positive when B points into the ground."""
+    r_hat = np.array([np.sin(theta), np.cos(theta)])
+    B = B_dipole(theta, r)
+    B_radial = ___               # component of B along r_hat (positive = out of the ground)
+    return np.degrees(np.arcsin(-B_radial / np.linalg.norm(B)))
+ 
+# (a), (b): at the surface
+for name, th in [("southern end", 0.0), ("dipole equator", np.pi/2),
+                 ("northern end", np.pi), ("45 deg N", 3*np.pi/4)]:
+    B = B_dipole(th, a)
+    Bx, Bz = np.round(B / B_star, 2) + 0.0          # + 0.0 avoids printing -0.00
+    I = round(below_horizontal(th, a), 1) + 0.0
+    print(f"{name:15s} B/B* = ({Bx:+.2f}, {Bz:+.2f}),  "
+          f"|B| = {np.linalg.norm(B)*1e6:5.1f} uT,  below horizontal = {I:+6.1f} deg")
+ 
+# (c): Swarm at 450 km altitude above 45 deg N
+r_swarm = ___
+print(f"(c) |B| at Swarm altitude = {np.linalg.norm(B_dipole(3*np.pi/4, r_swarm))*1e6:.1f} uT,"
+      f"  below horizontal = {below_horizontal(3*np.pi/4, r_swarm):.1f} deg")
+ 
+# (d): distance at which the field has dropped to 1% of its surface value
+r_1pct = ___
+print(f"(d) r = {r_1pct/a:.2f} a = {r_1pct/1e3:.0f} km")
+ 
+# (e): dipole latitude for a measured angle I = 70 deg, from tan I = 2 tan(lambda_m)
+lam_nav = ___                    # [rad]
+print(f"(e) I = 70 deg  ->  lambda_m = {np.degrees(lam_nav):.1f} deg N")
+ 
+# self-check
+assert np.isclose(np.linalg.norm(B_dipole(np.pi/2, a)), B_star)
+assert np.isclose(np.linalg.norm(B_dipole(3*np.pi/4, a)), 47.0e-6, rtol=1e-3)
+assert np.isclose(below_horizontal(3*np.pi/4, a), 63.43, atol=0.01)
+assert np.isclose(np.linalg.norm(B_dipole(3*np.pi/4, r_swarm)), 38.3e-6, rtol=2e-3)
+assert np.isclose(np.linalg.norm(B_dipole(np.pi, r_1pct)) / np.linalg.norm(B_dipole(np.pi, a)), 0.01)
+assert np.isclose(np.degrees(lam_nav), 53.95, atol=0.01)
+print("Self-check passed.")
+```
+ 
+The explorer below draws the dipole field lines in the $x$–$z$ plane, oriented as in the lecture ($\hat m=\hat z$ up the page, so the southern end of Earth's axis is at the top). Choose a probe point with $\theta$ and $r/a$. At the probe, the blue, red and black arrows show the head-to-tail construction of the bracket $3(\hat m\cdot\hat r)\hat r-\hat m$. The dashed line is the local horizontal. The lower-left panel shows $|\vec B|$ along the radial line through the probe on log–log axes. The lower-right panel shows the angle below the horizontal and $|\vec B|/B_*$ at the surface as functions of $\theta$.
+ 
+1. At $r/a=1$, set $\theta=0^\circ$, $90^\circ$, $180^\circ$ and $135^\circ$. Check your answers to quiz parts (a) and (b).
+2. Press *Swarm altitude*. Which numbers change, and which stay the same? Do the arrows at the probe change? (W4L2, slide 15)
+3. In the lower-left panel, why is the curve a straight line? Read off where it crosses the $1\%$ line and compare with quiz part (d). By what factor does $|\vec B|$ drop between $r/a=1$ and $2$? (W4L2, slide 18)
+4. In the lower-right panel, where is the field vertical, where is it horizontal, and where is $|\vec B|$ largest and smallest? Where does the angle change fastest with $\theta$? Relate this to part (e).
+```{code-cell} ipython3
+:tags: [remove-input]
+ 
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+ 
+for _candidate in (
+    Path("earth_dipole_lab.html"),
+    Path("book/2_potential_fields/labs/week4/earth_dipole_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("earth_dipole_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+ 
+display({"text/html": '<iframe title="Interactive Earth dipole explorer" '
+             'style="width:100%;height:1180px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
+ 
