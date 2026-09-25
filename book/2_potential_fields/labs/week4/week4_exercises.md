@@ -197,7 +197,7 @@ For Earth, take $R=a=6371\ \mathrm{km}$ and $B_*\approx 29.7\ \mu\mathrm{T}$ (ca
  
 Parts (a)–(d) of this exercise are question 3 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
  
-(e) Repeat part (b) of the quiz for a general $\theta$ at $r=a$.
+(e) The quiz quotes the component form of the dipole field; here you derive it. Repeat part (b) of the quiz for a general $\theta$ at $r=a$.
 1. Write $\hat z=\cos\theta\,\hat r-\sin\theta\,\hat\theta$, with $\hat\theta=\cos\theta\,\hat x-\sin\theta\,\hat z$ pointing along the ground toward the northern end of the axis. Show that the field has a radial component $B_r=2B_*\cos\theta$ and a horizontal component $B_\theta=B_*\sin\theta$.
 2. Use the dipole latitude $\lambda_m=\theta-\pi/2$ (positive in the northern hemisphere) to show that the angle $I$ below the horizontal satisfies $\tan I=2\tan\lambda_m$. Check it against quiz part (b).
 3. A navigator measures $I=70^\circ$. What is the dipole latitude? Near which latitudes does a small error in $I$ matter least?
@@ -260,7 +260,7 @@ print("Self-check passed.")
  
 The explorer below draws the dipole field lines in the $x$–$z$ plane, oriented as in the lecture ($\hat m=\hat z$ up the page, so the southern end of Earth's axis is at the top). Choose a probe point with $\theta$ and $r/a$. At the probe, the blue, red and black arrows show the head-to-tail construction of the bracket $3(\hat m\cdot\hat r)\hat r-\hat m$. The dashed line is the local horizontal. The lower-left panel shows $|\vec B|$ along the radial line through the probe on log–log axes. The lower-right panel shows the angle below the horizontal and $|\vec B|/B_*$ at the surface as functions of $\theta$.
  
-1. At $r/a=1$, set $\theta=0^\circ$, $90^\circ$, $180^\circ$ and $135^\circ$. Check your answers to quiz parts (a) and (b).
+1. At $r/a=1$, set $\theta=0^\circ$, $90^\circ$ and $135^\circ$ to check your answers to quiz parts (a) and (b), then $180^\circ$ to see the northern end.
 2. Press *Swarm altitude*. Which numbers change, and which stay the same? Do the arrows at the probe change? (W4L2, slide 15)
 3. In the lower-left panel, why is the curve a straight line? Read off where it crosses the $1\%$ line and compare with quiz part (d). By what factor does $|\vec B|$ drop between $r/a=1$ and $2$? (W4L2, slide 18)
 4. In the lower-right panel, where is the field vertical, where is it horizontal, and where is $|\vec B|$ largest and smallest? Where does the angle change fastest with $\theta$? Relate this to part (e).
@@ -291,3 +291,99 @@ display({"text/html": '<iframe title="Interactive Earth dipole explorer" '
              + '"></iframe>'}, raw=True)
 ```
  
+
+## 4. Explore a current loop and its dipole field
+ 
+Far from a compact current loop, its magnetic field is that of a dipole (W4L2, slide 14). A circular loop carrying current $I$ around an area $A$ has the magnetic moment
+```{math}
+\vec m = IA\,\hat n,
+```
+where $\hat n$ is the normal to the loop given by the right-hand rule: curl the fingers along the current, and the thumb gives $\hat n$. Use $\mu_0 = 4\pi\cdot10^{-7}\ \mathrm{T\,m/A}$.
+ 
+Parts (a)–(d) of this exercise are question 4 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
+ 
+(e) Return to the core loop of quiz part (b). An observer stands on Earth's surface above the northern end of the axis, at distance $z = a$ from the centre of the loop. How large is the error of the dipole formula there? How far from Earth's centre, in units of $a$, would the observer have to be for the dipole formula to be accurate to within $10\%$? What does this tell you about the single-loop picture of the geodynamo?
+ 
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for parts (a)–(d) of the quiz and part (e). The last blank, `z_10`, is the height where the dipole formula becomes accurate to within $10\%$; compare it with explorer question 4.
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+ 
+import numpy as np
+ 
+mu0 = 4e-7 * np.pi                     # [T m/A]
+a, B_star, R_c = 6371e3, 29.7e-6, 3480e3   # Earth radius [m], B_* [T], outer-core radius [m]
+ 
+# (a), (b): Earth's moment and the equivalent core current
+m_earth = ___                          # from B_* = mu0 m / (4 pi a^3)  [A m^2]
+I_core  = ___                          # from m = I * pi R_c^2  [A]
+print(f"(a) m = {m_earth:.2e} A m^2     (b) I = {I_core:.2e} A")
+ 
+def B_loop_axis(z, I, R):
+    """Exact field on the axis of a circular loop of radius R [T]."""
+    return mu0 * I * R**2 / (2 * (R**2 + z**2)**1.5)
+ 
+def B_dip_axis(z, m):
+    """Dipole formula on the axis [T]."""
+    return ___
+ 
+# (c), (d): the survey loop
+R_L, I_L = 50.0, 10.0
+m_L = ___                              # moment of the survey loop [A m^2]
+print(f"(c) m = {m_L:.3g} A m^2")
+for z in (100.0, 250.0):                # (d): z = 2 R_L and z = 5 R_L
+    B_ex, B_dp = B_loop_axis(z, I_L, R_L), B_dip_axis(z, m_L)
+    print(f"(d) at z = {z:.0f} m: exact {B_ex*1e9:.2f} nT, dipole {B_dp*1e9:.2f} nT, "
+          f"ratio {B_dp/B_ex:.2f}")
+z_10 = ___                             # height where B_dip / B_loop = 1.1 [m]
+print(f"    dipole formula within 10% beyond z = {z_10:.0f} m = {z_10/R_L:.1f} R_L")
+ 
+# (e): the core loop seen from Earth's surface on the axis
+ratio_core = B_dip_axis(a, m_earth) / B_loop_axis(a, I_core, R_c)
+print(f"(e) z/R_c = {a/R_c:.2f}: dipole / exact = {ratio_core:.2f};  "
+      f"10% needs r = {z_10/R_L * R_c / a:.2f} a")
+ 
+# self-check
+assert np.isclose(m_earth, 7.68e22, rtol=2e-3) and np.isclose(I_core, 2.02e9, rtol=5e-3)
+assert np.isclose(m_L, 7.854e4, rtol=1e-3)
+assert np.isclose(B_dip_axis(100.0, m_L) / B_loop_axis(100.0, I_L, R_L), 1.398, atol=1e-3)
+assert np.isclose(B_dp / B_ex, 1.061, atol=1e-3)            # last loop value: z = 250 m
+assert np.isclose(z_10, 195.2, atol=0.5)
+assert np.isclose(ratio_core, 1.48, atol=0.01)
+print("Self-check passed.")
+```
+ 
+The explorer below shows a circular loop seen edge-on, with its axis vertical. The upper panel compares the exact field lines of the loop (solid) with those of a point dipole with the same moment (dashed), in units of the loop radius $R_L$. The lower-left panel shows $|\vec B|$ on the axis on log–log axes, for the loop radius and current you choose. The lower-right panel shows the ratio of the dipole formula to the exact field, with a line at $10\%$.
+ 
+1. Keep $R_L = 50\ \mathrm{m}$ and $I = 10\ \mathrm{A}$ and set $z/R_L = 2$. Check your answers to quiz part (d).
+2. In the upper panel, where do the solid and dashed field lines agree, and where do they differ most? What does "far from a compact loop" (W4L2, slide 14) mean in this picture?
+3. Change $R_L$ and $I$. Does the curve in the lower-right panel change? Explain why. What does change in the lower-left panel?
+4. Find the value of $z/R_L$ where the ratio drops to $1.1$, so that the dipole formula is accurate to within $10\%$. Compare it with your results at $2R_L$ and $5R_L$ in quiz part (d). Then set $z/R_L \approx 1.85$ to check part (e).
+```{code-cell} ipython3
+:tags: [remove-input]
+ 
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+ 
+for _candidate in (
+    Path("current_loop_lab.html"),
+    Path("book/2_potential_fields/labs/week4/current_loop_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("current_loop_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+ 
+display({"text/html": '<iframe title="Interactive current loop explorer" '
+             'style="width:100%;height:1120px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
