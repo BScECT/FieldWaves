@@ -65,9 +65,10 @@ parts:
       - file: 2_potential_fields/magnetic_field/exercises.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
-    - file: 2_potential_fields/labs/week4/week4_exersizes.md
-    - file: 2_potential_fields/labs/week4/week4_exercises_solutions.md 
     - file: 2_potential_fields/labs/week4/week4_quiz.md
+    - file: 2_potential_fields/labs/week4/week4_quiz_solutions.md
+    - file: 2_potential_fields/labs/week4/week4_exercises.md
+    - file: 2_potential_fields/labs/week4/week4_exercises_solutions.md
     # - file: 2_potential_fields/gradient_fields.md
     # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md

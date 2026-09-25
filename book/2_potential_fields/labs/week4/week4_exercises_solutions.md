@@ -10,7 +10,80 @@ kernelspec:
   name: python3
 ---
 # Lab 4: Electrostatic and Magnetic Fields (Solutions)
-## 1. Warm-up: charges in the fair-weather field
+## 1. Explore a spherical capacitor
+
+Between the shells the region is free space, so the potential obeys Laplace's equation. With spherical symmetry this reduces to the radial form used in the {doc}`week 4 quiz <week4_quiz>`, whose solution is $V(r) = A + B/r$. The two constants follow from the boundary conditions $V(R_E)=0$ and $V(R_I)=V_o$:
+```{math}
+\boxed{B = \frac{V_o}{1/R_I - 1/R_E}}, \qquad \boxed{A = -\frac{B}{R_E}},
+\qquad
+V(r) = V_o\,\frac{1/R_E - 1/r}{1/R_I - 1/R_E}.
+```
+The field between the shells is radial,
+```{math}
+\vec{E} = -\vec{\nabla}V = -\frac{\partial V}{\partial r}\hat{r} = \boxed{\frac{B}{r^2}\,\hat{r}}.
+```
+Because the outer shell is at the higher potential, $B<0$: the field points radially **inward**, i.e. downward at the ground, in agreement with the fair-weather field of Exercise 2.
+
+**1. Reproduce the quiz numbers.** With $R_E = 6370\ \mathrm{km}$, $R_I = 6470\ \mathrm{km}$ and $V_o = 100\ \mathrm{kV}$,
+```{math}
+\frac{1}{R_I}-\frac{1}{R_E} = \frac{R_E-R_I}{R_I R_E} = -2.427\cdot 10^{-9}\ \mathrm{m^{-1}},
+```
+```{math}
+B = \frac{10^{5}}{-2.427\cdot 10^{-9}} = \boxed{-4.12\cdot 10^{13}\ \mathrm{V\,m}},
+\qquad
+A = -\frac{B}{R_E} = \boxed{6.47\cdot 10^{6}\ \mathrm{V}},
+```
+matching parts (b) and (d) of the quiz. At $50\ \mathrm{km}$ altitude, $r = 6420\ \mathrm{km}$:
+```{math}
+\vec{E} = \frac{B}{r^2}\hat{r} = \frac{-4.12\cdot 10^{13}}{(6.42\cdot 10^6)^2}\hat{r}
+= \boxed{-1.00\ \mathrm{V/m}\ \hat{r}},
+```
+a field of $1.00\ \mathrm{V/m}$ pointing towards the Earth, as in part (e).
+
+```{note}
+The explorer reports $B$ in $\mathrm{V\,km}$, because it works with radii in kilometres: it shows $-4.12\cdot 10^{10}\ \mathrm{V\,km}$, which is the same number as $-4.12\cdot 10^{13}\ \mathrm{V\,m}$.
+```
+
+**2. Move the outer shell farther away.** Writing the gap as $d = R_I - R_E$,
+```{math}
+B = \frac{V_o}{1/R_I - 1/R_E} = -\,\frac{V_o R_E R_I}{d},
+```
+so $|B|$ **shrinks** as $R_I$ grows at fixed $V_o$, and with it the field at any fixed radius. Numerically, at the Earth's surface: $1.02\ \mathrm{V/m}$ for $d = 100\ \mathrm{km}$, $0.52\ \mathrm{V/m}$ for $200\ \mathrm{km}$, $0.12\ \mathrm{V/m}$ for $1000\ \mathrm{km}$. The field is not fixed by $V_o$ alone because the field is the *rate* at which the potential changes with distance, and the same $100\ \mathrm{kV}$ is now spread over a thicker gap. For a thin gap, $d \ll R_E$, the shells are almost parallel plates and
+```{math}
+|\vec{E}| \approx \frac{V_o}{d} = \frac{10^5\ \mathrm{V}}{10^5\ \mathrm{m}} = 1\ \mathrm{V/m},
+```
+which is why the answer to question 1 came out so close to $1\ \mathrm{V/m}$. As $R_I\to\infty$ the field does not vanish but tends to that of an isolated charged sphere, $|B| \to V_o R_E$.
+
+**3. Increase $V_o$ toward 200 kV.** Both $A$ and $B$ are proportional to $V_o$, so at every radius
+```{math}
+|\vec{E}| = \frac{|B|}{r^2} \propto V_o .
+```
+The relationship is **linear**: doubling $V_o$ from $100$ to $200\ \mathrm{kV}$ doubles the field at $50\ \mathrm{km}$ altitude from $1.00$ to $2.00\ \mathrm{V/m}$. This is a direct consequence of Laplace's equation being linear, so scaling the boundary values scales the whole solution.
+
+**4. Move the probe outside $R_I$ and inside $R_E$.** Outside the outer shell the explorer shows $V = V_o$ and $E = 0$: the two shells carry equal and opposite charges, so any sphere enclosing both contains zero net charge and Gauss's law gives no flux, hence no field. Inside the inner shell $V = 0$ and $E = 0$, as in the interior of any conductor in electrostatic equilibrium. In both regions the potential is constant, consistent with each shell being an equipotential surface: the entire field lives in the gap between them.
+
+```{code-cell} ipython3
+import numpy as np
+
+R_E, R_I, V_o = 6370e3, 6470e3, 100e3          # m, m, V
+
+B = V_o / (1 / R_I - 1 / R_E)
+A = -B / R_E
+r = 6420e3                                      # 50 km altitude
+print(f"A = {A:.3e} V,  B = {B:.3e} V m,  E(50 km) = {B / r**2:+.2f} V/m")
+print(f"thin-gap estimate V_o/d = {V_o / (R_I - R_E):.2f} V/m")
+
+for R in (6470e3, 6570e3, 7370e3):              # question 2: a thicker gap
+    b = V_o / (1 / R - 1 / R_E)
+    print(f"  d = {(R - R_E)/1e3:6.0f} km -> |E| at the ground = {abs(b)/R_E**2:.3f} V/m")
+
+# self-check against the quiz
+assert np.isclose(B, -4.12e13, rtol=1e-3) and np.isclose(A, 6.47e6, rtol=1e-3)
+assert np.isclose(B / r**2, -1.00, atol=5e-3)
+print("Matches the quiz values for A, B and E(50 km).")
+```
+
+## 2. Charges in the fair-weather field
  
 On a clear day, the air above flat, open ground carries a downward electric field (W4L1, slides 16–17):
 ```{math}
@@ -18,50 +91,9 @@ On a clear day, the air above flat, open ground carries a downward electric fiel
 ```
 Cosmic rays continuously ionise the air, producing free electrons and positive ions such as $\mathrm{N_2^+}$. Wind also lifts charged mineral dust from deserts into the atmosphere. Use $e = 1.602\cdot 10^{-19}\ \mathrm{C}$, $g = 9.81\ \mathrm{m/s^2}$ and $1\ \mathrm{eV} = 1.602\cdot 10^{-19}\ \mathrm{J}$ (the energy an elementary charge gains across $1\ \mathrm{V}$).
  
-(a) Sketch the equipotentials and field lines for $0 \leq z \leq 10\ \mathrm{m}$. What is the potential at $z = 2\ \mathrm{m}$?
+Parts (a)–(d) of this exercise are question 2 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
  
-(b) An electron ($q=-e$) and an $\mathrm{N_2^+}$ ion ($q=+e$) are each moved from the ground to $z = 10\ \mathrm{m}$. For each, find $\Delta V$, $\Delta U$ (in J and in eV) and the work done by the field, $W_\mathrm{field}$.
- 
-(c) Both particles are released from rest. Which one accelerates upward? In which direction does the resulting electric current flow?
- 
-(d) A Saharan dust grain (radius $1\ \mu\mathrm{m}$, density $2650\ \mathrm{kg/m^3}$) carries a negative charge. How many excess electrons does it need for the electric force to balance gravity? Does the answer depend on its height in this model?
- 
-(e) You are standing on the ground and are about $2\ \mathrm{m}$ tall. Is there a $200\ \mathrm{V}$ potential difference between your head and your feet? Sketch how the equipotentials change around you. *Hint:* you are a conductor connected to the ground (W4L1, slide 14).
- 
-**(a)** The equipotentials are horizontal planes spaced evenly: every metre up adds $100\ \mathrm{V}$. The field lines are vertical, point downward and are equally spaced, so the field is uniform. At head height,
-```{math}
-V(2\ \mathrm{m}) = E_0 z = (100)(2) = \boxed{200\ \mathrm{V}}.
-```
-The potential increases upward, while $\vec{E}$ points down, from high to low potential.
- 
-**(b)** The potential difference does not depend on the test charge:
-```{math}
-\Delta V = V(10\ \mathrm{m}) - V(0) = \boxed{1000\ \mathrm{V}}.
-```
-Using $\Delta U = q\Delta V$ and $W_\mathrm{field} = -\Delta U$ (W4L1, slide 13):
- 
-| | $q$ | $\Delta U$ | $W_\mathrm{field}$ |
-|---|---|---|---|
-| electron | $-e$ | $-1.60\cdot 10^{-16}\ \mathrm{J} = -1000\ \mathrm{eV}$ | $+1.60\cdot 10^{-16}\ \mathrm{J}$ |
-| $\mathrm{N_2^+}$ ion | $+e$ | $+1.60\cdot 10^{-16}\ \mathrm{J} = +1000\ \mathrm{eV}$ | $-1.60\cdot 10^{-16}\ \mathrm{J}$ |
- 
-Moving up the electron *loses* potential energy, because the field does positive work on it. The ion *gains* potential energy, because the field works against the motion. Same $\Delta V$, opposite energies.
- 
-**(c)** The force is $\vec{F} = q\vec{E} = q(-E_0\hat{z})$.
-- Electron: $\vec{F} = (-e)(-E_0\hat{z}) = +eE_0\hat{z} = +1.6\cdot 10^{-17}\ \mathrm{N}\,\hat{z}$. It **accelerates upward**, toward lower potential energy.
-- Ion: $\vec{F} = -eE_0\hat{z}$. It accelerates downward.
-Positive charge moving down and negative charge moving up both give a **downward** current. This is the small fair-weather current of the global atmospheric electrical circuit, which flows downward through fair-weather regions because air is a poor, but not perfect, insulator. Thunderstorms help maintain the potential difference between the upper atmosphere and the ground that drives it (W4L1, slide 16).
- 
-**(d)** The mass of the grain is
-```{math}
-m = \tfrac{4}{3}\pi a^3 \rho = \tfrac{4}{3}\pi (10^{-6})^3 (2650) = 1.11\cdot 10^{-14}\ \mathrm{kg}.
-```
-A negative charge feels an upward force (see (c)), so it can balance gravity when $|q|E_0 = mg$:
-```{math}
-|q| = \frac{mg}{E_0} = \frac{(1.11\cdot 10^{-14})(9.81)}{100} = 1.09\cdot 10^{-15}\ \mathrm{C},
-\qquad N = \frac{|q|}{e} \approx \boxed{6.8\cdot 10^{3}\ \text{electrons}}.
-```
-In this model, $\vec{E}$ is uniform, so the answer **does not depend on height**. The linear potential is only valid near the ground (W4L1, slide 17). In real dust storms, the field near the ground can be much stronger than $E_0$, so far less charge is needed.
+(e) In the undisturbed fair-weather field, the potential difference between $z=0$ and $z=2\ \mathrm{m}$ is $200\ \mathrm{V}$ (quiz part (a)). You are standing on the ground and are about $2\ \mathrm{m}$ tall. Is there a $200\ \mathrm{V}$ potential difference between your head and your feet? Sketch how the equipotentials change around you and explain your reasoning. *Hint:* you are a conductor connected to the ground (W4L1, slide 14).
  
 **(e)** No. Your body is a conductor connected to the ground, so in electrostatic equilibrium it is an equipotential with $V = 0$ (W4L1, slides 14–15). Charge redistributes (negative charge gathers near your head) until the field inside you vanishes. That is why you feel nothing.
  
@@ -77,7 +109,7 @@ three times the fair-weather ground value $\sigma_q=-\epsilon_0E_0\approx-8.9\cd
  
 The potential of the hemisphere is the uniform field plus a dipole term $-E_0 a^3 z/r^3$. The hemisphere and its mirror image below the ground together form a full sphere, which is the same kind of dipole construction as the image charge in W4L1, slide 24.
  
-### Python check
+### Check your answers with Python
  
 ```{code-cell} ipython3
 import numpy as np
@@ -115,97 +147,35 @@ The explorer below shows the fair-weather field over flat ground. You can add a 
 ```{math}
 V(\vec{r}) = E_0 z\left(1 - \frac{a^3}{r^3}\right), \qquad z \geq 0,\ r \geq a.
 ```
-The left panel shows the field strength $|\vec{E}|/E_0$ in colour, the equipotentials in white (every $E_0\cdot 1\ \mathrm{m}$), the field lines in grey, and the force $\vec{F} = q\vec{E}$ on the test charge as an arrow. The right panel shows $V(z)$ and $U(z)/e$ along the vertical line through the test charge.
+The upper panel shows the field strength $|\vec{E}|/E_0$ in colour, the equipotentials in white (every $E_0\cdot 1\ \mathrm{m}$), the field lines in grey, and the force $\vec{F} = q\vec{E}$ on the test charge as an arrow. The lower panel shows $V(z)$ and $U(z)/e$ along the vertical line through the test charge.
  
 1. With $a = 0$, move the test charge up and down. Check your answers to (a) and (b).
 2. Switch between the electron and the ion. Which quantities change, and which stay the same? (W4L1, slide 9)
 3. Set $a = 1\ \mathrm{m}$. Where do the equipotentials crowd together? Read $|\vec{E}|$ just above the top of the object and near its base. Use this to check your sketch for (e).
+
 ```{code-cell} ipython3
-%matplotlib inline
-import numpy as np
-import matplotlib.pyplot as plt
-import ipywidgets as widgets
- 
-def fair_weather(x, z, E0, a):
-    """Fair-weather field over flat ground with a grounded conducting hemisphere
-    of radius a at the origin (a crude person, tree or hill; a = 0: flat ground).
-        V = E0 z (1 - a^3/r^3),   z >= 0,  r = sqrt(x^2 + z^2) >= a
-    Returns V [V], Ex, Ez [V/m] in the plane y = 0."""
-    x, z = np.asarray(x, float), np.asarray(z, float)
-    if a == 0:
-        return E0 * z, 0 * x, -E0 + 0 * x
-    r = np.maximum(np.hypot(x, z), 1e-9)
-    k = a**3 / r**3
-    V  = E0 * z * (1 - k)
-    Ex = -E0 * 3 * a**3 * x * z / r**5
-    Ez = -E0 * (1 - k + 3 * a**3 * z**2 / r**5)
-    inside = r < a                                   # inside the conductor
-    V  = np.where(inside, 0.0, V)
-    Ex = np.where(inside, np.nan, Ex)
-    Ez = np.where(inside, np.nan, Ez)
-    return V, Ex, Ez
- 
-def explore(E0=100, a=0.0, charge="electron (−e)", x_p=3.0, z_p=4.0):
-    sign = -1 if charge.startswith("electron") else +1
-    col  = "tab:blue" if sign < 0 else "tab:red"
-    x = np.linspace(-8, 8, 321); z = np.linspace(0, 10, 201)
-    X, Z = np.meshgrid(x, z)
-    V, Ex, Ez = fair_weather(X, Z, E0, a)
- 
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11, 4.6), layout="constrained",
-                                  gridspec_kw=dict(width_ratios=(1.7, 1)))
-    # left: |E|/E0 in colour, equipotentials in white, field lines in grey
-    pc = ax.pcolormesh(X, Z, np.hypot(Ex, Ez) / E0, cmap="magma", vmin=0, vmax=3,
-                       shading="auto")
-    ax.contour(X, Z, V, levels=np.linspace(0, 10 * E0, 11)[1:], colors="w", linewidths=0.8)
-    ax.streamplot(x, z, Ex, Ez, color="0.75", density=1.1, linewidth=0.7, arrowsize=0.8)
-    if a > 0:
-        t = np.linspace(0, np.pi, 100)
-        ax.fill(a * np.cos(t), a * np.sin(t), color="0.35", zorder=3)
-    ax.axhline(0, color="k", lw=2)
-    fig.colorbar(pc, ax=ax, shrink=0.85, label=r"$|\vec{E}|\,/\,E_0$")
- 
-    # test charge and its force F = qE (arrow length proportional to |F|)
-    Vp, Exp, Ezp = [float(v) for v in fair_weather(x_p, z_p, E0, a)]
-    if np.hypot(x_p, z_p) >= a:
-        s = 1.2 / E0
-        ax.plot(x_p, z_p, "o", ms=10, color=col, mec="k", zorder=5)
-        ax.annotate("", xy=(x_p + s * sign * Exp, z_p + s * sign * Ezp), xytext=(x_p, z_p),
-                    arrowprops=dict(arrowstyle="-|>", color=col, lw=2.5), zorder=6)
-        ax.set_title(f"V = {Vp:.0f} V,   U = {sign * Vp:+.0f} eV,   "
-                     f"|E| = {np.hypot(Exp, Ezp):.0f} V/m", fontsize=10)
-    else:
-        ax.set_title("test charge is inside the conductor", fontsize=10)
-    ax.set_xlabel("x [m]"); ax.set_ylabel("z [m]")
-    ax.set_xlim(-8, 8); ax.set_ylim(-0.3, 10); ax.set_aspect("equal")
- 
-    # right: V(z) and U(z)/e along the vertical line through the test charge
-    zz = np.linspace(0, 10, 400)
-    Vz = fair_weather(np.full_like(zz, x_p), zz, E0, a)[0]
-    ax2.plot(Vz, zz, "k", lw=2, label="V(z)   [V]")
-    ax2.plot(sign * Vz, zz, color=col, lw=2, ls="--",
-             label=f"U(z)/e for q = {'−e' if sign < 0 else '+e'}   [eV]")
-    ax2.plot([Vp, sign * Vp], [z_p, z_p], "o", color="0.3")
-    ax2.axvline(0, color="0.6", lw=0.8)
-    ax2.set_xlim(-10.5 * E0, 10.5 * E0); ax2.set_ylim(0, 10)
-    ax2.set_xlabel("V [V]   or   U/e [eV]"); ax2.set_ylabel("z [m]")
-    ax2.set_title(f"Profile along x = {x_p:.1f} m", fontsize=10)
-    ax2.legend(loc="upper left", fontsize=8, frameon=False)
-    plt.show()
- 
-style = {"description_width": "150px"}
-widgets.interact(
-    explore,
-    E0=widgets.FloatSlider(value=100, min=50, max=300, step=10, style=style,
-                           description="E₀ [V/m]", continuous_update=False),
-    a=widgets.FloatSlider(value=0.0, min=0.0, max=3.0, step=0.25, style=style,
-                          description="object radius a [m]", continuous_update=False),
-    charge=widgets.ToggleButtons(options=["electron (−e)", "N₂⁺ ion (+e)"],
-                                 description="test charge", style=style),
-    x_p=widgets.FloatSlider(value=3.0, min=-7.5, max=7.5, step=0.25, style=style,
-                            description="charge x [m]", continuous_update=False),
-    z_p=widgets.FloatSlider(value=4.0, min=0.25, max=9.75, step=0.25, style=style,
-                            description="charge z [m]", continuous_update=False),
-);
+:tags: [remove-input]
+
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+
+for _candidate in (
+    Path("fair_weather_lab.html"),
+    Path("book/2_potential_fields/labs/week4/fair_weather_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("fair_weather_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+
+display({"text/html": '<iframe title="Interactive fair-weather field explorer" '
+             'style="width:100%;height:820px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
 ```
- 
