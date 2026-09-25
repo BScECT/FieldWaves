@@ -195,6 +195,8 @@ Parts (a)–(d) of this exercise are question 3 of the {doc}`week 4 quiz <week4_
 1. Write $\hat z=\cos\theta\,\hat r-\sin\theta\,\hat\theta$, with $\hat\theta=\cos\theta\,\hat x-\sin\theta\,\hat z$ pointing along the ground toward the northern end of the axis. Show that the field has a radial component $B_r=2B_*\cos\theta$ and a horizontal component $B_\theta=B_*\sin\theta$.
 2. Use the dipole latitude $\lambda_m=\theta-\pi/2$ (positive in the northern hemisphere) to show that the angle $I$ below the horizontal satisfies $\tan I=2\tan\lambda_m$. Check it against quiz part (b).
 3. A navigator measures $I=70^\circ$. What is the dipole latitude? Near which latitudes does a small error in $I$ matter least?
+
+
 **(e) 1.** From slide 17, at $r=a$: $\vec B/B_*=3\cos\theta\,\hat r-\hat z$. Check the given decomposition:
 ```{math}
 \cos\theta\,\hat r-\sin\theta\,\hat\theta
@@ -279,10 +281,13 @@ The explorer below draws the dipole field lines in the $x$–$z$ plane, oriented
 3. In the lower-left panel, why is the curve a straight line? Read off where it crosses the $1\%$ line and compare with quiz part (d). By what factor does $|\vec B|$ drop between $r/a=1$ and $2$? (W4L2, slide 18)
 4. In the lower-right panel, where is the field vertical, where is it horizontal, and where is $|\vec B|$ largest and smallest? Where does the angle change fastest with $\theta$? Relate this to part (e).
  
-**1.** The status line shows the quiz values: bracket $(0,2)$ and $59.4\ \mu\mathrm{T}$ out of the ground at $0^\circ$; $(0,-1)$ and $29.7\ \mu\mathrm{T}$ horizontal at $90^\circ$; $(0,2)$ and $59.4\ \mu\mathrm{T}$ into the ground at $180^\circ$; $(-1.50,0.50)$, $47.0\ \mu\mathrm{T}$ and $63.4^\circ$ below the horizontal at $135^\circ$.
-**2.** At Swarm altitude, $(a/r)^3$ drops to $0.816$, so $|\vec B|$ and $B_r$ fall to $38.3\ \mu\mathrm{T}$ and $-34.3\ \mu\mathrm{T}$. The bracket, the arrows and the angle below the horizontal ($63.4^\circ$) do not change: the bracket depends only on directions (W4L2, slide 15).
-**3.** $|\vec B|\propto r^{-3}$, so $\log|\vec B|=\text{const}-3\log r$: a straight line with slope $-3$. It crosses the $1\%$ line at $r/a\approx4.6$, as in quiz part (d). From $r/a=1$ to $2$, $|\vec B|$ drops by a factor of $8$ (W4L2, slide 18).
-**4.** The field is vertical at $\theta=0^\circ$ and $180^\circ$ (angle $\mp90^\circ$) and horizontal at $\theta=90^\circ$. $|\vec B|$ is largest at the poles ($2B_*$) and smallest at the equator ($B_*$). The angle changes fastest near $\theta=90^\circ$, which is why the dip is the most sensitive latitude indicator near the dipole equator (part (e) 3).
+**Answers**
+ 
+1. The status line shows the quiz values: bracket $(0,2)$ and $59.4\ \mu\mathrm{T}$ out of the ground at $0^\circ$; $(0,-1)$ and $29.7\ \mu\mathrm{T}$ horizontal at $90^\circ$; $(0,2)$ and $59.4\ \mu\mathrm{T}$ into the ground at $180^\circ$; $(-1.50,0.50)$, $47.0\ \mu\mathrm{T}$ and $63.4^\circ$ below the horizontal at $135^\circ$.
+2. At Swarm altitude, $(a/r)^3$ drops to $0.816$, so $|\vec B|$ and $B_r$ fall to $38.3\ \mu\mathrm{T}$ and $-34.3\ \mu\mathrm{T}$. The bracket, the arrows and the angle below the horizontal ($63.4^\circ$) do not change: the bracket depends only on directions (W4L2, slide 15).
+3. $|\vec B|\propto r^{-3}$, so $\log|\vec B|=\text{const}-3\log r$: a straight line with slope $-3$. It crosses the $1\%$ line at $r/a\approx4.6$, as in quiz part (d). From $r/a=1$ to $2$, $|\vec B|$ drops by a factor of $8$ (W4L2, slide 18).
+4. The field is vertical at $\theta=0^\circ$ and $180^\circ$ (angle $\mp90^\circ$) and horizontal at $\theta=90^\circ$. $|\vec B|$ is largest at the poles ($2B_*$) and smallest at the equator ($B_*$). The angle changes fastest near $\theta=90^\circ$, which is why the dip is the most sensitive latitude indicator near the dipole equator (part (e) 3).
+
 ```{code-cell} ipython3
 :tags: [remove-input]
  
@@ -330,12 +335,6 @@ At Earth's surface, the dipole formula would be **48% too large** for a single l
  
 So a single loop as large as the core would *not* look like a centred dipole at Earth's surface, yet the observed main field is dominated by its dipole part (teachbook, *Earth as a Magnetic Dipole*). The real geodynamo currents are spread through the core rather than concentrated in one loop at its edge. The single loop in quiz part (b) is therefore only an order-of-magnitude estimate of the current, not a model of its geometry. This is why the teachbook calls the dipole an *equivalent* description of the core currents.
  
-**Explorer questions**
- 
-1. With $R_L=50\ \mathrm{m}$, $I=10\ \mathrm{A}$ and $z/R_L=2$, the status line gives $B_\mathrm{loop}=11.2\ \mathrm{nT}$, $B_\mathrm{dip}=15.7\ \mathrm{nT}$ and a ratio of $1.40$, as in quiz part (d).
-2. A few loop radii away, the solid and dashed lines almost coincide: there the loop is "compact" compared with the distance. They differ most near the wire. The loop's field lines close around the wire, while every dipole line passes through the single point at the centre. Near the loop, its size matters; far away, only its moment $I\pi R_L^2$ does.
-3. The ratio curve does not change: $B_\mathrm{dip}/B_\mathrm{loop} = (1+R_L^2/z^2)^{3/2}$ depends only on $z/R_L$. In the lower-left panel both curves shift: at a fixed $z/R_L$ the field scales as $I/R_L$, so a larger current raises the curves and a larger loop lowers them.
-4. The ratio drops to $1.1$ at $z/R_L\approx3.9$ (195 m for the survey loop), between the $40\%$ error at $2R_L$ and the $6\%$ error at $5R_L$ found in quiz part (d). Solving $(1+R_L^2/z^2)^{3/2}=1.1$ gives the same value: $z = R_L/\sqrt{1.1^{2/3}-1} = 3.9\,R_L$. At $z/R_L=1.85$ it is about $1.47$, close to the $1.48$ found in part (e) for $z/R_c = 1.83$.
 ### Check your answers with Python
  
 ```{code-cell} ipython3
@@ -389,6 +388,13 @@ The explorer below shows a circular loop seen edge-on, with its axis vertical. T
 2. In the upper panel, where do the solid and dashed field lines agree, and where do they differ most? What does "far from a compact loop" (W4L2, slide 14) mean in this picture?
 3. Change $R_L$ and $I$. Does the curve in the lower-right panel change? Explain why. What does change in the lower-left panel?
 4. Find the value of $z/R_L$ where the ratio drops to $1.1$, so that the dipole formula is accurate to within $10\%$. Compare it with your results at $2R_L$ and $5R_L$ in quiz part (d). Then set $z/R_L \approx 1.85$ to check part (e).
+ 
+**Answers**
+ 
+1. With $R_L=50\ \mathrm{m}$, $I=10\ \mathrm{A}$ and $z/R_L=2$, the status line gives $B_\mathrm{loop}=11.2\ \mathrm{nT}$, $B_\mathrm{dip}=15.7\ \mathrm{nT}$ and a ratio of $1.40$, as in quiz part (d).
+2. A few loop radii away, the solid and dashed lines almost coincide: there the loop is "compact" compared with the distance. They differ most near the wire. The loop's field lines close around the wire, while every dipole line passes through the single point at the centre. Near the loop, its size matters; far away, only its moment $I\pi R_L^2$ does.
+3. The ratio curve does not change: $B_\mathrm{dip}/B_\mathrm{loop} = (1+R_L^2/z^2)^{3/2}$ depends only on $z/R_L$. In the lower-left panel both curves shift: at a fixed $z/R_L$ the field scales as $I/R_L$, so a larger current raises the curves and a larger loop lowers them.
+4. The ratio drops to $1.1$ at $z/R_L\approx3.9$ (195 m for the survey loop), between the $40\%$ error at $2R_L$ and the $6\%$ error at $5R_L$ found in quiz part (d). Solving $(1+R_L^2/z^2)^{3/2}=1.1$ gives the same value: $z = R_L/\sqrt{1.1^{2/3}-1} = 3.9\,R_L$. At $z/R_L=1.85$ it is about $1.47$, close to the $1.48$ found in part (e) for $z/R_c = 1.83$.
 ```{code-cell} ipython3
 :tags: [remove-input]
  
