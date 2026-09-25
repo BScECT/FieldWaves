@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:12px;font:14px system-ui,sans-serif;color:#203541;background:#fff}
+p{line-height:1.45;margin:8px 0}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:15px 0}
+label{display:block;font-weight:600}
+input[type=range]{width:100%;accent-color:#007da5}
+button{font:inherit;padding:6px;background:white;border:1px solid #8a9da7;border-radius:4px;cursor:pointer}
+button:hover{background:#eef6f8}
+output{font-variant-numeric:tabular-nums;font-weight:400}
+.scroll{overflow-x:auto}
+.plots{display:grid;grid-template-columns:1fr;gap:6px;max-width:640px;margin:0 auto}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+figure{margin:0}
+figure figcaption{text-align:center;font-weight:600;font-size:13px;margin:6px 0}
+canvas{display:block;width:100%;height:auto;border:1px solid #d6dfe4;touch-action:manipulation}
+.legend{font-size:12px;color:#415764}
+.status{padding:8px;background:#eef6f8;font-variant-numeric:tabular-nums}
+@media(max-width:580px){.controls,.row{grid-template-columns:1fr}body{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="controls">
+<div><label for="th">Polar angle &theta; from m&#770; (&deg;): <output id="thv"></output></label><input id="th" type="range" min="0" max="180" step="5" value="135"></div>
+<div><label for="rr">Distance from Earth's centre r/a: <output id="rrv"></output></label><input id="rr" type="range" min="1" max="3" step="0.01" value="1"></div>
+</div>
+<div>
+<button id="swarm" type="button">Swarm altitude (450 km)</button>
+<button id="reset" type="button">Reset</button>
+</div>
+<div class="scroll"><div class="plots">
+<figure><figcaption>Dipole field lines and the head-to-tail construction at the probe</figcaption>
+<canvas id="map" width="640" height="560" aria-label="Earth's dipole field in a meridian plane"></canvas></figure>
+<div class="row">
+<figure><figcaption>|B| along the radial line through the probe</figcaption>
+<canvas id="decay" width="400" height="280" aria-label="Field strength versus distance"></canvas></figure>
+<figure><figcaption>At the surface: angle below horizontal and |B|/B<sub>*</sub></figcaption>
+<canvas id="angle" width="400" height="280" aria-label="Inclination and field strength versus polar angle"></canvas></figure>
+</div>
+</div></div>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="legend">Drawn as in the lecture slides: m&#770; = z&#770; points up the page and &theta; is measured from m&#770;. For the present Earth, m&#770; points to the <b>southern</b> end of the dipole axis, so the southern end (&theta; = 0) is at the top and the northern end (&theta; = 180&deg;) at the bottom. Arrows at the probe show the bracket 3(m&#770;&middot;r&#770;)r&#770; &minus; m&#770; (blue: 3(m&#770;&middot;r&#770;)r&#770;, red: &minus;m&#770;, black: sum); their length does not depend on r. The field itself is B = B<sub>*</sub>(a/r)<sup>3</sup> times this bracket, with B<sub>*</sub> = 29.7 &micro;T and a = 6371 km.</p>
+<script>
+(()=>{
+'use strict';
+const $ = id => document.getElementById(id);
+const BSTAR = 29.7, A_KM = 6371;                 // microtesla, km
+const W = 3.2;                                   // map half-width in units of a
+const map = $('map'), dec = $('decay'), ang = $('angle');
+const mctx = map.getContext('2d'), dctx = dec.getContext('2d'), actx = ang.getContext('2d');
+
+// --- physics: B = B* (a/r)^3 [3 (m.r) r - m],  m = z,  r = (sin th, cos th) ---
+function bracket(th) {
+  const c = Math.cos(th), s = Math.sin(th);
+  return {t1x: 3 * c * s, t1z: 3 * c * c, t2x: 0, t2z: -1,
+          bx: 3 * c * s, bz: 3 * c * c - 1};
+}
+function field(th, r) {                          // r in units of a; result in microtesla
+  const k = BSTAR / (r * r * r), b = bracket(th);
+  const Bx = k * b.bx, Bz = k * b.bz;
+  const Br = k * 2 * Math.cos(th);               // along r-hat (+ = out of the ground)
+  const Bt = k * Math.sin(th);                   // along theta-hat (toward the northern end)
+  return {Bx, Bz, Br, Bt, mag: Math.hypot(Bx, Bz),
+          I: Math.atan2(-Br, Bt) * 180 / Math.PI};  // angle below horizontal, + = down
+}
+
+// --- map -------------------------------------------------------------------
+const S = map.height / (2 * W);                  // pixels per unit a
+const cx = map.width / 2, cy = map.height / 2;
+const px = x => cx + x * S, py = z => cy - z * S;
+
+function arrow(ctx, x0, y0, x1, y1, col, lw) {
+  const a = Math.atan2(y1 - y0, x1 - x0), h = 9;
+  ctx.save(); ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  if (Math.hypot(x1 - x0, y1 - y0) > 3) {
+    ctx.beginPath(); ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - h * Math.cos(a - 0.4), y1 - h * Math.sin(a - 0.4));
+    ctx.lineTo(x1 - h * Math.cos(a + 0.4), y1 - h * Math.sin(a + 0.4));
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawFieldLines() {
+  // dipole field lines r = L sin^2(th), used here only for drawing
+  mctx.save(); mctx.strokeStyle = '#b7c3ca'; mctx.lineWidth = 1;
+  for (const L of [1.25, 1.6, 2.1, 2.8, 3.8, 5.2, 7.5, 12]) {
+    const th0 = Math.asin(Math.sqrt(1 / L));
+    for (const side of [1, -1]) {
+      mctx.beginPath();
+      let first = true;
+      for (let k = 0; k <= 400; k++) {
+        const th = th0 + (Math.PI - 2 * th0) * k / 400;
+        const r = L * Math.sin(th) ** 2;
+        const x = side * r * Math.sin(th), z = r * Math.cos(th);
+        first ? mctx.moveTo(px(x), py(z)) : mctx.lineTo(px(x), py(z));
+        first = false;
+      }
+      mctx.stroke();
+      if (L <= W) {                              // direction at the equator: along -z
+        const x = side * L;
+        arrow(mctx, px(x), py(0.12), px(x), py(-0.12), '#8a9da7', 1);
+      }
+    }
+  }
+  mctx.restore();
+}
+
+function drawEarth() {
+  mctx.save();
+  mctx.fillStyle = '#cfe3ee'; mctx.strokeStyle = '#5b7d90'; mctx.lineWidth = 1.5;
+  mctx.beginPath(); mctx.arc(cx, cy, S, 0, 2 * Math.PI); mctx.fill(); mctx.stroke();
+  arrow(mctx, cx, py(-0.55), cx, py(0.55), '#7b3fa0', 3);
+  mctx.fillStyle = '#7b3fa0'; mctx.font = 'italic 15px system-ui,sans-serif';
+  mctx.fillText('m', cx + 8, py(0.2));
+  mctx.fillStyle = '#203541'; mctx.font = '12px system-ui,sans-serif';
+  mctx.textAlign = 'center';
+  mctx.fillText('southern end (θ = 0)', cx, py(1) - 8);
+  mctx.fillText('northern end (θ = 180°)', cx, py(-1) + 18);
+  mctx.fillText('dipole equator (θ = 90°)', px(1.95), cy - 6);
+  mctx.textAlign = 'left';
+  mctx.fillText('z', 8, 16); mctx.fillText('x', map.width - 14, cy - 6);
+  mctx.restore();
+}
+
+function drawProbe(th, r) {
+  const x = r * Math.sin(th), z = r * Math.cos(th);
+  const X = px(x), Y = py(z), sc = 0.6 * S;      // arrow pixels per bracket unit
+  const b = bracket(th);
+  // local horizontal (tangent) through the probe
+  const tx = Math.cos(th), tz = -Math.sin(th);
+  mctx.save(); mctx.setLineDash([5, 4]); mctx.strokeStyle = '#203541'; mctx.lineWidth = 1;
+  mctx.beginPath(); mctx.moveTo(X - 60 * tx, Y + 60 * tz); mctx.lineTo(X + 60 * tx, Y - 60 * tz);
+  mctx.stroke(); mctx.restore();
+  const X1 = X + sc * b.t1x, Y1 = Y - sc * b.t1z;
+  arrow(mctx, X, Y, X1, Y1, '#1f77b4', 2.5);
+  arrow(mctx, X1, Y1, X1 + sc * b.t2x, Y1 - sc * b.t2z, '#d62728', 2.5);
+  arrow(mctx, X, Y, X + sc * b.bx, Y - sc * b.bz, '#000', 3.5);
+  mctx.save(); mctx.fillStyle = '#000';
+  mctx.beginPath(); mctx.arc(X, Y, 5, 0, 2 * Math.PI); mctx.fill(); mctx.restore();
+}
+
+// --- small plots --------------------------------------------------------------
+function axes(ctx, cv, L, R, T, B, xlab, ylab) {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = '#98a8b2'; ctx.lineWidth = 1;
+  ctx.strokeRect(L, T, cv.width - L - R, cv.height - T - B);
+  ctx.fillStyle = '#203541'; ctx.font = '12px system-ui,sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText(xlab, (L + cv.width - R) / 2, cv.height - 6);
+  ctx.save(); ctx.translate(13, (T + cv.height - B) / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText(ylab, 0, 0); ctx.restore(); ctx.textAlign = 'left';
+}
+
+function drawDecay(th, r) {
+  const cv = dec, ctx = dctx, L = 52, R = 10, T = 10, B = 36;
+  axes(ctx, cv, L, R, T, B, 'r / a  (log scale)', '|B| [µT]  (log scale)');
+  const lx0 = 0, lx1 = 1, ly0 = -2, ly1 = 2;     // log10 ranges: r/a 1..10, |B| 0.01..100
+  const X = v => L + (Math.log10(v) - lx0) / (lx1 - lx0) * (cv.width - L - R);
+  const Y = v => cv.height - B - (Math.log10(v) - ly0) / (ly1 - ly0) * (cv.height - T - B);
+  ctx.font = '11px system-ui,sans-serif'; ctx.fillStyle = '#415764'; ctx.strokeStyle = '#e3e9ec';
+  for (const v of [1, 2, 3, 5, 10]) {
+    ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), cv.height - B); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.fillText(v, X(v), cv.height - B + 14);
+  }
+  for (const v of [0.01, 0.1, 1, 10, 100]) {
+    ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(cv.width - R, Y(v)); ctx.stroke();
+    ctx.textAlign = 'right'; ctx.fillText(v, L - 4, Y(v) + 4);
+  }
+  ctx.textAlign = 'left';
+  const B0 = field(th, 1).mag;
+  ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#d62728';
+  ctx.beginPath(); ctx.moveTo(L, Y(B0 / 100)); ctx.lineTo(cv.width - R, Y(B0 / 100)); ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = '#d62728'; ctx.fillText('1% of the surface value', L + 6, Y(B0 / 100) - 5);
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let k = 0; k <= 100; k++) {
+    const rr = Math.pow(10, k / 100), v = field(th, rr).mag;
+    k ? ctx.lineTo(X(rr), Y(v)) : ctx.moveTo(X(rr), Y(v));
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(X(r), Y(field(th, r).mag), 4.5, 0, 2 * Math.PI); ctx.fill();
+}
+
+function drawAngle(th) {
+  const cv = ang, ctx = actx, L = 44, R = 52, T = 10, B = 36;
+  axes(ctx, cv, L, R, T, B, 'θ [°]', 'angle below horizontal [°]');
+  const X = d => L + d / 180 * (cv.width - L - R);
+  const Y = d => cv.height - B - (d + 90) / 180 * (cv.height - T - B);
+  const Y2 = v => cv.height - B - v / 2 * (cv.height - T - B);   // |B|/B* from 0 to 2
+  ctx.font = '11px system-ui,sans-serif'; ctx.strokeStyle = '#e3e9ec';
+  for (const d of [0, 45, 90, 135, 180]) {
+    ctx.beginPath(); ctx.moveTo(X(d), T); ctx.lineTo(X(d), cv.height - B); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'center'; ctx.fillText(d, X(d), cv.height - B + 14);
+  }
+  for (const d of [-90, -45, 0, 45, 90]) {
+    ctx.beginPath(); ctx.moveTo(L, Y(d)); ctx.lineTo(cv.width - R, Y(d)); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'right'; ctx.fillText(d, L - 4, Y(d) + 4);
+  }
+  ctx.fillStyle = '#c8741a'; ctx.textAlign = 'left';
+  for (const v of [0, 1, 2]) ctx.fillText(v, cv.width - R + 6, Y2(v) + 4);
+  ctx.save(); ctx.translate(cv.width - 6, (T + cv.height - B) / 2); ctx.rotate(Math.PI / 2);
+  ctx.textAlign = 'center'; ctx.fillText('|B| / B*  (dashed)', 0, 0); ctx.restore();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#000'; ctx.beginPath();
+  for (let k = 0; k <= 180; k++) {
+    const d = field(k * Math.PI / 180, 1).I;
+    k ? ctx.lineTo(X(k), Y(d)) : ctx.moveTo(X(k), Y(d));
+  }
+  ctx.stroke();
+  ctx.save(); ctx.setLineDash([6, 4]); ctx.strokeStyle = '#c8741a'; ctx.beginPath();
+  for (let k = 0; k <= 180; k++) {
+    const v = field(k * Math.PI / 180, 1).mag / BSTAR;
+    k ? ctx.lineTo(X(k), Y2(v)) : ctx.moveTo(X(k), Y2(v));
+  }
+  ctx.stroke(); ctx.restore();
+  const deg = th * 180 / Math.PI, f = field(th, 1);
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(X(deg), Y(f.I), 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#c8741a'; ctx.beginPath(); ctx.arc(X(deg), Y2(f.mag / BSTAR), 4.5, 0, 2 * Math.PI); ctx.fill();
+}
+
+const fx = (v, d) => (Math.abs(v) < 0.5 * 10 ** -d ? 0 : v).toFixed(d);
+
+function draw() {
+  const deg = +$('th').value, r = +$('rr').value, th = deg * Math.PI / 180;
+  $('thv').textContent = deg.toFixed(0);
+  $('rrv').textContent = r.toFixed(2) + '  (altitude ' + ((r - 1) * A_KM).toFixed(0) + ' km)';
+  mctx.clearRect(0, 0, map.width, map.height);
+  drawFieldLines(); drawEarth(); drawProbe(th, r);
+  drawDecay(th, r); drawAngle(th);
+  const b = bracket(th), f = field(th, r), lam = deg - 90;
+  const where = Math.abs(f.Br) < 1e-9 ? 'horizontal' : (f.Br > 0 ? 'out of the ground' : 'into the ground');
+  $('status').textContent =
+    `θ = ${deg}° (dipole latitude ${Math.abs(lam)}° ${lam > 0 ? 'N' : lam < 0 ? 'S' : ''}),  r = ${r.toFixed(2)} a.   `
+    + `Bracket: (${fx(b.bx, 2)}, ${fx(b.bz, 2)}),   (a/r)³ = ${(1 / r ** 3).toFixed(3)}.   `
+    + `|B| = ${f.mag.toFixed(1)} µT,   B_r = ${fx(f.Br, 1)} µT (${where}),   `
+    + `angle below horizontal = ${fx(f.I, 1)}°`;
+}
+
+['th', 'rr'].forEach(id => $(id).addEventListener('input', draw));
+$('swarm').addEventListener('click', () => { $('rr').value = (1 + 450 / A_KM).toFixed(2); draw(); });
+$('reset').addEventListener('click', () => { $('th').value = 135; $('rr').value = 1; draw(); });
+draw();
+})();
+</script>
+</body>
+</html>
