@@ -169,8 +169,9 @@ def show_records(t, records, *, t_label="t [s]", y_label="T [K]", title="",
     the same labels to a predicted (t_peak, value_peak), drawn as an open circle.
     """
     fig, ax = plt.subplots(figsize=(8.2, 3.4))
+    _ls = ("-", "--", "-.", ":")         # not colour alone: the C2/C3 pair is a common confusion
     for k, (lab, y) in enumerate(records.items()):
-        ax.plot(t, y, color=f"C{k}", lw=2, label=lab)
+        ax.plot(t, y, color=f"C{k}", ls=_ls[k % 4], lw=2, label=lab)
         if peaks and lab in peaks:
             ax.plot(*peaks[lab], "o", mfc="none", mec=f"C{k}", mew=1.5, ms=9)
     if log_t:
