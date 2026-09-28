@@ -79,7 +79,7 @@ In fact, we solve first the spatial equation. We must consider three ranges for 
 
 $$
 f(x) = c_1\sin(x\sqrt{\lambda}) + c_2\cos(x\sqrt{\lambda}).
-$$
+$$ (eq:fsincosd)
 
 Because $f(0)=0$, we find $c_2=0$. Because $f(L)=0$, we find that $\sin(L\sqrt{\lambda})=0$, which leads to
 
@@ -209,9 +209,9 @@ We can choose only $f'(0)=f'(L)=0$ to avoid finding the trivial solution only. W
 
 $$
 f(x) = c_1\sin(x\sqrt{\lambda}) + c_2\cos(x\sqrt{\lambda}).
-$$
+$$ (eq:fsincosn)
 
-Because $f'(0)=0$, we find $\left.\partial_x f(x)\right|_{x=0} = c_1\sqrt{\lambda} = 0$, hence $c_1=0$. Because $f'(L)=0$, we find that $c_2\sin(L\sqrt{\lambda})=0$, which leads to
+Because $f'(0)=0$, we find $\left.\partial_x f(x)\right|_{x=0} = c_1\sqrt{\lambda} = 0$, hence $c_1=0$. Because $f'(L)=0$, we find that $c_2\sqrt{\lambda}\sin(L\sqrt{\lambda})=0$, which leads to
 
 $$
 \lambda = \left(\frac{n\pi}{L}\right)^2, \quad\text{for } n=1,2,3,\cdots,
@@ -395,6 +395,24 @@ $$
 
 We conclude that the temperature has a maximum value that is inversely proportional to distance $|x|$, and it occurs on the bar for positions $|x|>L/\sqrt{2}$.
 
+To show the early- and late-time behaviour, we show the temperature as a function of time. In the example, $T_0=1$, $\kappa=1$, $L=10$, and we compute the temperature for positions $-30<x<30$ m and $0.1<t<10^4$ s. The full space-time graph is shown in {numref}`fig-gheat`. The figure shows the spatial axis and the temperature values on a linear scale, while time is shown on a logarithmic scale. The first 5 s no big changes are visible in the graph. This can be understood in our example with $\kappa=1$ from the fact that $4t$ and $L^2$ occur as a sum in the polynomial part and also in the denominator of the exponential function. This means that when $t=L^2/4$ and $x=0$, the temperature is $T_0/\sqrt{2}$, which is where the colours change from yellow to green. This is at $t=25$ s in this example. The figure also shows that the maximum temperature value for positions $|x|>L/\sqrt{2}\approx 7$ m occurs at later times with increasing distance to the mid point. The time of the maximum temperature value grows with distance squared. This is not very well visible in the plot, because of the logarithmic time scale.
+
+```{figure} figures/GHeat.png
+:name: fig-gheat
+:width: 75%
+
+The temperature as a function of space and time with a Gaussian distribution in space at $t=0$ as initial condition.
+```
+
+Looking at the temperature as a function of time for specific locations away from the mid point is useful to evaluate the interplay between the late-time, or polynomial, part and the early-time, or exponential, part. To this end, {numref}`fig-gheata` shows them as a function of time for distances of $x=10$ m (left plot) and $x=20$ m (right plot) as black curves, together with the polynomial part (red dashed lines) and the exponential part (blue dashed lines). The vertical thin black lines mark the time to the maximum temperature, which is 25 s for $x=10$ m and 175 s for $x=20$ m.
+
+```{figure} figures/GHeatA.png
+:name: fig-gheata
+:width: 100%
+
+The temperature as a function of time at $x=10$ m (left) and $x=20$ m (right), with a Gaussian distribution in space at $t=0$ as initial condition. The black curve is the temperature, the red dashed line the polynomial part, the blue dashed line the exponential part, and the thin vertical line marks the time $t_p$ to the maximum temperature.
+```
+
 ### An infinitely long wire with an initial double Gaussian temperature distribution
 
 If the initial condition specifies two shifted Gaussians, the solution can be written immediately by understanding that the superposition principle holds. This means that two separate initial conditions each lead to a solution that can be summed and that is equal to the solution we would obtain by specifying the two initial conditions as a single starting point and then solving the equation. Hence, if we have
@@ -414,30 +432,102 @@ $$ (eq:T2Gauss)
 
 From this solution, and the fact that the exponential functions are quite distinct for early times but become equal for late times, we can understand that after some time we cannot distinguish between a field that consisted initially of two Gaussians and one that consisted of a single Gaussian temperature distribution. The closer the initial peak values are together, the earlier the blurring is such that the distinction cannot be made anymore. In a nutshell, that is the difficulty with analysing diffusive field signals when we record them to obtain information about the Earth.
 
+## The infinitely long wire revisited: a solution with the Fourier cosine series
+
+Solving problems with separation of variables is not always the best solution, for example when the temperature distribution at $t=0$ is a Gaussian function, but it is possible and can still be convenient. For the example, we return to the infinitely long wire. Hence, we are solving the same equation and boundary condition as before,
+
+$$
+\begin{aligned}
+\partial_t T &= \kappa\,\partial_x^2 T, \\
+T(x,0) &= T_0\exp\left(-\frac{x^2}{L^2}\right).
+\end{aligned}
+$$
+
+This function goes to zero at the end points "infinity", which seems to make sense from a physical point of view. We still want a solution of the form
+
+$$
+T(x,t) = f(x)g(t).
+$$
+
+We cannot use the boundary conditions at "infinity", because that would not help us in finding eigenvalues. Instead we can look at the functional description of the boundary condition at zero time. This is a Gaussian function in space and it is characterised by the width $L$. Hence the fact that the wire is infinitely long does not matter too much, because the temperature goes exponentially to zero for large distances. We can then choose a finite length $M$ and we will approximate the boundary condition with $2M$ as the length of the wire.
+
+The initial distribution is an even function in space. This means that an integral $-\infty<x<\infty$ with a multiplication of a sine and cosine function with the Gaussian function will result in zero for the sine part, because the sine is an odd function in space. If we choose $n\pi x/M$ as argument, the integral with the sine function will still go to zero. For the cosine we can investigate
+
+$$
+T(x,0) = T_0\exp\left(-\frac{x^2}{L^2}\right) = T_0\sum_{n=0}^N C_n\cos\left(\frac{n\pi x}{M}\right),
+$$
+
+with $M\gg L$. We will find out later how much larger $M$ should be relative to $L$, and how large $N$ should be relative to $M$. We use what we have learned before and write down the solution for the temperature in terms of a cosine series with exponentially decaying functions in time. We therefore write
+
+$$
+\begin{aligned}
+T(x,t) &= T_0\sum_{n=0}^N C_n\cos\left(\frac{n\pi x}{M}\right)\exp\left[-\kappa\left(\frac{n\pi}{M}\right)^2 t\right], \\
+C_n &= \left\{\begin{array}{ll}
+\dfrac{1}{2M}\displaystyle\int_{x=-M}^{M}\exp\left(-\frac{x^2}{L^2}\right)\mathrm{d}x & n=0, \\[12pt]
+\dfrac{1}{M}\displaystyle\int_{x=-M}^{M}\exp\left(-\frac{x^2}{L^2}\right)\cos\left(\frac{n\pi x}{M}\right)\mathrm{d}x & n=1,2,3,\cdots .
+\end{array}\right.
+\end{aligned}
+$$
+
+The integrals for the coefficients can be computed as
+
+$$
+\begin{aligned}
+\int_{x=-M}^{M}\exp\left(-\frac{x^2}{L^2}\right)\mathrm{d}x &= \sqrt{\pi}\,L, \\
+\int_{x=-M}^{M}\exp\left(-\frac{x^2}{L^2}\right)\cos\left(\frac{n\pi x}{M}\right)\mathrm{d}x &= \sqrt{\pi}\,L\exp\left(-\frac{n^2\pi^2L^2}{4M^2}\right).
+\end{aligned}
+$$
+
+These are correct under the assumption that $M$ is large enough to approximate the infinite integral for finite $M$, because
+
+$$
+\begin{aligned}
+\int_{x=-\infty}^{\infty}\exp\left(-\frac{x^2}{L^2}\right)\mathrm{d}x &= \sqrt{\pi}\,L, \\
+\int_{x=-\infty}^{\infty}\exp\left(-\frac{x^2}{L^2}\right)\cos\left(\frac{n\pi x}{M}\right)\mathrm{d}x &= \sqrt{\pi}\,L\exp\left(-\frac{n^2\pi^2L^2}{4M^2}\right).
+\end{aligned}
+$$
+
+A final point of note is that when $M\rightarrow\infty$ the argument of the cosine becomes a continuous variable $k$ and will replace $n\pi/M$. The integral would then formally constitute a Fourier-cosine transformation. For both integrals, we can take $\kappa=1$ and $M\ge 4L$. For $L=10$ and $M=4L$ we find that $N=8$ delivers a solution that has an error less than 1% on the interval $-3L<x<3L$ for the initial condition, while the error grows as a function of time. To keep the solution within 1% for the first 1000 seconds, we need $M=9L$ and $N=20$. $L$ and $M$ do not have to be integers, but $N$ is an integer. If we want to make the resulting time function accurate such that the late-time behaviour of $T_0L/\sqrt{4\kappa t+L^2}$ is accurately obtained with a sum of weighted damped exponential functions in time, we need much larger values of $M$ and $N$. We conclude that it is indeed possible to use separation of variables also for arbitrary functions. We find that we can approximate the exact solution
+
+$$
+T(x,t) = \frac{T_0L}{\sqrt{4\kappa t+L^2}}\exp\left(-\frac{x^2}{4\kappa t+L^2}\right),
+$$ (eq:TGExact)
+
+by a sum of products of cosines in space and exponential damping functions in time, given by
+
+$$
+T(x,t) = \frac{T_0L\sqrt{\pi}}{M}\left\{\frac{1}{2} + \sum_{n=1}^{N}\cos\left(\frac{n\pi x}{M}\right)\exp\left[-\left(\frac{n\pi}{2M}\right)^2(4\kappa t+L^2)\right]\right\}.
+$$ (eq:HGCos)
+
+The exact equation is easier to analyse in terms of the actual field behaviour, which is not easy to find from the series solution.
+
 As a last topic, we discuss the inhomogeneous electromagnetic diffusive field equations. This means we are going to put a source somewhere in space and solve Maxwell's diffusive field equations in one and three dimensions.
 
 ## Exercises
 
 1. Solve {eq}`eq:Heat1D` with boundary conditions $T(x,0)=\tfrac{1}{2}$, $T(0,t)=T(L,t)=0$.
-2. Solve {eq}`eq:Heat1D` with boundary conditions $T(x,0)=\tfrac{1}{2}$, $T'(0,t)=T'(L,t)=0$.
-3. Solve {eq}`eq:Heat1D` with boundary conditions $T(x,0)=h(x)$, $T(0,t)=T'(L,t)=0$.
-4. Python exercise: use the solution structure for {eq}`eq:Heat1D` as found in the first example of a bar of length $L$, hence with $T(0,t)=T(L,t)=0$, but now for $T(x,0)=h(x)=(0,-1,1,0)$ for $(0<x<L/4,\ L/4<x<L/2,\ L/2<x<3L/4,\ 3L/4<x<L)$, as shown in {numref}`fig-heat-ic-quarters`.
+2. Solve {eq}`eq:Heat1D` with boundary conditions $T(x,0)=\cos(\pi x/L)$, $T'(0,t)=T'(L,t)=0$.
+3. Solve {eq}`eq:Heat1D` with boundary conditions $T(x,0)=h(x)$, $T(0,t)=0$ and $T'(L,t)=0$, which is a Dirichlet condition at $x=0$ and a Neumann condition at $x=L$.
+4. Choose $f(x)=c_1\exp(\mathrm{i}x\sqrt{\lambda}) + c_2\exp(-\mathrm{i}x\sqrt{\lambda})$ instead of {eq}`eq:fsincosd` in the solution for the finite length wire with Dirichlet conditions. Which solution do you find?
+5. Choose $f(x)=c_1\exp(\mathrm{i}x\sqrt{\lambda}) + c_2\exp(-\mathrm{i}x\sqrt{\lambda})$ instead of {eq}`eq:fsincosn` in the solution for the finite length wire with Neumann conditions. Which solution do you find?
+6. Python exercise: use the solution structure for {eq}`eq:Heat1D` as found in the first example of a bar of length $L$, hence with $T(0,t)=T(L,t)=0$, but now for $T(x,0)=h(x)=(0,-1,1,0)$ for $(0<x<L/4,\ L/4<x<L/2,\ L/2<x<3L/4,\ 3L/4<x<L)$, as shown in {numref}`fig-heat-ic-quarters`.
 
     ```{figure} figures/heat_ic_quarters.svg
     :name: fig-heat-ic-quarters
     :width: 55%
 
-    Initial temperature $h(x)$ for exercise 4.
+    Initial temperature $h(x)$ for exercise 6.
     ```
 
-5. Python exercise: use the solution structure for {eq}`eq:Heat1D` as found in the second example of a bar of length $L$, hence with $T'(0,t)=T'(L,t)=0$, but now for $T(x,0)=h(x)=(1,-1,1)$ for $(0<x<L/3,\ L/3<x<2L/3,\ 2L/3<x<L)$, as shown in {numref}`fig-heat-ic-thirds`.
+7. Python exercise: use the solution structure for {eq}`eq:Heat1D` as found in the second example of a bar of length $L$, hence with $T'(0,t)=T'(L,t)=0$, but now for $T(x,0)=h(x)=(1,-1,1)$ for $(0<x<L/3,\ L/3<x<2L/3,\ 2L/3<x<L)$, as shown in {numref}`fig-heat-ic-thirds`.
 
     ```{figure} figures/heat_ic_thirds.svg
     :name: fig-heat-ic-thirds
     :width: 55%
 
-    Initial temperature $h(x)$ for exercise 5.
+    Initial temperature $h(x)$ for exercise 7.
     ```
 
-6. Python exercise: write a code for the solution expressed in {eq}`eq:TGauss`. Take the product $\kappa t$ on a logarithmic scale such that $-1<\log_{10}(\kappa t)<3$, $L=3$, and use a linear scale for position $-10<x<10$. Show a colour 2D plot as a function of all points in space and time where the colour shows the temperature, and make a line-plot movie of the temperature in space where time evolves.
-7. Python exercise: repeat the previous exercise, but now with the double Gaussian as initial temperature distribution as given in {eq}`eq:2c0time`, which has the solution given in {eq}`eq:T2Gauss`. You can make the separation between the two Gaussians, which is now $4L$, a variable that you can change to see the effect on the shape of the time evolution of temperature along the bar.
+8. Python exercise: write a code for the solution expressed in {eq}`eq:TGauss`. Take the product $\kappa t$ on a logarithmic scale such that $-1<\log_{10}(\kappa t)<3$, $L=3$, and use a linear scale for position $-10<x<10$. Show a colour 2D plot as a function of all points in space and time where the colour shows the temperature, and make a line-plot movie of the temperature in space where time evolves.
+9. Python exercise: repeat the previous exercise, but now with the double Gaussian as initial temperature distribution as given in {eq}`eq:2c0time`, which has the solution given in {eq}`eq:T2Gauss`. You can make the separation between the two Gaussians, which is now $4L$, a variable that you can change to see the effect on the shape of the time evolution of temperature along the bar.
+10. Python exercise: use the expression of {eq}`eq:HGCos` to approximate the heat evolution in space-time and compare with the exact solution, and when the late-time behaviour is an accurate approximation. Choose $L=10$ and evaluate the functions for $-3L<x<3L$ and $-1<\log_{10}(\kappa t)<4$ on a logarithmic time axis. Find out what $M$ and $N$ should be to compute the temperature with an error less than 0.1% compared with the exact solution of {eq}`eq:TGExact` over the whole time window.

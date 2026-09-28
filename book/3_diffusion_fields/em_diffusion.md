@@ -100,7 +100,7 @@ You recognise the similarity with the solution to the heat equation with a Gauss
 
 ## Solution using Fourier transformation
 
-In the course on Signals and Time Series, you have learned Fourier series and the Fourier transformation. In the heat equation for a finite-length wire, we use Fourier series to find solutions, but we can solve partial differential equations with a non-zero source term more formally with the aid of Fourier transformations. We do this by transforming {eq}`eq:dee` to the frequency domain using
+In the course on Signals and Time Series, you have learned Fourier series and the Fourier transformation. In the heat equation for a finite-length wire, we use Fourier series to find solutions. We then showed that for an infinitely long wire that has a Gaussian temperature distribution at zero time, a solution in terms of Fourier series is possible as well. We also showed that if we let the distance between two frequency values go to zero, the Fourier transformation is found. But we can solve partial differential equations with a non-zero source term more formally with the aid of Fourier transformations. We do this by transforming {eq}`eq:dee` to the frequency domain using
 
 $$
 \hat{\boldsymbol E}(z,\omega) = \int_{t=0}^{\infty}\exp(-\mathrm{i}\omega t)\,\boldsymbol E(z,t)\,\mathrm{d}t,
