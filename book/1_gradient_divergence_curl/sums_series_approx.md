@@ -106,3 +106,35 @@ We saw for the particle motion that for negative $t$ the particle is at rest and
 1. Expand the particle motion of {eq}`eq:pm` around $t=-1$, using $f(x) = x(t)$ in {eq}`eq:Taylor` with $a=-1$, and explain why it is not giving you more than $x(t) = x_0$.
 2. Find the expansions for $\sin(x)$, $\cos(x)$, $\exp(-x)$, $(1+x)^{-1}$ around $x=0$ and determine whether the Taylor series converges.
 3. What happens if you try a Taylor series expansion for $\sqrt{t}$ and $1/t$?
+4. Consider the simple model of the bouncing ball problem. The ball leaves the surface at $z=0$ with upward velocity $v_0$.
+
+    (a) Give the expression for the height of the ball for $t>0$ that is valid until the ball hits the ground again for the first time.
+
+    (b) Determine the time $T_0$ at which the ball hits the ground and the maximum height $H$ the ball reaches the first time.
+
+    Assume that every time the ball hits the ground there is some plastic deformation of the ball and the ball loses a fraction $\gamma$ of its energy at every bounce, such that at the $n^{\text{th}}$ bounce the velocity can be expressed as $v_n = \sqrt{1-\gamma}\,v_{n-1}$ for $n>0$.
+
+    (c) The time it takes to complete the $n^{\text{th}}$ bounce, $T_n$, can be written in terms of $T_{n-1}$ as $T_n = \alpha T_{n-1}$, and in terms of $T_0$ as $T_n = \beta T_0$. Determine $\alpha$ and $\beta$.
+
+    (d) Show that $T_n = (1-\gamma)^{n/2}\sqrt{\dfrac{8H}{g}}$.
+
+    (e) Give an expression for $T_\infty$ by evaluating the series $T_\infty = \sum_{m=0}^{\infty}T_m$. Since $\gamma$ is a fraction, it has a positive non-zero value smaller than 1, so that the series can be summed to an explicit expression. Why does it take only a finite time for the ball to make infinitely many bounces?
+
+    (f) If the energy loss per bounce is extremely small, $\gamma\ll 1$, use a Taylor series expansion around $\gamma=0$ for $T_\infty$ and keep only the leading term as a first-order approximation to the time required to make an infinite number of bounces.
+
+    (g) Plot the height as a function of time and try different values for $\gamma$, to understand truncation of a series as an approximation of a function. How many terms do you need in the sum to arrive at the same time as the approximate expression?
+
+    :::{admonition} Answers to (a)–(f)
+    :class: tip dropdown
+    (a) $z = v_0 t - \tfrac{1}{2}gt^2$.
+
+    (b) $H = \dfrac{v_0^2}{2g}$ and $T_0 = \dfrac{2v_0}{g}$.
+
+    (c) $T_n$ is proportional to $v_n$, hence $T_n = \sqrt{1-\gamma}\,T_{n-1} = (1-\gamma)^{n/2}T_0$, so $\alpha=\sqrt{1-\gamma}$ and $\beta=(1-\gamma)^{n/2}$.
+
+    (d) In the expression for $T_n$ in (c), express $T_0$ in terms of $H$ instead of in terms of $v_0$.
+
+    (e) $T_\infty = T_0\sum_{m=0}^{\infty}(1-\gamma)^{m/2} = \sqrt{\dfrac{8H}{g}}\dfrac{1}{1-\sqrt{1-\gamma}}$.
+
+    (f) In that case $\sqrt{1-\gamma}\approx 1-\tfrac{\gamma}{2}$ and $T_\infty \approx \sqrt{\dfrac{8H}{g}}\dfrac{2}{\gamma}$.
+    :::
