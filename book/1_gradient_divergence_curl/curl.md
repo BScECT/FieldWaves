@@ -120,6 +120,56 @@ $$ (eq:divvecprod)
 
 The divergence of a vector product of two functions takes the curl of each of them, computes the scalar product with the other, and subtracts the results.
 
+## The magnetic field around an infinite current carrying wire
+
+In the chapter on Potential Fields you will investigate this problem a bit deeper, but here we use it to illustrate that a field that circulates around another field does not have a non-zero curl everywhere, and that it can have zero divergence as well. Let us take an infinitely long current carrying wire along the vertical axis. That makes it a two-dimensional problem, because nothing is changing in the $z$-direction. In cylindrical coordinates the magnetic field is given by
+
+$$
+\boldsymbol H = \frac{I}{2\pi\varrho}\hat{\boldsymbol\phi},
+$$ (eq:HJcyl)
+
+which in Cartesian coordinates is written as
+
+$$
+\boldsymbol H = \frac{I}{2\pi\varrho^2}\left(-y\,\hat{\boldsymbol x} + x\,\hat{\boldsymbol y}\right).
+$$ (eq:HJcart)
+
+The curl of this magnetic field has only a vertical component, as you can imagine from Ampère's law, because it states that $\nabla\times\boldsymbol H = \boldsymbol J$, with $\boldsymbol J$ the electric current density in the wire. We have to look only at the vertical component, because $\boldsymbol J$ has only a vertical component. We find
+
+$$
+\hat{\boldsymbol z}\cdot(\nabla\times\boldsymbol H) = \partial_x H_y - \partial_y H_x = \frac{I}{2\pi}\left(\partial_y\frac{y}{\varrho^2} + \partial_x\frac{x}{\varrho^2}\right) = 0, \qquad \text{for } \varrho>0 .
+$$
+
+We find that the magnetic field is curl-free everywhere outside the wire. The field rotates around the wire but it has zero curl. If we take the divergence of the magnetic field, we find
+
+$$
+\nabla\cdot\boldsymbol H = \partial_x H_x + \partial_y H_y = \frac{I}{2\pi}\left(-\partial_x\frac{y}{\varrho^2} + \partial_y\frac{x}{\varrho^2}\right) = 0, \qquad \text{for } \varrho>0 .
+$$
+
+We find that the magnetic field is divergence free as well, everywhere outside the wire. We investigate what happens at the wire. For that we take a planar circular area in the $(x,y)$-plane, as a cross-section that goes through the wire, but we do not specify the radius. We multiply Ampère's law with a unit vector in the vertical direction and integrate over the surface area $\mathbb{S}$ to find
+
+$$
+\int_{\mathbb{S}}\hat{\boldsymbol z}\cdot(\nabla\times\boldsymbol H)\,\mathrm{d}x\,\mathrm{d}y = \int_{\mathbb{S}}\hat{\boldsymbol z}\cdot\boldsymbol J\,\mathrm{d}x\,\mathrm{d}y .
+$$
+
+The right-hand side is identified as the current $I$ running in the wire, and we use Stokes' theorem on the left-hand side to arrive at
+
+$$
+\oint_{\partial\mathbb{S}}\boldsymbol\tau\cdot\boldsymbol H\,\mathrm{d}l .
+$$
+
+This is a line integral around the full circle, which is the boundary of the circular surface area that we started out with, and $\boldsymbol\tau$ is the unit tangent vector. In cylindrical coordinates, $\boldsymbol\tau\,\mathrm{d}l = \hat{\boldsymbol\phi}\,\varrho\,\mathrm{d}\phi$. Substituting this together with the expression of the magnetic field in {eq}`eq:HJcyl` in the above equation results in
+
+$$
+\oint_{\partial\mathbb{S}}\boldsymbol\tau\cdot\boldsymbol H\,\mathrm{d}l = \frac{I}{2\pi}\int_{\phi=0}^{2\pi}\mathrm{d}\phi = I,
+$$
+
+which is equal to the surface integral with the normal component of the current. In conclusion, the magnetic field has zero curl at any point outside the wire, but the line integral around any circle around the wire of the tangential component of the magnetic field is equal to the current flowing in the wire. This will come back when we discuss Potential Fields, and again when we discuss Electromagnetic Fields.
+
+## Sources of non-zero curl
+
+Rigid rotation and shear are two known causes for generating a field with non-zero curl.
+
 ## Exercises
 
 1. Use Stokes' theorem to evaluate $\oint_{\boldsymbol r}\boldsymbol\tau\,\mathrm{d}l$, where $\boldsymbol\tau$ is the unit tangent along the closed boundary of the area $\mathbb{S}$. The integration runs in the direction of circulation that forms a right-handed system with the unit normal vector on $\mathbb{S}$.

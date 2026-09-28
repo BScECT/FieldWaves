@@ -201,7 +201,7 @@ In a constant-density environment the flow field must be radial away from the so
 
 $$
 \boldsymbol v = f(r)\,\boldsymbol r .
-$$
+$$ (eq:incflow)
 
 The function $f(r)$ depends only on the radial distance $r=\sqrt{x^2+y^2+z^2}$. We can find $f(r)$ by requiring that the flow is divergence free,
 
@@ -209,13 +209,19 @@ $$
 \nabla\cdot\boldsymbol v = 3f(r) + \boldsymbol r\cdot\nabla f(r) = 0, \qquad \text{for } r\ne 0 .
 $$
 
-This gives
+We push this expression one step further and use the chain rule for differentiation to find that $\nabla f(r) = \partial_r f(r)\,(\nabla r)$. Substituting this in the above equation, with the result for the gradient of $r$ of {eq}`eq:gradr`, we find that
+
+$$
+\nabla\cdot\boldsymbol v = 3f(r) + r\,\partial_r f(r) = 0, \qquad \text{for } r\ne 0 .
+$$ (eq:iflowrad)
+
+Now we recognise that we have an expression in spherical coordinates. The solution for $f(r)$ is
 
 $$
 f(r) = \frac{A}{r^3},
 $$ (eq:NF)
 
-where $A$ is a constant that is determined by the source or sink.
+where $A$ is a constant that is determined by the source or sink. This means that the flow is radial and inversely proportional to distance squared.
 
 ## Electric potential, electric field, and electric current
 
@@ -339,7 +345,8 @@ For this particular solution $\nabla\cdot\boldsymbol B = 0$ for all points in sp
 
 1. If $(\boldsymbol v\cdot\hat{\boldsymbol n})\hat{\boldsymbol n}$ in {eq}`eq:vflux` is the fraction of $\boldsymbol v$ that leaves the volume $\mathbb{D}$ through the surface $\mathbb{S}$, what is the fraction of the flow that does not leave the volume $\mathbb{D}$?
 2. Carry out the differentiations to show that the expression for $f(r)$ in {eq}`eq:NF` is correct.
-3. The total current that can be injected into the ground must run in a cable from the source (battery and signal conditioner) to the ground. Once it is in the ground it is free to go anywhere, but the total volume integral must remain equal to the current that runs in the cable, because of the continuity of electric current. We have used the symbol $I$ to denote the total current, and in {eq}`eq:Icur` you have seen a sequence of expressions that resulted in finding the unknown coefficient $A$.
+3. In spherical coordinates, the component $v_r$ is the only non-zero component of an incompressible flow vector as given in {eq}`eq:incflow`, which can then be written as $\boldsymbol v = v_r\hat{\boldsymbol r} = r f(r)\hat{\boldsymbol r}$. Apply the divergence in spherical coordinates of {eq}`eq:divcurvi` to arrive at the same expression given in {eq}`eq:iflowrad`.
+4. The total current that can be injected into the ground must run in a cable from the source (battery and signal conditioner) to the ground. Once it is in the ground it is free to go anywhere, but the total volume integral must remain equal to the current that runs in the cable, because of the continuity of electric current. We have used the symbol $I$ to denote the total current, and in {eq}`eq:Icur` you have seen a sequence of expressions that resulted in finding the unknown coefficient $A$.
 
     Another way of finding this result is by observing that the electric potential is the solution of {eq}`eq:laplV` under the condition that a current is injected at the origin. Hence the actual problem is obtained if you take the divergence of both sides of {eq}`eq:Ohm`. This results in $\nabla\cdot\boldsymbol E = \rho\,\nabla\cdot\boldsymbol J$. Integrate both sides of this equation over a spherical volume with fixed radius $r$ and use Gauss' theorem to show that
 
@@ -354,20 +361,20 @@ For this particular solution $\nabla\cdot\boldsymbol B = 0$ for all points in sp
     $$
 
     Substitute the solution proposed for $V$ of {eq}`eq:pot` with $B=0$ in this equation to verify that $A=\rho I/(4\pi)$.
-4. Evaluate the gradient of the potential expressed in {eq}`eq:Vpdp` and give the expression for the electric current density in the ground at and below the ground surface. Write a Python script that computes the electric potential and the electric current density on the ground surface and in a vertical cross-section, and reproduce the plots of {numref}`fig-dcpoth` and {numref}`fig-dcpotv`. Normalise distance to the electrode spacing $a$ and avoid the points $x=\pm a/2$. You can choose any colour map you like for the potential and choose a contrasting colour for the arrows representing the current lines and directions.
-5. The electric field associated with the electric potential given in {eq}`eq:Vpdp` can be evaluated by taking the gradient of the potential, because of {eq}`eq:EgradV`. Give an argument why the flux integral of the electric field $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol E\,\mathrm{d}S = 0$ for every closed and piecewise smooth surface that does not include the current injection and extraction points $x=\pm a/2$.
-6. Verify that the magnetic field expressed in {eq}`eq:magB` is divergence free for all points in space.
-7. Show that the divergence of a vector field in cylindrical and in spherical coordinates is given by {eq}`eq:divcurvi`. Remember that in cylindrical coordinates $\varrho=\sqrt{x^2+y^2}$ and in spherical coordinates $r=\sqrt{x^2+y^2+z^2}$!
-8. Derive the expressions for Gauss' theorem in cylindrical coordinates, in analogy with {eq}`eq:gauss-sphereseg` and {eq}`eq:gauss-sphere`.
-9. Consider a general flow field $\boldsymbol v(\boldsymbol r) = \left(v_x(y,z),\,v_y(x,z),\,v_z(x,y)\right)$ flowing in an open space containing a closed surface $\mathbb{S}$. Evaluate the flux integral $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol v\,\mathrm{d}S$.
-10. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Gauss' integral theorem gives
+5. Evaluate the gradient of the potential expressed in {eq}`eq:Vpdp` and give the expression for the electric current density in the ground at and below the ground surface. Write a Python script that computes the electric potential and the electric current density on the ground surface and in a vertical cross-section, and reproduce the plots of {numref}`fig-dcpoth` and {numref}`fig-dcpotv`. Normalise distance to the electrode spacing $a$ and avoid the points $x=\pm a/2$. You can choose any colour map you like for the potential and choose a contrasting colour for the arrows representing the current lines and directions.
+6. The electric field associated with the electric potential given in {eq}`eq:Vpdp` can be evaluated by taking the gradient of the potential, because of {eq}`eq:EgradV`. Give an argument why the flux integral of the electric field $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol E\,\mathrm{d}S = 0$ for every closed and piecewise smooth surface that does not include the current injection and extraction points $x=\pm a/2$.
+7. Verify that the magnetic field expressed in {eq}`eq:magB` is divergence free for all points in space.
+8. Show that the divergence of a vector field in cylindrical and in spherical coordinates is given by {eq}`eq:divcurvi`. Remember that in cylindrical coordinates $\varrho=\sqrt{x^2+y^2}$ and in spherical coordinates $r=\sqrt{x^2+y^2+z^2}$!
+9. Derive the expressions for Gauss' theorem in cylindrical coordinates, in analogy with {eq}`eq:gauss-sphereseg` and {eq}`eq:gauss-sphere`.
+10. Consider a general flow field $\boldsymbol v(\boldsymbol r) = \left(v_x(y,z),\,v_y(x,z),\,v_z(x,y)\right)$ flowing in an open space containing a closed surface $\mathbb{S}$. Evaluate the flux integral $\int_{\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol v\,\mathrm{d}S$.
+11. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Gauss' integral theorem gives
 
     $$
     \int_{\mathbb{S}}p\,\hat{\boldsymbol n}\,\mathrm{d}S = \int_{\mathbb{D}}\nabla p\,\mathrm{d}V,
     $$
 
     which is Gauss' theorem for the gradient.
-11. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Gauss' integral theorem gives
+12. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Gauss' integral theorem gives
 
     $$
     \int_{\mathbb{S}}\hat{\boldsymbol n}\times\boldsymbol w\,\mathrm{d}S = \int_{\mathbb{D}}\nabla\times\boldsymbol w\,\mathrm{d}V,
