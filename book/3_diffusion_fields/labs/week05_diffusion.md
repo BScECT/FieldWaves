@@ -215,16 +215,18 @@ With $\partial_xT = 0$ at both ends, no heat crosses them. The eigenfunctions be
 
 $$ T(x,t) = C_0 + \sum_{n=1}^{\infty} C_n \cos\!\left(\frac{n\pi x}{L}\right)\exp\!\left[-\kappa\left(\frac{n\pi}{L}\right)^2 t\right], \qquad C_0 = \frac{1}{L}\int_0^L h\,\mathrm{d}x, \quad C_n = \frac{2}{L}\int_0^L h\cos\!\left(\frac{n\pi x}{L}\right)\mathrm{d}x . $$
 
-The initial temperature is now $1$, $-1$, $1$ K on the three thirds of the bar. **Predict** the temperature at late times, and whether the heat content $\int_0^L T\,\mathrm{d}x$ changes.
+The initial temperature is now $1$, $-1$, $1$ K on the three thirds of the bar. The cosine projection is given; write $C_0$, the one mode the clamped bar of Task 2 did not have. **Predict** the temperature at late times, and whether the heat content $\int_0^L T\,\mathrm{d}x$ changes.
 
 ```{code-cell} ipython3
 Cc = np.cos(np.outer(n, np.pi * x / L))                    # row n-1 is cos(n pi x / L)
 h_ins = np.where(x < L/3, 1.0, np.where(x < 2*L/3, -1.0, 1.0))   # initial temperature [K]
 
-# Task 3 -- three blanks: the cosine version of Tasks 1 and 2.
+# Task 3 -- one blank: the n = 0 coefficient, the mode the clamped bar did not have.
 C0 = ___                                   # the n = 0 coefficient [K]
-Cn = ___                                   # C_n for n = 1..N, shape (N,)
-T_ins = ___                                # T(x, t) on the times t, reusing D from Task 2
+
+# --- given: the rest is Task 2 with cosines in place of sines ---
+Cn = (2 / L) * np.sum(h_ins * Cc, axis=1) * dx     # C_n for n = 1..N, shape (N,)
+T_ins = C0 + (Cn * D) @ Cc                         # T(x, t), reusing D from Task 2
 
 Q = np.sum(T_ins, axis=1) * dx            # heat content, per unit area and heat capacity [K m]
 
@@ -248,8 +250,6 @@ fw.check_abs("at t = 0.1 s the series still equals h(x) away from the jumps",
 
 ```python
 C0 = np.sum(h_ins) * dx / L
-Cn = (2 / L) * np.sum(h_ins * Cc, axis=1) * dx
-T_ins = C0 + (Cn * D) @ Cc
 ```
 :::
 
@@ -263,9 +263,11 @@ Every cosine with $n\ge1$ integrates to zero over the bar, so the heat content i
 
 ## Part 2 — An infinitely long wire
 
-Without ends there is no series. For an initial Gaussian $T(x,0) = T_0\exp(-x^2/L^2)$, the lecture notes find the solution in closed form:
+On an infinite wire the lecture notes solve the same equation twice. First in closed form, for an initial Gaussian $T(x,0) = T_0\exp(-x^2/L^2)$:
 
 $$ T(x,t) = \frac{T_0 L}{\sqrt{4\kappa t + L^2}}\exp\!\left(-\frac{x^2}{4\kappa t + L^2}\right). $$
+
+Then again as a cosine series, by putting the wire in a box of length $2M$ and letting $M$ grow. Task 7 takes up that second route; Parts 2 and 3 use the closed form, because it is the one you can read.
 
 In this part $L$ is the width of the initial Gaussian, not a length of wire; the code calls it `Lg`. Time enters only through $\kappa t$, which has units of m², so every result below holds for any material. The figures below use $L=3$ m, $-10<x<10$ m and $10^{-1}<\kappa t<10^{3}$ m².
 
@@ -531,6 +533,100 @@ And the same $t\propto x^2$ that set the peak time in Task 4 sets this departure
 a diffusive field has only one way to convert a distance into a time.
 :::
 
+
+### Task 7 — how big a box, and how many modes?
+
+Part 2 used the closed form on the infinite wire. The lecture notes reach the same field a second
+way: put the wire in a box of length $2M$, expand the initial Gaussian in cosines, and let each
+mode decay at its own rate. With $M\gg L$ the coefficients can be integrated in closed form, and
+the series collapses to
+
+$$ T(x,t) = \frac{T_0L\sqrt{\pi}}{M}\left\{\frac{1}{2} + \sum_{n=1}^{N}\cos\!\left(\frac{n\pi x}{M}\right)\exp\!\left[-\left(\frac{n\pi}{2M}\right)^2\!(4\kappa t+L^2)\right]\right\} . $$
+
+The box is fictitious, so $M$ and $N$ are ours to choose, and a wrong choice shows up as an error
+against the exact solution. Take $L=10$ m, $-3L<x<3L$ and $-1<\log_{10}(\kappa t)<4$.
+
+1. Write the series above as a function of `kt`, `M` and `Nc`. It is one matrix product: build
+   $\cos(n\pi x/M)$ with rows $n=1\ldots N$, the decay $\exp[-(n\pi/2M)^2(4\kappa t+L^2)]$ with
+   rows over time, and multiply.
+2. The given code measures the largest error against the exact solution over the whole window,
+   for a grid of $M$ and $N$, and prints it as a table. Read off the **smallest** pair that stays
+   under 0.1%, and enter it below.
+3. Before you look: which of $M$ and $N$ do you expect to matter, and why?
+
+```{code-cell} ipython3
+Lw, xw = 10.0, np.linspace(-30.0, 30.0, 401)   # Gaussian width [m], position [m]
+ktw = np.logspace(-1, 4, 120)                  # kappa * t [m^2]
+Ms, Ns = np.array([10, 15, 20, 25, 30, 35, 40]) * Lw, np.array([10, 20, 30, 40, 60, 80, 120])
+
+# Task 7 -- two blanks.
+def T_cos(kt, M, Nc):
+    """The cosine series above, on the grid xw. Returns shape (len(kt), len(xw))."""
+    return ___
+
+M_ok, N_ok = ___, ___          # the smallest pair in the table that stays under 0.1%
+
+# --- given: the exact solution, and the error of the series against it ---
+_w2 = 4*ktw[:, None] + Lw**2                   # the spreading width squared [m^2]
+T_ex = T0 * Lw / np.sqrt(_w2) * np.exp(-xw[None, :]**2 / _w2)
+def worst(M, Nc):
+    """Largest error over the window, as a fraction of the peak at the same instant."""
+    return np.max(np.abs(T_cos(ktw, M, Nc) - T_ex) / np.max(np.abs(T_ex), axis=1)[:, None])
+
+print("max error against the exact solution, per cent of the peak\n")
+print("       " + "".join(f"{'N=' + str(v):>8s} " for v in Ns))
+for M in Ms:
+    print(f"M={M/Lw:4.0f}L " + "".join(f"{worst(M, v)*100:8.3f} " for v in Ns))
+
+# --- given: your own choice, against the exact solution ---
+fw.show_profiles(xw, {"cosine series": T_cos(ktw, M_ok, N_ok)[::3], "exact": T_ex[::3]}, ktw[::3],
+                 value_name="κt", value_fmt="{:.3g}", unit=" m²", ylabel="T [K]",
+                 title=f"A wire in a box of {M_ok/Lw:.0f}L, with {N_ok} modes")
+
+# --- self-check (leave this alone) ---
+fw.check("a box of 40L with 120 modes reproduces the exact solution to 0.1%",
+         worst(40 * Lw, 120) < 1e-3,
+         "check the prefactor T0 L sqrt(pi) / M, the lone 1/2 for the n = 0 mode, "
+         "and that the decay carries (4 kt + L^2), not 4 kt")
+fw.check(f"your pair M = {M_ok/Lw:.0f}L, N = {N_ok} stays under 0.1%", worst(M_ok, N_ok) < 1e-3)
+fw.check("it is the smallest such pair: one step down in M, or in N, breaks 0.1%",
+         worst(Ms[max(np.searchsorted(Ms, M_ok) - 1, 0)], N_ok) > 1e-3
+         and worst(M_ok, Ns[max(np.searchsorted(Ns, N_ok) - 1, 0)]) > 1e-3,
+         "a generous box passes the previous check but is not the answer to the question")
+```
+
+:::{admonition} Solution — Task 7
+:class: dropdown
+
+```python
+def T_cos(kt, M, Nc):
+    nc = np.arange(1, Nc + 1)
+    C = np.cos(np.outer(nc, np.pi * xw / M))
+    D = np.exp(-(nc * np.pi / (2*M))**2 * (4*np.asarray(kt)[:, None] + Lw**2))
+    return T0 * Lw * np.sqrt(np.pi) / M * (0.5 + D @ C)
+
+M_ok, N_ok = 300.0, 60
+```
+:::
+
+:::{admonition} The box must outrun the heat, and the modes must resolve the source
+:class: important dropdown
+
+The table falls into two halves. Below $M=25L$ nothing helps: by the end of the window the
+Gaussian has spread to $\sqrt{4\kappa t}=20L$, so a box of $15L$ has heat piled against a wall
+that is not there in the real problem. The box has to outrun the diffusion length, and $30L$
+against $20L$ is the margin that does it.
+
+Adding modes cannot repair that, but neither is $N$ free. Read down the $N=10$ column: the error
+*grows* as the box grows, from 23% at $15L$ to 56% at $40L$. The shortest wavelength in the series
+is $2M/N$, and it has to resolve the initial Gaussian, so $N$ must grow in step with $M$:
+$N\gtrsim 2M/L$. At $M=30L$ that is $N=60$, which is exactly where the table turns.
+
+So the two knobs answer two different physical questions, one about the far field at late time and
+one about the source at early time. This is Task 6 read backwards. There we asked when a real
+boundary makes itself felt; here we ask how far away to put a fictitious one so that it never does.
+:::
+
 ---
 
 ## Part 4 — The same kernel in the Earth
@@ -541,7 +637,7 @@ $$ E_x(z,t) = -I\sqrt{\frac{\mu}{4\pi\sigma t}}\exp\!\left(-\frac{\sigma\mu z^2}
 
 This is the kernel of Part 2 with $\kappa$ replaced by $1/(\sigma\mu)$, so the field soaks into the ground exactly as heat spreads along a wire. The approximation neglects $\varepsilon\,\partial_t\boldsymbol{E}$, which is justified when $t$ is much longer than the charge relaxation time $\tau_r = \varepsilon/\sigma$. This is the field a time-domain electromagnetic sounding records.
 
-### Task 7 — when does the field arrive at depth?
+### Task 8 — when does the field arrive at depth?
 
 Write the time at which $\lvert E_x\rvert$ at depth $z$ peaks, from $\partial_t\lvert E_x\rvert = 0$.
 
@@ -554,7 +650,7 @@ _depths = [100.0, 300.0, 1000.0]           # [m]
 def E_step(z, t):
     return -I_s * np.sqrt(mu_0 / (4*np.pi*sigma*t)) * np.exp(-sigma*mu_0*z**2 / (4*t))
 
-# Task 7 -- one blank.
+# Task 8 -- one blank.
 def t_peak_em(z):
     """Time at which |E_x| at depth z peaks [s]."""
     return ___
@@ -588,7 +684,7 @@ for z in _depths:
                     t_em[np.argmax(np.abs(E_step(z, t_em)))], rtol=0.01, unit=" s")
 ```
 
-:::{admonition} Solution — Task 7
+:::{admonition} Solution — Task 8
 :class: dropdown
 
 ```python
