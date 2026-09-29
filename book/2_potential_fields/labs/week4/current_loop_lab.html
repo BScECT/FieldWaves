@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:12px;font:14px system-ui,sans-serif;color:#203541;background:#fff}
+p{line-height:1.45;margin:8px 0}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 24px;margin:15px 0}
+label{display:block;font-weight:600}
+input[type=range]{width:100%;accent-color:#007da5}
+button{font:inherit;padding:6px;background:white;border:1px solid #8a9da7;border-radius:4px;cursor:pointer}
+button:hover{background:#eef6f8}
+output{font-variant-numeric:tabular-nums;font-weight:400}
+.scroll{overflow-x:auto}
+.plots{display:grid;grid-template-columns:1fr;gap:6px;max-width:640px;margin:0 auto}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+figure{margin:0}
+figure figcaption{text-align:center;font-weight:600;font-size:13px;margin:6px 0}
+canvas{display:block;width:100%;height:auto;border:1px solid #d6dfe4;touch-action:manipulation}
+.legend{font-size:12px;color:#415764}
+.status{padding:8px;background:#eef6f8;font-variant-numeric:tabular-nums}
+@media(max-width:580px){.controls,.row{grid-template-columns:1fr}body{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="controls">
+<div><label for="rl">Loop radius R<sub>L</sub> (m): <output id="rlv"></output></label><input id="rl" type="range" min="10" max="200" step="5" value="50"></div>
+<div><label for="cur">Current I (A): <output id="curv"></output></label><input id="cur" type="range" min="1" max="20" step="1" value="10"></div>
+<div><label for="zr">Probe on the axis, z/R<sub>L</sub>: <output id="zrv"></output></label><input id="zr" type="range" min="0.25" max="8" step="0.05" value="2"></div>
+</div>
+<div><button id="reset" type="button">Reset</button></div>
+<div class="scroll"><div class="plots">
+<figure><figcaption>Field lines in the x&ndash;z plane: exact loop (solid) and dipole with the same moment (dashed)</figcaption>
+<canvas id="map" width="640" height="520" aria-label="Field lines of a current loop and of a dipole"></canvas></figure>
+<div class="row">
+<figure><figcaption>|B| on the axis (log&ndash;log)</figcaption>
+<canvas id="axis" width="400" height="280" aria-label="Axial field versus distance"></canvas></figure>
+<figure><figcaption>Dipole formula / exact field on the axis</figcaption>
+<canvas id="ratio" width="400" height="280" aria-label="Ratio of dipole to exact field"></canvas></figure>
+</div>
+</div></div>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="legend">The loop lies in the x&ndash;y plane and is seen edge-on: &otimes; current into the page, &#8857; current out of the page, so m = I&pi;R<sub>L</sub><sup>2</sup> z&#770; points up. Lengths in the upper panel are in units of R<sub>L</sub>. Exact axial field: B = &mu;<sub>0</sub>IR<sub>L</sub><sup>2</sup> / [2(R<sub>L</sub><sup>2</sup>+z<sup>2</sup>)<sup>3/2</sup>]. Dipole formula on the axis: B = &mu;<sub>0</sub>m / (2&pi;z<sup>3</sup>).</p>
+<script>
+(()=>{
+'use strict';
+const $ = id => document.getElementById(id);
+const MU0 = 4e-7 * Math.PI;
+const map = $('map'), ax = $('axis'), ra = $('ratio');
+const mctx = map.getContext('2d'), actx = ax.getContext('2d'), rctx = ra.getContext('2d');
+
+// --- physics, lengths in units of R_L ------------------------------------------
+// exact field of a unit loop (radius 1, unit current, CCW seen from +z) at (x, 0, z),
+// by summing Biot-Savart contributions of N straight segments (common factor dropped)
+const N = 240, SEG = [];
+for (let k = 0; k < N; k++) {
+  const p0 = 2 * Math.PI * k / N, p1 = 2 * Math.PI * (k + 1) / N, pm = (p0 + p1) / 2;
+  SEG.push([Math.cos(pm), Math.sin(pm), Math.cos(p1) - Math.cos(p0), Math.sin(p1) - Math.sin(p0)]);
+}
+function loopB(x, z) {
+  let bx = 0, bz = 0;
+  for (const [sx, sy, dx, dy] of SEG) {
+    const rx = x - sx, ry = -sy, rz = z, r2 = rx * rx + ry * ry + rz * rz, r3 = r2 * Math.sqrt(r2);
+    // dl x r with dl = (dx, dy, 0): (dy*rz, -dx*rz, dx*ry - dy*rx)
+    bx += dy * rz / r3;
+    bz += (dx * ry - dy * rx) / r3;
+  }
+  return [bx, bz];
+}
+function dipB(x, z) {                              // point dipole along z at the origin
+  const r2 = x * x + z * z, r = Math.sqrt(r2), r5 = r2 * r2 * r;
+  return [3 * x * z / r5, (3 * z * z - r2) / r5];
+}
+const exactAxis = (I, R, z) => MU0 * I * R * R / (2 * Math.pow(R * R + z * z, 1.5));
+const dipAxis = (I, R, z) => MU0 * I * Math.PI * R * R / (2 * Math.PI * z * z * z);
+
+// --- map -------------------------------------------------------------------------
+const W = 4;                                        // half-width in units of R_L
+const S = map.height / (2 * W * 0.8125);
+const cx = map.width / 2, cy = map.height / 2;
+const px = x => cx + x * S, py = z => cy - z * S;
+const inBox = (x, z) => Math.abs(px(x) - cx) < cx - 2 && Math.abs(py(z) - cy) < cy - 2;
+
+function trace(fn, x0, z0, dir) {
+  const pts = [[x0, z0]];
+  let x = x0, z = z0;
+  for (let n = 0; n < 3000; n++) {
+    const h = 0.02 * dir;
+    let [bx, bz] = fn(x, z), m = Math.hypot(bx, bz);
+    if (!(m > 0)) break;
+    const xm = x + 0.5 * h * bx / m, zm = z + 0.5 * h * bz / m;
+    [bx, bz] = fn(xm, zm); m = Math.hypot(bx, bz);
+    if (!(m > 0)) break;
+    x += h * bx / m; z += h * bz / m;
+    pts.push([x, z]);
+    if (!inBox(x, z)) break;
+    if (Math.hypot(x - 1, z) < 0.03 || Math.hypot(x + 1, z) < 0.03) break;   // at the wire
+    if (n > 50 && Math.hypot(x - x0, z - z0) < 0.02) break;                  // closed
+  }
+  return pts;
+}
+function polyline(pts, style, dash, lw) {
+  mctx.save(); mctx.strokeStyle = style; mctx.lineWidth = lw; mctx.setLineDash(dash);
+  mctx.beginPath();
+  pts.forEach(([x, z], i) => i ? mctx.lineTo(px(x), py(z)) : mctx.moveTo(px(x), py(z)));
+  mctx.stroke(); mctx.restore();
+}
+let MAP_CACHE = null;                               // field lines do not depend on I or R_L
+function drawMap(zr) {
+  if (!MAP_CACHE) {
+    const off = document.createElement('canvas'); off.width = map.width; off.height = map.height;
+    const save = mctx; const octx = off.getContext('2d');
+    // draw into the offscreen canvas by temporarily swapping the context
+    const draw = (ctx) => {
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, map.width, map.height);
+    };
+    draw(octx);
+    MAP_CACHE = {off, octx};
+    const real = mctx;
+    // helper that draws with octx
+    const pl = (pts, style, dash, lw) => {
+      octx.save(); octx.strokeStyle = style; octx.lineWidth = lw; octx.setLineDash(dash);
+      octx.beginPath();
+      pts.forEach(([x, z], i) => i ? octx.lineTo(px(x), py(z)) : octx.moveTo(px(x), py(z)));
+      octx.stroke(); octx.restore();
+    };
+    for (const x0 of [0.15, 0.35, 0.55, 0.72, 0.85, 0.93]) {
+      for (const s of [1, -1]) {
+        const up = trace(loopB, s * x0, 0, 1), dn = trace(loopB, s * x0, 0, -1);
+        pl(up, '#203541', [], 1.4); pl(dn, '#203541', [], 1.4);
+        // the dipole line through the same outer equatorial crossing, if the loop line returns
+        const all = up.concat(dn);
+        let xo = null;
+        for (let i = 1; i < all.length; i++) {
+          const [xa, za] = all[i - 1], [xb, zb] = all[i];
+          if (za * zb <= 0 && Math.abs(xb) > 1.05 && Math.sign(xb) === s) { xo = Math.abs(xb); break; }
+        }
+        if (xo) {
+          arrowHead(octx, px(s * xo), py(0), Math.PI / 2, '#203541');   // returns downward outside the loop
+          const L = xo, th0 = Math.asin(Math.min(1, Math.sqrt(0.02 / L))), pts = [];
+          for (let k = 0; k <= 400; k++) {
+            const th = th0 + (Math.PI - 2 * th0) * k / 400, r = L * Math.sin(th) ** 2;
+            pts.push([s * r * Math.sin(th), r * Math.cos(th)]);
+          }
+          pl(pts.filter(([x, z]) => inBox(x, z)), '#d62728', [5, 4], 1.2);
+        }
+      }
+    }
+  }
+  mctx.clearRect(0, 0, map.width, map.height);
+  mctx.drawImage(MAP_CACHE.off, 0, 0);
+  // axis, loop wires, moment
+  mctx.save(); mctx.strokeStyle = '#98a8b2'; mctx.setLineDash([2, 3]);
+  mctx.beginPath(); mctx.moveTo(cx, 0); mctx.lineTo(cx, map.height); mctx.stroke();
+  mctx.beginPath(); mctx.moveTo(px(-1), cy); mctx.lineTo(px(1), cy); mctx.stroke(); mctx.restore();
+  for (const [x, sym] of [[1, 'x'], [-1, 'o']]) {
+    mctx.save(); mctx.fillStyle = '#fff'; mctx.strokeStyle = '#c8741a'; mctx.lineWidth = 2.5;
+    mctx.beginPath(); mctx.arc(px(x), cy, 9, 0, 2 * Math.PI); mctx.fill(); mctx.stroke();
+    mctx.fillStyle = '#c8741a'; mctx.beginPath();
+    if (sym === 'o') { mctx.arc(px(x), cy, 3, 0, 2 * Math.PI); mctx.fill(); }
+    else { mctx.moveTo(px(x) - 5, cy - 5); mctx.lineTo(px(x) + 5, cy + 5);
+           mctx.moveTo(px(x) + 5, cy - 5); mctx.lineTo(px(x) - 5, cy + 5); mctx.stroke(); }
+    mctx.restore();
+  }
+  arrow(mctx, cx, py(-0.5), cx, py(0.6), '#7b3fa0', 3.5);
+  mctx.fillStyle = '#7b3fa0'; mctx.font = 'italic bold 16px system-ui,sans-serif';
+  mctx.fillText('m', cx - 20, py(0.45));
+  // probe on the axis
+  const Y = py(zr);
+  if (Y > 0) {
+    mctx.fillStyle = '#000'; mctx.beginPath(); mctx.arc(cx, Y, 5.5, 0, 2 * Math.PI); mctx.fill();
+    mctx.font = '12px system-ui,sans-serif'; mctx.fillText('probe', cx + 9, Y + 4);
+  }
+  mctx.fillStyle = '#203541'; mctx.font = '12px system-ui,sans-serif';
+  mctx.fillText('z / R_L', cx + 6, 14);
+  mctx.fillText('x / R_L', map.width - 52, cy - 8);
+  for (const v of [-3, -2, -1, 1, 2, 3]) {
+    mctx.fillText(v, px(v) - 4, cy + 22);
+    mctx.fillText(v, cx - 18, py(v) + 4);
+  }
+}
+function arrowHead(ctx, X, Y, ang, col) {
+  const h = 8; ctx.save(); ctx.fillStyle = col; ctx.beginPath();
+  ctx.moveTo(X + h * Math.cos(ang), Y + h * Math.sin(ang));
+  ctx.lineTo(X + h * Math.cos(ang + 2.5), Y + h * Math.sin(ang + 2.5));
+  ctx.lineTo(X + h * Math.cos(ang - 2.5), Y + h * Math.sin(ang - 2.5));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+function arrow(ctx, x0, y0, x1, y1, col, lw) {
+  const a = Math.atan2(y1 - y0, x1 - x0), h = 9;
+  ctx.save(); ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x1, y1);
+  ctx.lineTo(x1 - h * Math.cos(a - 0.4), y1 - h * Math.sin(a - 0.4));
+  ctx.lineTo(x1 - h * Math.cos(a + 0.4), y1 - h * Math.sin(a + 0.4));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+// --- small plots ------------------------------------------------------------------
+function frame(ctx, cv, L, R, T, B, xlab, ylab) {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = '#98a8b2'; ctx.lineWidth = 1;
+  ctx.strokeRect(L, T, cv.width - L - R, cv.height - T - B);
+  ctx.fillStyle = '#203541'; ctx.font = '12px system-ui,sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText(xlab, (L + cv.width - R) / 2, cv.height - 6);
+  ctx.save(); ctx.translate(13, (T + cv.height - B) / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText(ylab, 0, 0); ctx.restore(); ctx.textAlign = 'left';
+}
+function drawAxis(I, R, zr) {
+  const cv = ax, ctx = actx, L = 56, Rm = 10, T = 10, B = 36;
+  frame(ctx, cv, L, Rm, T, B, 'z / R_L  (log scale)', '|B| [nT]  (log scale)');
+  const nT = z => exactAxis(I, R, z * R) * 1e9, nTd = z => dipAxis(I, R, z * R) * 1e9;
+  const x0 = Math.log10(0.25), x1 = 1;
+  const y1 = Math.ceil(Math.log10(nTd(0.25))), y0 = Math.floor(Math.log10(nT(10)));
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (cv.width - L - Rm);
+  const Y = v => cv.height - B - (Math.log10(v) - y0) / (y1 - y0) * (cv.height - T - B);
+  ctx.font = '11px system-ui,sans-serif'; ctx.strokeStyle = '#e3e9ec';
+  for (const v of [0.25, 0.5, 1, 2, 4, 10]) {
+    ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), cv.height - B); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'center'; ctx.fillText(v, X(v), cv.height - B + 14);
+  }
+  for (let e = y0; e <= y1; e++) {
+    const v = Math.pow(10, e);
+    ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(cv.width - Rm, Y(v)); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'right';
+    ctx.fillText(v >= 1 ? v.toFixed(0) : v.toPrecision(1), L - 4, Y(v) + 4);
+  }
+  ctx.textAlign = 'left';
+  const curve = (f, col, dash) => {
+    ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.setLineDash(dash); ctx.beginPath();
+    for (let k = 0; k <= 120; k++) {
+      const z = Math.pow(10, x0 + (x1 - x0) * k / 120);
+      k ? ctx.lineTo(X(z), Y(f(z))) : ctx.moveTo(X(z), Y(f(z)));
+    }
+    ctx.stroke(); ctx.restore();
+  };
+  ctx.save(); ctx.beginPath(); ctx.rect(L, T, cv.width - L - Rm, cv.height - T - B); ctx.clip();
+  curve(nT, '#000', []); curve(nTd, '#d62728', [6, 4]);
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(X(zr), Y(nT(zr)), 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#d62728'; ctx.beginPath(); ctx.arc(X(zr), Y(nTd(zr)), 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.restore();
+  ctx.font = '12px system-ui,sans-serif';
+  ctx.fillStyle = '#000'; ctx.fillText('exact loop', cv.width - Rm - 118, T + 16);
+  ctx.fillStyle = '#d62728'; ctx.fillText('dipole formula', cv.width - Rm - 118, T + 32);
+}
+function drawRatio(zr) {
+  const cv = ra, ctx = rctx, L = 44, R = 10, T = 10, B = 36;
+  frame(ctx, cv, L, R, T, B, 'z / R_L', 'dipole / exact');
+  const X = v => L + v / 8 * (cv.width - L - R), Y = v => cv.height - B - (v - 1) / 2 * (cv.height - T - B);
+  const ratio = z => Math.pow(1 + 1 / (z * z), 1.5);
+  ctx.font = '11px system-ui,sans-serif'; ctx.strokeStyle = '#e3e9ec';
+  for (const v of [0, 2, 4, 6, 8]) {
+    ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), cv.height - B); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'center'; ctx.fillText(v, X(v), cv.height - B + 14);
+  }
+  for (const v of [1, 1.5, 2, 2.5, 3]) {
+    ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(cv.width - R, Y(v)); ctx.stroke();
+    ctx.fillStyle = '#415764'; ctx.textAlign = 'right'; ctx.fillText(v, L - 4, Y(v) + 4);
+  }
+  ctx.textAlign = 'left';
+  ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#d62728';
+  ctx.beginPath(); ctx.moveTo(L, Y(1.1)); ctx.lineTo(cv.width - R, Y(1.1)); ctx.stroke(); ctx.restore();
+  ctx.fillStyle = '#d62728'; ctx.font = '12px system-ui,sans-serif';
+  ctx.fillText('10% too large', cv.width - R - 92, Y(1.1) - 5);
+  ctx.save(); ctx.beginPath(); ctx.rect(L, T, cv.width - L - R, cv.height - T - B); ctx.clip();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let k = 0; k <= 200; k++) {
+    const z = 0.25 + (8 - 0.25) * k / 200;
+    k ? ctx.lineTo(X(z), Y(ratio(z))) : ctx.moveTo(X(z), Y(ratio(z)));
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(X(zr), Y(ratio(zr)), 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.restore();
+}
+
+function fmt(v) { return v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2); }
+function draw() {
+  const R = +$('rl').value, I = +$('cur').value, zr = +$('zr').value, z = zr * R;
+  $('rlv').textContent = R.toFixed(0);
+  $('curv').textContent = I.toFixed(0);
+  $('zrv').textContent = zr.toFixed(2) + '  (z = ' + z.toFixed(0) + ' m)';
+  drawMap(zr); drawAxis(I, R, zr); drawRatio(zr);
+  const m = I * Math.PI * R * R, be = exactAxis(I, R, z) * 1e9, bd = dipAxis(I, R, z) * 1e9, q = bd / be;
+  $('status').textContent =
+    `m = IπR_L² = ${m.toExponential(2)} A m².   At z = ${z.toFixed(0)} m:  `
+    + `exact B = ${fmt(be)} nT,  dipole formula B = ${fmt(bd)} nT,  ratio = ${q.toFixed(3)}  `
+    + `(${+q.toFixed(3) <= 1.1 ? 'within' : 'not within'} 10%).`;
+}
+['rl', 'cur', 'zr'].forEach(id => $(id).addEventListener('input', draw));
+$('reset').addEventListener('click', () => { $('rl').value = 50; $('cur').value = 10; $('zr').value = 2; draw(); });
+draw();
+})();
+</script>
+</body>
+</html>
