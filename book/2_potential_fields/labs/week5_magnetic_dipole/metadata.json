@@ -1,0 +1,20 @@
+{
+  "model": "IGRF-14, degrees 1\u201313",
+  "epoch": 2025.0,
+  "radius_km": 6371.2,
+  "field": "radial, positive outward, microtesla",
+  "coordinates": "geocentric; theta from geographic north; longitude east from Greenwich",
+  "quadrature": "32 Gauss-Legendre nodes in cos(theta), 64 uniformly spaced longitudes; weights integrate dOmega",
+  "rows": 2048,
+  "dipole_axis_unit_vector_xyz": [
+    -0.04743156324080122,
+    0.15287539581015527,
+    -0.9871065596805758
+  ],
+  "axis_convention": "positive z_m along the magnetic moment, pointing toward the southern dipole-axis end",
+  "axis_is_supplied": "direction from degree-one reference model; recover strength from the CSV",
+  "source": "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt",
+  "reference": "https://doi.org/10.1186/s40623-025-02360-0",
+  "coefficient_sha256": "8f8d88403028fc4ee92c4f38d97b46e0a87e2cfc496045b43c9e26c1d6b0903c",
+  "provenance": "Model-generated surface samples, not raw satellite or observatory measurements."
+}
