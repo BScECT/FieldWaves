@@ -349,14 +349,14 @@ which is a line integral along the four line segments of the loop. The unit vect
 
 $$
 \begin{aligned}
-E_x(\boldsymbol r,t) &= -\frac{\mu}{4\pi}\sqrt{\frac{\sigma\mu}{t^3}}\left\{\exp\left(-\frac{\sigma\mu[(y+L_y/2)^2+z^2]}{4t}\right) - \exp\left(-\frac{\sigma\mu[(y-L_y/2)^2+z^2]}{4t}\right)\right\} \\
+E_x(\boldsymbol r,t) &= -\frac{\mu}{4\pi}\sqrt{\frac{\sigma\mu}{4\pi t^3}}\left\{\exp\left(-\frac{\sigma\mu[(y+L_y/2)^2+z^2]}{4t}\right) - \exp\left(-\frac{\sigma\mu[(y-L_y/2)^2+z^2]}{4t}\right)\right\} \\
 &\quad\times\int_{-L_x/2}^{L_x/2}\exp\left(-\frac{\sigma\mu(x-x')^2}{4t}\right)\mathrm{d}x',
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
-E_y(\boldsymbol r,t) &= -\frac{\mu}{4\pi}\sqrt{\frac{\sigma\mu}{t^3}}\left\{\exp\left(-\frac{\sigma\mu[(x-L_x/2)^2+z^2]}{4t}\right) - \exp\left(-\frac{\sigma\mu[(x+L_x/2)^2+z^2]}{4t}\right)\right\} \\
+E_y(\boldsymbol r,t) &= -\frac{\mu}{4\pi}\sqrt{\frac{\sigma\mu}{4\pi t^3}}\left\{\exp\left(-\frac{\sigma\mu[(x-L_x/2)^2+z^2]}{4t}\right) - \exp\left(-\frac{\sigma\mu[(x+L_x/2)^2+z^2]}{4t}\right)\right\} \\
 &\quad\times\int_{-L_y/2}^{L_y/2}\exp\left(-\frac{\sigma\mu(y-y')^2}{4t}\right)\mathrm{d}y',
 \end{aligned}
 $$
@@ -389,11 +389,11 @@ $$
 where $\mathrm{erf}$ denotes the error function and the scale factor is chosen such that $\mathrm{erf}(\infty)=1$. Substituting these results in the expressions for the electric field, we finally obtain
 
 $$
-E_x(\boldsymbol r,t) = -\frac{\mu}{8\sqrt{\pi}\,t}\left\{\exp\left(-\frac{y_p^2+z^2}{D^2}\right) - \exp\left(-\frac{y_m^2+z^2}{D^2}\right)\right\}\left[\mathrm{erf}\left(\frac{x_p}{D}\right) - \mathrm{erf}\left(\frac{x_m}{D}\right)\right],
+E_x(\boldsymbol r,t) = -\frac{\mu}{8\pi t}\left\{\exp\left(-\frac{y_p^2+z^2}{D^2}\right) - \exp\left(-\frac{y_m^2+z^2}{D^2}\right)\right\}\left[\mathrm{erf}\left(\frac{x_p}{D}\right) - \mathrm{erf}\left(\frac{x_m}{D}\right)\right],
 $$ (eq:Exloop)
 
 $$
-E_y(\boldsymbol r,t) = -\frac{\mu}{8\sqrt{\pi}\,t}\left\{\exp\left(-\frac{x_m^2+z^2}{D^2}\right) - \exp\left(-\frac{x_p^2+z^2}{D^2}\right)\right\}\left[\mathrm{erf}\left(\frac{y_p}{D}\right) - \mathrm{erf}\left(\frac{y_m}{D}\right)\right].
+E_y(\boldsymbol r,t) = -\frac{\mu}{8\pi t}\left\{\exp\left(-\frac{x_m^2+z^2}{D^2}\right) - \exp\left(-\frac{x_p^2+z^2}{D^2}\right)\right\}\left[\mathrm{erf}\left(\frac{y_p}{D}\right) - \mathrm{erf}\left(\frac{y_m}{D}\right)\right].
 $$ (eq:Eyloop)
 
 {eq}`eq:Exloop` and {eq}`eq:Eyloop` are the expressions for the electric field anywhere in space and for all times after the source has been switched on. They show that $E_x=0$ in the $(x,z)$-plane at $y=0$ because then $y_p^2=y_m^2$ and $E_y=0$ in the $(y,z)$-plane at $x=0$ because then $x_p^2=x_m^2$. That makes sense because the contributions from the two line-segments in the $x$-direction have equal distance to all the points in the $(x,z)$ plane but have opposite currents. The equations also show that $E_y$ is the strongest in the $(x,z)$-plane at $y=0$ because then $y_p=-y_m$ and the error functions add up, and similarly $E_x$ is strongest in the $(y,z)$-plane at $x=0$ because then $x_p=-x_m$. The electric field is computed for a square loop with 100 m long segments placed in a conductive medium with $\sigma=0.3$ S/m. The result can be seen in {numref}`fig-et12xz` where $E_y$ is shown for two time instances in the $(x,z)$-plane at $y=0$, which is the cross-section right through the middle of the loop, such that the wire segments between points 4 and 1 and points 2 and 3 are perpendicular to the plane of the graph. The figure shows $E_y$ as a function of $x$ and $z$ at $t=0.03$ ms (left plot) and $t=5$ ms (right plot). It is shown only for positive depth values, but the field is symmetric in $z$ and the plot can be mirrored to add the picture of negative $z$. It can be seen that at 0.03 ms, the field is very strong and concentrated around the wires of the loop, whereas at 5 ms, the field is three orders of magnitude weaker and it almost occupies all the plane where the plot is made. Hence, we see that the maximum value of the electric field moves away from the loop wire segments and the width of the Gaussian in space widens with increasing time.
