@@ -501,7 +501,7 @@ $$ (eq:HGCos)
 
 The exact equation is easier to analyse in terms of the actual field behaviour, which is not easy to find from the series solution.
 
-As a last topic, we discuss the inhomogeneous electromagnetic diffusive field equations. This means we are going to put a source somewhere in space and solve Maxwell's diffusive field equations in one and three dimensions.
+As a last topic, we discuss the inhomogeneous electromagnetic diffusive field equations. This means we are going to put a source somewhere in space and solve Maxwell's diffusive field equations in one, two, and three dimensions.
 
 ## Exercises
 
