@@ -95,6 +95,13 @@ The exponential is the kernel of the heat equation with $\kappa$ replaced by $1/
 
 Every field in this lab has that form, $t^{-p}\exp(-\sigma\mu r^2/4t)$, with a different $p$. It is worth finding the peak time once, for any $p$.
 
+```{figure} figures/setup_sheet.svg
+:name: fig-lab6-sheet
+:width: 85%
+
+The model of this part. An infinite sheet of current switched on at $t=0$, in a uniform conductor, with receivers at three depths.
+```
+
 ### Task 1 — when does the field arrive, and in what ground?
 
 Setting $\partial_t\ln|E|=0$ is easier than differentiating $|E|$ itself and gives the same answer. With a prefactor $t^{-p}$,
@@ -107,6 +114,8 @@ Solve it for $t$ and write the result once, as `t_peak(r, p, s)`.
 
 The second blank is the margin the diffusive approximation still has. Dropping $\varepsilon\,\partial_t\boldsymbol E$ is safe only while the peak arrives long after the charge relaxation time $\tau_r=\varepsilon/\sigma$. Write $t_p/\tau_r$ for the sheet in closed form, in terms of $z$ and $\sigma$, and watch what $\sigma$ does to it.
 
+The cell evaluates {eq}`eq:ExtH` over a grid of depths and times. Dividing by the value at the shallowest depth cancels the common $t^{-1/2}$ and leaves $\exp(-\sigma\mu z^2/4t)$, which says how far the field has penetrated rather than how strong it is. A receiver keeps the $t^{-1/2}$, so there the arriving exponential and the decaying prefactor compete, and that competition is what you are solving for.
+
 ```{code-cell} ipython3
 sigma_sheet, eps_r, I_sheet = 0.01, 10.0, 1.0   # sediments [S/m], relative permittivity, [A/m]
 tau_r = eps_r * epsilon_0 / sigma_sheet         # charge relaxation time [s]
@@ -114,6 +123,11 @@ tau_r = eps_r * epsilon_0 / sigma_sheet         # charge relaxation time [s]
 def E_sheet(z, t, s=sigma_sheet):
     """eq:ExtH -- the field of a current sheet switched on at t = 0 [V/m]."""
     return -I_sheet * np.sqrt(mu / (4*np.pi*s*t)) * np.exp(-s*mu*z**2 / (4*t))
+
+def t_for_D(D, s):
+    """When the diffusion distance sqrt(4t/(s*mu)) reaches D [s]. Used only to
+    frame the figures, so that every axis follows the parameters you set."""
+    return s * mu * D**2 / 4
 
 # Task 1 -- two blanks.
 def t_peak(r, p, s):
@@ -128,8 +142,10 @@ def peak_over_relax(z, s):
 
 # --- given: the field soaking downward. Drag the bar, or press play ---------
 z_grid = np.linspace(1.0, 2000.0, 400)                   # depth [m]
-t_grid = np.logspace(-6, -1.3, 60)                       # [s]
-soak = np.array([np.abs(E_sheet(z_grid, tv)) / np.abs(E_sheet(1.0, tv)) for tv in t_grid])
+t_grid = np.logspace(np.log10(t_for_D(z_grid[-1], sigma_sheet)) - 4,
+                     np.log10(t_for_D(z_grid[-1], sigma_sheet)), 60)        # [s]
+soak = np.array([np.abs(E_sheet(z_grid, tv)) / np.abs(E_sheet(z_grid[0], tv))
+                 for tv in t_grid])
 fw.show_profiles(z_grid, soak, t_grid, value_name="t", value_fmt="{:.2g}", unit=" s",
                  xlabel="depth z [m]", ylabel="|E<sub>x</sub>| / its value at the surface",
                  title="The field diffuses into the Earth", ylim=(0.0, 1.05))
@@ -142,25 +158,31 @@ fw.show_spacetime(z_grid, t_grid, soak, t_label="t [s]", x_label="depth z [m]",
                   title=r"Deeper means later: does your curve follow the ridge?")
 
 # --- given: what a receiver records at three depths ------------------------
-t_rec = np.logspace(-6, -1, 3001)                        # [s]
 depths = [100.0, 300.0, 1000.0]                          # [m]
+t_rec = np.logspace(np.log10(t_for_D(min(depths), sigma_sheet)) - 2,
+                    np.log10(t_for_D(max(depths), sigma_sheet)) + 2, 3001)  # [s]
 fw.show_records(t_rec, {f"z = {z:g} m": np.abs(E_sheet(z, t_rec)) / np.max(np.abs(E_sheet(z, t_rec)))
                         for z in depths},
                 peaks={f"z = {z:g} m": (t_peak(z, 0.5, sigma_sheet), 1.0) for z in depths},
                 t_label="t [s]", y_label=r"$|E_x|$ / peak value",
-                title=r"Step response at depth, $\sigma$ = 0.01 S/m")
+                title=f"Step response at depth, sigma = {sigma_sheet:g} S/m")
 
-fw.check_scalar("t_p at 300 m against the peak of the record",
-                t_peak(300.0, 0.5, sigma_sheet),
-                t_rec[np.argmax(np.abs(E_sheet(300.0, t_rec)))], rtol=0.01, unit=" s")
+_zc = depths[1]
+fw.check_scalar(f"t_p at {_zc:g} m against the peak of the record",
+                t_peak(_zc, 0.5, sigma_sheet),
+                t_rec[np.argmax(np.abs(E_sheet(_zc, t_rec)))], rtol=0.01, unit=" s")
 ```
+
+The same expression evaluated at three conductivities. $t_p$ is linear in $\sigma$ while $\tau_r=\varepsilon/\sigma$ is inverse in it, so as the ground changes the arrival time and the margin behind the approximation move in opposite directions.
 
 ```{code-cell} ipython3
 # --- given: one receiver at 300 m, three grounds ---------------------------
 media = {"seawater, 4 S/m": 4.0,
          "saturated sediments, 1e-2 S/m": 0.01,
          "crystalline basement, 1e-4 S/m": 1e-4}
-z_s, t_s = 300.0, np.logspace(-8, 1, 900)
+z_s = 300.0                                             # the receiver depth [m]
+_tp_all = [t_peak(z_s, 0.5, sv) for sv in media.values()]
+t_s = np.logspace(np.log10(min(_tp_all)) - 3, np.log10(max(_tp_all)) + 2, 900)
 
 fw.show_records(t_s, {k: np.abs(E_sheet(z_s, t_s, sv)) / np.max(np.abs(E_sheet(z_s, t_s, sv)))
                       for k, sv in media.items()},
@@ -175,7 +197,7 @@ for k, sv in media.items():
           f"{peak_over_relax(z_s, sv):>13.3g}")
 
 fw.check("a tenfold drop in conductivity costs a hundredfold in margin",
-         np.isclose(peak_over_relax(300.0, 1e-3) / peak_over_relax(300.0, 1e-4), 100.0, rtol=1e-9),
+         np.isclose(peak_over_relax(z_s, 1e-3) / peak_over_relax(z_s, 1e-4), 100.0, rtol=1e-9),
          "the margin goes as sigma squared, not as sigma")
 ```
 
@@ -215,9 +237,18 @@ $$ E_z(\varrho,t) = \frac{\mu I}{4\pi t}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}
 
 The kernel is the same as the sheet's. The prefactor is now $t^{-1}$, so $p=1$.
 
+```{figure} figures/setup_wire.svg
+:name: fig-lab6-wire
+:width: 92%
+
+The model of this part. The wire is a point in the plane you will plot, the electric field points out of that plane, and the magnetic field circles the wire within it.
+```
+
 ### Task 2 — the field of the wire, and when it arrives
 
 Write $E_z$. Then **predict**, before running: at the same distance, does the wire's field peak earlier or later than the sheet's, and by what factor?
+
+The wire carries the same kernel with $t^{-1}$ in front of it. The cell evaluates it over the plane perpendicular to the wire at a sequence of instants, then at three fixed distances through time. The colour is logarithmic and rescaled each frame because the field spans ten decades across one picture and four more across the run.
 
 ```{code-cell} ipython3
 sigma_wire, I_wire = 3.0, 1.0            # seawater [S/m], wire current [A]
@@ -229,12 +260,14 @@ def E_wire(rho, t, s=sigma_wire):
     return ___
 
 # --- given: the field spreading out from the wire, on a logarithmic colour scale ---
-n_w = 91
-x_w = np.linspace(-50.0, 50.0, n_w)                        # [m]
+n_w, half_w = 91, 50.0
+x_w = np.linspace(-half_w, half_w, n_w)                    # [m]
 X_w, Y_w = np.meshgrid(x_w, x_w, indexing="ij")            # F[ix, iy] sits at (x[ix], y[iy])
 rho_w = np.hypot(X_w, Y_w)
 rho_w[rho_w == 0] = x_w[1] - x_w[0]                        # keep the wire out of the formula
-t_w = np.logspace(-4, 0, 16)                               # [s]
+# from when the field has spread a fifth of the box to when it has long left it
+t_w = np.logspace(np.log10(t_for_D(half_w / 5, sigma_wire)),
+                  np.log10(t_for_D(half_w * 20, sigma_wire)), 16)           # [s]
 
 E_frames = np.array([E_wire(rho_w, tv) for tv in t_w])
 fw.show_map(x_w, x_w, E_frames, t_w, value_name="t", value_fmt="{:.2g}", unit=" s",
@@ -242,22 +275,25 @@ fw.show_map(x_w, x_w, E_frames, t_w, value_name="t", value_fmt="{:.2g}", unit=" 
             log_c=True, per_frame_scale=True, title="The electric field spreads out from the wire")
 
 # --- given: three receivers, with your arrival times marked ----------------
-t_r = np.logspace(-6, 1, 3001)
 dists = [0.36, 15.0, 30.0]                                 # [m]
+d_mid = dists[1]
+t_r = np.logspace(np.log10(t_for_D(min(dists), sigma_wire)) - 2,
+                  np.log10(t_for_D(max(dists), sigma_wire)) + 3, 3001)      # [s]
 fw.show_records(t_r, {f"{d:g} m": E_wire(d, t_r) / np.max(E_wire(d, t_r)) for d in dists},
                 peaks={f"{d:g} m": (t_peak(d, 1, sigma_wire), 1.0) for d in dists},
                 t_label="t [s]", y_label=r"$E_z$ / peak value",
-                title=r"The wire, $\sigma$ = 3 S/m: close in, the field is already fading")
+                title=f"The wire, sigma = {sigma_wire:g} S/m:"
+                      f" close in, the field is already fading")
 
-print(f"the sheet and the wire at the same 15 m, in the same ground:")
-print(f"   sheet, p = 1/2 : t_p = {t_peak(15.0, 0.5, sigma_wire)*1e3:.3f} ms")
-print(f"   wire,  p = 1   : t_p = {t_peak(15.0, 1.0, sigma_wire)*1e3:.3f} ms")
+print(f"the sheet and the wire at the same {d_mid:g} m, in the same ground:")
+print(f"   sheet, p = 1/2 : t_p = {t_peak(d_mid, 0.5, sigma_wire)*1e3:.3f} ms")
+print(f"   wire,  p = 1   : t_p = {t_peak(d_mid, 1.0, sigma_wire)*1e3:.3f} ms")
 
-_tp15 = t_peak(15.0, 1, sigma_wire)
-fw.check_scalar("t_p at 15 m against the peak of the record", _tp15,
-                t_r[np.argmax(E_wire(15.0, t_r))], rtol=0.01, unit=" s")
-fw.check_scalar("the peak value, against mu I / (4 pi t_p) times 1/e", E_wire(15.0, _tp15),
-                mu*I_wire/(4*np.pi*_tp15)*np.exp(-1.0), rtol=0.01, unit=" V/m")
+_tpm = t_peak(d_mid, 1, sigma_wire)
+fw.check_scalar(f"t_p at {d_mid:g} m against the peak of the record", _tpm,
+                t_r[np.argmax(E_wire(d_mid, t_r))], rtol=0.01, unit=" s")
+fw.check_scalar("the peak value, against mu I / (4 pi t_p) times 1/e", E_wire(d_mid, _tpm),
+                mu*I_wire/(4*np.pi*_tpm)*np.exp(-1.0), rtol=0.01, unit=" V/m")
 ```
 
 :::{admonition} Solution — Task 2
@@ -279,6 +315,8 @@ Write that ratio. It runs from 0 at switch-on to 1 at late time, so the picture 
 
 Then move the conductivity slider on the second figure. **Predict** first: in which ground does the magnetic field reach its static value soonest?
 
+Faraday's law turns this $E_z$ into a magnetic field that circles the wire. Its direction is settled from the first instant; only its size grows, from zero towards the static $I/(2\pi\varrho)$, through the very same exponential that shapes $E_z$. The second figure plots what is left of that climb, which for $t\gg\sigma\mu\varrho^2/4$ falls as $\sigma\mu\varrho^2/4t$.
+
 ```{code-cell} ipython3
 # Task 3 -- one blank.
 def H_over_static(rho, t, s=sigma_wire):
@@ -295,16 +333,23 @@ fw.show_map(x_w, x_w, H_frames, t_w, arrows=(Hx_dir, Hy_dir), arrow_every=10,
             title="The magnetic field is already circular. It is only filling in")
 
 # --- given: how far it still has to go, in three grounds -------------------
-t_h = np.logspace(-5, 2, 400)
 sigmas = np.array([0.01, 0.1, 1.0, 3.0, 10.0])             # [S/m]
+# wide enough to show the 1/t tail for every curve, and no wider: far below this
+# the exponential is zero to machine precision and nothing is left to plot
+_a_lo = t_for_D(min(dists[1:]), sigmas.min())
+_a_hi = t_for_D(max(dists[1:]), sigmas.max())
+t_h = np.logspace(np.log10(_a_hi / 500), np.log10(_a_lo * 1e7), 400)        # [s]
 gap = {f"{d:g} m": np.array([1.0 - H_over_static(d, t_h, sv) for sv in sigmas])
-       for d in (15.0, 30.0)}
+       for d in dists[1:]}
 fw.show_profiles(t_h, gap, sigmas, value_name="&#963;", value_fmt="{:.3g}", unit=" S/m",
                  xlabel="t [s]", ylabel="1 &#8722; |H| / static value", log_x=True, log_y=True,
                  title="The distance still to go falls as 1/t, and a conductive ground is slower")
 
+# "early" and "late" written in terms of the problem, so the test survives a change
+# of sigma_wire or of the distance: the field has spread a fifth of d_mid, then a hundred times it.
+_early, _late = t_for_D(d_mid / 5, sigma_wire), t_for_D(d_mid * 100, sigma_wire)
 fw.check("the ratio climbs from 0 at switch-on to 1 at late time",
-         H_over_static(15.0, 1e-5) < 1e-6 and abs(H_over_static(15.0, 1e2) - 1.0) < 1e-3,
+         H_over_static(d_mid, _early) < 1e-6 and abs(H_over_static(d_mid, _late) - 1.0) < 1e-3,
          "it is exp(-a/t), not 1 - exp(-a/t): at t -> 0 there is no field yet")
 ```
 
@@ -323,8 +368,13 @@ The second of the chapter's two-dimensional equations is $\partial_xH_y-\partial
 
 Write the $z$-component of the curl. The two derivatives of each component are already computed for you.
 
+{eq}`eq:TEEy` with no source says $\partial_xH_y-\partial_yH_x=-\sigma E_z$. The cell builds $\boldsymbol H$ on the grid, differentiates it numerically, and lays the result beside $-\sigma E_z$. Where they agree, the diffusing magnetic field is demonstrably not curl-free; near the wire they will not agree, because a finite grid cannot follow $1/\varrho$.
+
 ```{code-cell} ipython3
-t_c = 1e-3                                                  # one instant [s]
+# One instant, chosen so the field has spread about as far as the ring the check uses.
+# That makes the accuracy below independent of sigma_wire.
+r_ring = (0.4*half_w, 0.9*half_w)                           # the comparison ring [m]
+t_c = t_for_D(np.mean(r_ring), sigma_wire)                  # [s]
 dx = x_w[1] - x_w[0]
 H_mag = I_wire / (2*np.pi*rho_w) * H_over_static(rho_w, t_c)
 Hx_c, Hy_c = -Y_w/rho_w * H_mag, X_w/rho_w * H_mag          # [A/m]
@@ -336,15 +386,16 @@ dHy_dx, dHy_dy = np.gradient(Hy_c, dx, dx)
 curl_z = ___
 
 # --- given: the curl beside the electric field it equals -------------------
-shown = rho_w > 8.0                     # H goes as 1/rho, so the grid cannot follow it at the wire
+shown = rho_w > 7*dx                    # H goes as 1/rho, so the grid cannot follow it at the wire
 fw.show_map(x_w, x_w, np.array([np.where(shown, curl_z, np.nan),
                                 np.where(shown, -sigma_wire*E_wire(rho_w, t_c), np.nan)]),
             ["curl of H", "minus sigma times E_z"], value_name="showing", value_fmt="{}",
             x_label="x [m]", y_label="y [m]", c_label="A/m&#178;",
             title=f"Two ways to the same picture, at t = {t_c*1e3:g} ms")
 
-# The comparison is made on the outer ring, where a 1.1 m grid resolves 1/rho.
-ring = (rho_w > 20.0) & (rho_w < 45.0)
+# The comparison is made on the outer ring, where the grid resolves 1/rho. Push t_c
+# up and it will fail: the true curl is on its way to zero, and round-off takes over.
+ring = (rho_w > r_ring[0]) & (rho_w < r_ring[1])
 fw.check_close("the curl of H against minus sigma E_z, away from the wire",
                curl_z[ring], -sigma_wire*E_wire(rho_w, t_c)[ring], rtol=0.05,
                hint="eq:TEEy with no source: d_x H_y - d_y H_x + sigma E_z = 0")
@@ -382,9 +433,18 @@ $$ G(R,t) = \frac{(\sigma\mu)^{1/2}}{[4\pi t]^{3/2}}\exp\left(-\frac{\sigma\mu R
 
 Same kernel again. The prefactor is $t^{-3/2}$, so $p=3/2$.
 
+```{figure} figures/setup_ladder.svg
+:name: fig-lab6-ladder
+:width: 95%
+
+The three models of this lab side by side. The source spreads over a plane, a cylinder or a sphere, which is the only thing that changes between them.
+```
+
 ### Task 5 — the ladder
 
 Write $G$. Your `t_peak` already covers it: the three geometries differ only in $p$, so at the same distance their peak times are in a fixed ratio. **Predict** that ratio before you run the last figure.
+
+The three-dimensional impulse response is the same kernel again, now with $t^{-3/2}$. The cell evaluates it on a cube to draw surfaces of constant $G$, then puts the sheet, the wire and the point on one time axis at the same distance and in the same ground, so that the only thing still different between them is the power of $t$.
 
 ```{code-cell} ipython3
 sigma_pt = 0.01                                             # sediments [S/m]
@@ -397,8 +457,9 @@ def G_point(R, t, s=sigma_pt):
 # --- given: a rotatable view of the field at one instant -------------------
 # Change t_show and run the cell again to watch the shell move outward.
 t_show = 1.0e-3                                             # [s]
-g_xy = np.linspace(-400.0, 400.0, 32)                       # [m]
-g_z = np.linspace(0.0, 800.0, 32)                           # depth [m]
+D_show = np.sqrt(4*t_show / (sigma_pt*mu))                  # how far it has spread [m]
+g_xy = np.linspace(-1.5*D_show, 1.5*D_show, 32)             # the box follows the field
+g_z = np.linspace(0.0, 3.0*D_show, 32)                      # depth [m]
 GX, GY, GZ = np.meshgrid(g_xy, g_xy, g_z, indexing="ij")
 G_vol = G_point(np.sqrt(GX**2 + GY**2 + GZ**2), t_show)
 fw.show_isosurface(g_xy, g_xy, g_z, G_vol, levels=(0.08, 0.25, 0.6), opacity=0.32,
@@ -407,7 +468,8 @@ fw.show_isosurface(g_xy, g_xy, g_z, G_vol, levels=(0.08, 0.25, 0.6), opacity=0.3
 
 # --- given: the three geometries at the same distance, same ground ---------
 r0 = 300.0                                                  # [m]
-t_l = np.logspace(-6, -1, 4001)
+t_l = np.logspace(np.log10(t_for_D(r0, sigma_pt)) - 2,
+                  np.log10(t_for_D(r0, sigma_pt)) + 2, 4001)                # [s]
 ladder = {"sheet,  p = 1/2": np.abs(E_sheet(r0, t_l, sigma_pt)),
           "wire,   p = 1  ": E_wire(r0, t_l, sigma_pt),
           "point,  p = 3/2": G_point(r0, t_l)}
@@ -425,9 +487,10 @@ for name, p in zip(("sheet", "wire", "point"), (0.5, 1.0, 1.5)):
 fw.check_scalar("the point source peaks at sigma mu R^2 / 6",
                 t_peak(r0, 1.5, sigma_pt), t_l[np.argmax(G_point(r0, t_l))],
                 rtol=0.01, unit=" s")
-_R = np.linspace(0.5, 6000.0, 60000)                        # a radial grid [m]
+# integrate out to ten diffusion distances, where the Gaussian has nothing left
+_R = np.linspace(1e-3, 10*D_show, 60000)                    # a radial grid [m]
 fw.check_scalar("the integral of G over all space, which fixes the constant in front",
-                np.sum(G_point(_R, 1e-3) * 4*np.pi*_R**2) * (_R[1] - _R[0]),
+                np.sum(G_point(_R, t_show) * 4*np.pi*_R**2) * (_R[1] - _R[0]),
                 1.0 / (sigma_pt*mu), rtol=0.01, unit=" m/S")
 ```
 
@@ -466,6 +529,13 @@ $$ D = \sqrt{\frac{4t}{\sigma\mu}} , $$
 
 which is how far the field has spread by time $t$. The two exponentials are the two segments that run along $y$, at $x=\pm L_x/2$. They carry opposite currents, so they enter with opposite signs, and that difference is the only part you have to write.
 
+```{figure} figures/setup_loop.svg
+:name: fig-lab6-loop
+:width: 88%
+
+The model of this part, and the two planes you will cut through it. The current runs clockwise from vertex 1 to vertex 4, seen from above with $z$ pointing down.
+```
+
 ### Task 6 — the loop forgets its shape
 
 Fill in the brace of $E_y$. Then read three things off the pictures.
@@ -473,6 +543,8 @@ Fill in the brace of $E_y$. Then read three things off the pictures.
 1. Run the time slider on the $(x,y)$ view. At which $D$ does the square stop looking square? Compare $D$ with $L_x$.
 2. Move the depth slider on the third figure. **Predict first** what going deeper does to the picture, then check. The answer is not what most people expect.
 3. Rotate the 3-D view.
+
+Integrating the point response along the four sides of the loop leaves a Gaussian across each pair of parallel wires and an error function along them. The cell evaluates $E_y$ in the vertical plane through the middle of the loop, where the two segments running along $y$ are what you see, entering with opposite signs because they carry opposite currents.
 
 ```{code-cell} ipython3
 sigma_loop, Lx, Ly = 0.3, 100.0, 100.0          # [S/m], loop sides [m]
@@ -506,10 +578,12 @@ def E_loop(x, y, z, t, s=sigma_loop):
 
 # --- given: the vertical plane through the middle of the loop --------------
 n_L = 91
-x_L = np.linspace(-300.0, 300.0, n_L)                       # [m]
-z_L = np.linspace(0.0, 300.0, n_L)
+x_L = np.linspace(-3*Lx, 3*Lx, n_L)                         # three loop widths either way [m]
+z_L = np.linspace(0.0, 3*Lx, n_L)
 XZ_x, XZ_z = np.meshgrid(x_L, z_L, indexing="ij")
-t_L = np.logspace(-5, -1, 16)                               # [s]
+# from when the field has spread a tenth of the loop to when it has spread ten times it
+t_L = np.logspace(np.log10(t_for_D(Lx/10, sigma_loop)),
+                  np.log10(t_for_D(Lx*10, sigma_loop)), 16)                 # [s]
 
 xz = np.array([E_loop(XZ_x, 0.0, XZ_z, tv)[1] for tv in t_L])
 fw.show_map(x_L, z_L, xz, t_L*1e3, value_name="t", value_fmt="{:.3g}", unit=" ms",
@@ -524,32 +598,38 @@ The same field, finely sampled, from the lecturer's own script. It runs over 200
 :width: 80%
 ```
 
+The same expression in a horizontal plane, with both components so the direction can be drawn. The diffusion distance $D=\sqrt{4t/\sigma\mu}$ is the only length the field itself has, so holding it against $L_x$ is what decides whether the pattern still remembers the shape of its source.
+
 ```{code-cell} ipython3
 # --- given: the plane at 10 m depth, seen from above. Arrows give direction ---
+z_xy = 10.0                                                 # the depth of this slice [m]
 XY_x, XY_y = np.meshgrid(x_L, x_L, indexing="ij")
-EE = [E_loop(XY_x, XY_y, 10.0, tv) for tv in t_L]
+EE = [E_loop(XY_x, XY_y, z_xy, tv) for tv in t_L]
 mag = np.array([np.hypot(ex, ey) for ex, ey in EE])
 fw.show_map(x_L, x_L, mag, t_L*1e3,
             arrows=(np.array([e[0] for e in EE]), np.array([e[1] for e in EE])),
             arrow_every=10, log_c=True, per_frame_scale=True, y_down=True,
             value_name="t", value_fmt="{:.3g}", unit=" ms",
             x_label="x [m]", y_label="y [m]", c_label="log<sub>10</sub>(|E| / max)",
-            title="At z = 10 m: watch the square become a circle")
+            title=f"At z = {z_xy:g} m: watch the square become a circle")
 
 print(f"{'t [ms]':>9}{'D [m]':>9}{'D / Lx':>9}")
-for tv in (1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 5e-3):
+for tv in t_L[::3]:
     print(f"{tv*1e3:>9.3g}{D_of(tv):>9.1f}{D_of(tv)/Lx:>9.2f}")
 ```
+
+Now the time is held fixed and the depth is stepped instead. One colour scale is shared by every frame, so the frames can be compared directly. Make your prediction before you run it, then read the printed column.
 
 ```{code-cell} ipython3
 # --- given: the same instant, at a depth you choose -------------------------
 t_fix = 3e-4                                                # [s]
-z_try = np.array([0.0, 50.0, 100.0, 200.0, 400.0])          # depth [m]
+# depths spaced against the diffusion distance, so the five frames always span the drop
+z_try = np.round(D_of(t_fix) * np.array([0.0, 0.9, 1.8, 3.5, 7.0]))         # depth [m]
 deep = np.array([np.hypot(*E_loop(XY_x, XY_y, zv, t_fix)) for zv in z_try])
 fw.show_map(x_L, x_L, deep, z_try, value_name="z", value_fmt="{:.0f}", unit=" m",
             log_c=True, per_frame_scale=False, y_down=True,
             x_label="x [m]", y_label="y [m]", c_label="log<sub>10</sub>(|E| / max)",
-            title=f"The same instant, t = {t_fix*1e3:g} ms, at five depths")
+            title=f"The same instant, t = {t_fix*1e3:g} ms, at {len(z_try)} depths")
 
 print(f"at t = {t_fix*1e3:g} ms the diffusion distance is D = {D_of(t_fix):.0f} m\n")
 print(f"{'depth [m]':>11}{'|E| / its surface value':>26}")
@@ -558,11 +638,15 @@ for zv in z_try:
     print(f"{zv:>11.0f}{f:>26.4f}")
 ```
 
+The magnitude of the same field on a cube around the loop, drawn as nested surfaces of constant $|\boldsymbol E|$ so the interior stays visible. The box is sized from $D$, so it keeps framing the field at whatever instant you set.
+
 ```{code-cell} ipython3
 # --- given: the loop in three dimensions. Drag to rotate --------------------
 t_3d = 3e-5                                                 # [s]
-g3 = np.linspace(-180.0, 180.0, 36)                         # [m]
-gz3 = np.linspace(0.0, 180.0, 36)                           # depth [m]
+# wide enough for the loop, and for the field once it has spread past it
+half3 = max(1.8*Lx/2, 1.5*D_of(t_3d))                       # [m]
+g3 = np.linspace(-half3, half3, 36)
+gz3 = np.linspace(0.0, half3, 36)                           # depth [m]
 L3x, L3y, L3z = np.meshgrid(g3, g3, gz3, indexing="ij")
 E3x, E3y = E_loop(L3x, L3y, L3z, t_3d)
 loop_wire = ([-Lx/2, Lx/2, Lx/2, -Lx/2, -Lx/2],
@@ -570,10 +654,11 @@ loop_wire = ([-Lx/2, Lx/2, Lx/2, -Lx/2, -Lx/2],
 fw.show_isosurface(g3, g3, gz3, np.hypot(E3x, E3y), levels=(0.06, 0.18, 0.45), opacity=0.3,
                    wire=loop_wire, wire_name="the loop", c_label="|E| [V/m]",
                    z_label="depth z [m]",
-                   title=f"t = {t_3d*1e3:g} ms, so D = {D_of(t_3d):.0f} m. The loop is still square")
+                   title=f"t = {t_3d*1e3:g} ms:  D = {D_of(t_3d):.0f} m,  "
+                         f"D / Lx = {D_of(t_3d)/Lx:.2f}")
 
 fw.check("the field opposes the source current over the x = +Lx/2 wire",
-         E_loop(Lx/2, 0.0, 10.0, 3e-5)[1] < 0 < E_loop(-Lx/2, 0.0, 10.0, 3e-5)[1],
+         E_loop(Lx/2, 0.0, z_xy, t_3d)[1] < 0 < E_loop(-Lx/2, 0.0, z_xy, t_3d)[1],
          "the current there runs in +y, so an opposing field has E_y < 0")
 ```
 
@@ -618,11 +703,15 @@ You now have everything a time-domain electromagnetic survey rests on. This part
 3. You have two loops, 50 m and 400 m on a side. The target is 400 m down. Which do you choose, and what decides it: the loop size, or the time you record for?
 4. The field at the target is $\exp(-z^2/D^2)$ of its surface value. Below which amplitude would you say the target is not being illuminated at all, and what does that make the deepest usable depth?
 
+Everything here is $\exp(-z^2/D^2)$ at the target depth, with $D$ built from each ground's conductivity, against time. A target is worth looking for where that curve is still high inside the window you can actually record in.
+
 ```{code-cell} ipython3
 # --- given: the window, the ground and the depth, all on one picture -------
 z_target = 400.0                                            # [m]
 t_win = (1e-5, 1e-2)                                        # the recording window [s]
-t_d = np.logspace(-7, 1, 2001)
+_tp_t = [t_peak(z_target, 0.5, sv) for sv in media.values()]
+t_d = np.logspace(min(np.log10(min(_tp_t)), np.log10(t_win[0])) - 2,
+                  max(np.log10(max(_tp_t)), np.log10(t_win[1])) + 2, 2001)
 
 fig, ax = plt.subplots(figsize=(8.2, 3.6))
 for k, (name, sv) in enumerate(media.items()):
@@ -630,15 +719,16 @@ for k, (name, sv) in enumerate(media.items()):
     ax.axvline(t_peak(z_target, 0.5, sv), color=f"C{k}", ls=":", lw=1.2)
 ax.axvspan(*t_win, color="0.85", zorder=0, label="recording window")
 ax.axhline(1/np.e, color="k", lw=0.8, ls="--")
-ax.text(1.3e-7, 1/np.e*1.1, "z = D", fontsize=8)
+ax.text(0.01, 1/np.e + 0.02, "z = D", fontsize=8, transform=ax.get_yaxis_transform())
 ax.set_xscale("log"); ax.set_xlabel("t [s]")
 ax.set_ylabel(f"illumination at {z_target:.0f} m,  exp(-z²/D²)")
-ax.set_title("Which ground puts a 400 m target inside the window?")
+ax.set_title(f"Which ground puts a {z_target:.0f} m target inside the window?")
 ax.grid(alpha=0.3); ax.legend(fontsize=8, loc="upper left")
 plt.show()
 
 print(f"a target at {z_target:.0f} m, window {t_win[0]*1e6:.0f} us to {t_win[1]*1e3:.0f} ms\n")
-print(f"{'ground':<30}{'t_p [s]':>11}{'in window?':>12}{'illum. at 10 ms':>18}")
+print(f"{'ground':<30}{'t_p [s]':>11}{'in window?':>12}"
+      f"{f'illum. at {t_win[1]*1e3:g} ms':>18}")
 for name, sv in media.items():
     tp = t_peak(z_target, 0.5, sv)
     lit = np.exp(-z_target**2 * sv * mu / (4*t_win[1]))
