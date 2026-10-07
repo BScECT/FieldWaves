@@ -109,7 +109,7 @@ def wire():
 
     a1.add_patch(Circle((0, 0), 0.085, fc="none", ec=SRC, lw=2, zorder=6))
     a1.add_patch(Circle((0, 0), 0.026, fc=SRC, ec=SRC, zorder=6))
-    a1.text(0.0, -0.14, "$I$, $E_z$", ha="center", va="top", color=SRC, fontsize=9)
+    a1.text(0.0, -0.14, "$I$ out, $E_z$ in", ha="center", va="top", color=SRC, fontsize=9)
 
     ta = np.deg2rad(-32)
     arrow(a1, (0, 0), (0.86 * np.cos(ta), 0.86 * np.sin(ta)), color=INK, lw=1.3,
@@ -119,7 +119,7 @@ def wire():
     bare(a1, (-1.1, 1.25), (-1.1, 1.1), equal=True)
 
     caption(fig, "Nothing depends on $z$, so the fields live in the $(x,y)$-plane:"
-                 " $I$ and $E_z$ point out of it, $\\boldsymbol{H}$ lies in it.\n"
+                 " $I$ points out of it and $E_z$ into it, $\\boldsymbol{H}$ lies in it.\n"
                  "Receivers sit at three distances from the wire.", y=0.02)
     fig.tight_layout(rect=(0, 0.15, 1, 1))
     fig.savefig("setup_wire.svg", transparent=True, metadata={"Date": None})
@@ -133,8 +133,7 @@ def ladder():
     fig, axes = plt.subplots(1, 3, figsize=(7.6, 3.0))
     titles = ("sheet, 1-D", "wire, 2-D", "point, 3-D")
     pees = ("$p = 1/2$", "$p = 1$", "$p = 3/2$")
-    tps = ("$t_p = \\sigma\\mu r^2 / 2$", "$t_p = \\sigma\\mu r^2 / 4$",
-           "$t_p = \\sigma\\mu r^2 / 6$")
+    tps = ("$t_p = ?$", "$t_p = ?$", "$t_p = ?$")
     spreads = ("spreads one way", "spreads over a circle", "spreads over a sphere")
 
     for k, ax in enumerate(axes):
@@ -166,7 +165,7 @@ def ladder():
         bare(ax, (-1.0, 1.0), (-2.0, 1.0), equal=True)
 
     caption(fig, "One kernel, $\\exp(-\\sigma\\mu r^2/4t)$. Only the prefactor $t^{-p}$"
-                 " changes, and it is what fixes the arrival time.", y=0.025)
+                 " changes. Your $t_p(r, p)$ fills in the three question marks.", y=0.025)
     fig.tight_layout(rect=(0, 0.07, 1, 1))
     fig.savefig("setup_ladder.svg", transparent=True, metadata={"Date": None})
     plt.close(fig)
@@ -229,8 +228,8 @@ def loop():
                 ha="center", va="center")
 
     bare(ax, (-2.45, 3.15), (-1.45, 0.95))
-    caption(fig, "Depth enters only through $\\exp(-z^2/D^2)$, the same factor for both"
-                 " components, with $D = \\sqrt{4t/\\sigma\\mu}$.")
+    caption(fig, "The field is cut in the vertical plane $y = 0$ and in a horizontal"
+                 " plane at depth $z$, with $D = \\sqrt{4t/\\sigma\\mu}$.")
     fig.tight_layout(rect=(0, 0.08, 1, 1))
     fig.savefig("setup_loop.svg", transparent=True, metadata={"Date": None})
     plt.close(fig)
