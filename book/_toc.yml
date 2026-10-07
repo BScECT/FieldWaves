@@ -113,7 +113,9 @@ parts:
       sections:
       - file: 4_mechanical_waves/basic_notions.md
       - file: 4_mechanical_waves/snells_law.md
+      - file: 4_mechanical_waves/exercise_4a.md
       - file: 4_mechanical_waves/field_recordings.md
+      - file: 4_mechanical_waves/exercise_4b.md
       - file: 4_mechanical_waves/fundamental_laws.md
       - file: 4_mechanical_waves/acoustic_waves.md
       - file: 4_mechanical_waves/wave_equation_solutions.md
