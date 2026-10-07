@@ -106,6 +106,7 @@ parts:
       - file: 3_diffusion_fields/heat_equation_1d.md
       - file: 3_diffusion_fields/em_diffusion.md
     - file: 3_diffusion_fields/labs/week05_diffusion.md
+    - file: 3_diffusion_fields/labs/week06_em_diffusion.md
   - caption: Mechanical waves
     chapters:
     - file: 4_mechanical_waves/intro.md

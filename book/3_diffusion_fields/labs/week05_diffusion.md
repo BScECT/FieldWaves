@@ -28,7 +28,7 @@ Everything you write here is plain NumPy. The module `fwtools` only draws and ch
 
 - **Decaying modes.** Build an initial temperature from a Fourier series and explain why mode $n$ decays at $\kappa(n\pi/L)^2$, so fine structure goes first.
 - **Boundaries.** Ends held at a fixed temperature let heat leave; insulated ends conserve it and drive the bar to its mean.
-- **Superposition.** Evolve any initial temperature with the Green's function, and turn the $t\propto x^2$ it implies into a measurement: of $\kappa$ in a bar, of depth in the Earth.
+- **Superposition.** Evolve any initial temperature with the Green's function, and turn the $t\propto x^2$ it implies into a measurement of $\kappa$ in a bar. The same kernel measures depth in the Earth in [Lab 6](./week06_em_diffusion.md).
 
 ---
 
@@ -41,7 +41,6 @@ import sys, pathlib
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.constants import mu_0, epsilon_0
 
 # --- Live Code housekeeping, not part of the physics -----------------------
 try:
@@ -638,151 +637,4 @@ $N\gtrsim 2M/L$. At $M=30L$ that is $N=60$, which is exactly where the table tur
 So the two knobs answer two different physical questions, one about the far field at late time and
 one about the source at early time. This is Task 6 read backwards. There we asked when a real
 boundary makes itself felt; here we ask how far away to put a fictitious one so that it never does.
-:::
-
----
-
-## Part 4 — The same kernel in the Earth
-
-A horizontal current sheet is switched on at $t=0$ with current $I$ per unit width. In the diffusive approximation the electric field a distance $z$ from the sheet is
-
-$$ E_x(z,t) = -I\sqrt{\frac{\mu}{4\pi\sigma t}}\exp\!\left(-\frac{\sigma\mu z^2}{4t}\right), \qquad t>0 . $$
-
-The exponential is the kernel of Part 2 with $\kappa$ replaced by $1/(\sigma\mu)$, so the field soaks into the ground as heat spreads along a wire. The prefactors differ by the constant $I/\sigma$, which sets the amplitude and not the shape. Rock is non-magnetic, so $\mu=\mu_0$.
-
-The sheet sits in a uniform conductor and the solution is even in $z$, so reading $z$ as depth means ignoring the air above: an idealisation, not a consequence of the derivation. The approximation also neglects $\varepsilon\,\partial_t\boldsymbol{E}$, which is justified when $t$ is much longer than the charge relaxation time $\tau_r = \varepsilon/\sigma$. This is the one-dimensional idealisation behind time-domain electromagnetic sounding; a real system uses a finite loop and records $\partial_t B$.
-
-### Task 8 — when does the field arrive, and in what ground?
-
-Write the time at which $\lvert E_x\rvert$ at depth $z$ peaks, from $\partial_t\lvert E_x\rvert = 0$. Differentiating $\ln\lvert E_x\rvert$ is easier and has the same roots. **Predict** first whether a deeper receiver peaks earlier or later, and by what power of $z$.
-
-Then the same receiver in three grounds: seawater at 4 S/m, saturated sediments at $10^{-2}$ S/m, crystalline basement at $10^{-4}$ S/m. **Predict**, before running, how they rank by arrival time at 300 m and by what factor $t_p$ changes from basement to seawater.
-
-The second blank is the margin the diffusive approximation has left, $t_p/\tau_r$ with $\tau_r=\varepsilon/\sigma$. Write it in closed form, in terms of $z$ and $\sigma$, and watch what $\sigma$ does to it.
-
-```{code-cell} ipython3
-sigma, eps_r, I_s = 0.01, 10.0, 1.0        # sediments [S/m], relative permittivity, current [A/m]
-tau_r = eps_r * epsilon_0 / sigma          # charge relaxation time [s]
-t_em = np.logspace(-6, -1, 3001)           # [s], from about 100 relaxation times
-_depths = [100.0, 300.0, 1000.0]           # [m]
-
-def E_step(z, t, s=sigma):
-    return -I_s * np.sqrt(mu_0 / (4*np.pi*s*t)) * np.exp(-s*mu_0*z**2 / (4*t))
-
-# Task 8 -- two blanks. `s` is the conductivity [S/m]; it defaults to the sediments above.
-def t_peak_em(z, s=sigma):
-    """Time at which |E_x| at depth z peaks [s]."""
-    return ___
-
-def peak_over_relax(z, s):
-    """How many charge relaxation times the peak waits: t_p / tau_r. Dimensionless."""
-    return ___
-
-# --- given, 1: the field soaking downward. Drag the bar, or press play ---
-_zs = np.linspace(1.0, 2000.0, 400)                     # depth [m]
-_tp = np.logspace(-6, -1.3, 60)                         # [s]
-_prof = np.array([np.abs(E_step(_zs, tv)) / np.abs(E_step(1.0, tv)) for tv in _tp])
-fw.show_profiles(_zs, _prof, _tp, value_name="t", value_fmt="{:.2g}", unit=" s",
-                 xlabel="depth z [m]", ylabel="|E<sub>x</sub>| / its value at the surface",
-                 title="The field diffuses into the Earth", ylim=(0.0, 1.05))
-
-# --- given, 2: depth against time, with your arrival-time curve over it ---
-fw.show_spacetime(_zs, _tp, _prof, t_label="t [s]", x_label="depth z [m]",
-                  c_label=r"$|E_x|$ / surface value", signed=False,
-                  curve=(t_peak_em(_zs), _zs), curve_label=r"your $t_p(z)$", deeper_down=True,
-                  title=r"Deeper means later: $t_p \propto z^2$")
-
-# --- given, 3: what a receiver records at three depths ---
-fw.show_records(t_em, {f"z = {z:g} m": np.abs(E_step(z, t_em)) / np.max(np.abs(E_step(z, t_em)))
-                       for z in _depths},
-                peaks={f"z = {z:g} m": (t_peak_em(z), 1.0) for z in _depths},
-                t_label="t [s]", y_label=r"$|E_x|$ / peak value",
-                title=r"Step response at depth, $\sigma$ = 0.01 S/m")
-for z in _depths:
-    print(f"z = {z:6.0f} m:  t_p = {t_peak_em(z):.3g} s,  t_p / tau_r = {t_peak_em(z)/tau_r:.2g},"
-          f"  |E| at the peak = {abs(E_step(z, t_peak_em(z))):.3g} V/m")
-
-# --- self-check (leave this alone) ---
-for z in _depths:
-    fw.check_scalar(f"t_p at {z:g} m against the peak of the record", t_peak_em(z),
-                    t_em[np.argmax(np.abs(E_step(z, t_em)))], rtol=0.01, unit=" s")
-fw.check_close("t_p / tau_r against t_p and tau_r built separately, over five decades of sigma",
-               [peak_over_relax(300.0, sv) for sv in (1e-4, 1e-3, 1e-2, 1e-1, 1.0)],
-               [t_peak_em(300.0, sv) / (eps_r * epsilon_0 / sv)
-                for sv in (1e-4, 1e-3, 1e-2, 1e-1, 1.0)], rtol=1e-6,
-               hint="tau_r = eps_r eps_0 / sigma shrinks as t_p grows, so the ratio carries sigma twice")
-fw.check("a tenfold drop in conductivity costs a hundredfold in t_p / tau_r",
-         np.isclose(peak_over_relax(300.0, 1e-3) / peak_over_relax(300.0, 1e-4), 100.0, rtol=1e-9),
-         "the margin goes as sigma^2, not as sigma")
-```
-
-```{code-cell} ipython3
-# --- given: one receiver at 300 m, three grounds -----------------------------
-media = {"seawater, 4 S/m": 4.0,
-         "saturated sediments, 1e-2 S/m": 0.01,
-         "crystalline basement, 1e-4 S/m": 1e-4}
-z_s = 300.0                                             # the receiver depth [m]
-t_s = np.logspace(-8, 1, 900)                           # [s]
-
-fw.show_records(t_s, {k: np.abs(E_step(z_s, t_s, sv)) / np.max(np.abs(E_step(z_s, t_s, sv)))
-                      for k, sv in media.items()},
-                peaks={k: (t_peak_em(z_s, sv), 1.0) for k, sv in media.items()},
-                t_label="t [s]", y_label="|E| / peak value",
-                title=f"The same receiver at {z_s:.0f} m, in three grounds")
-
-print(f"at z = {z_s:.0f} m\n")
-print(f"{'ground':<30}{'t_p [s]':>11}{'tau_r [s]':>11}{'t_p / tau_r':>13}")
-for k, sv in media.items():
-    print(f"{k:<30}{t_peak_em(z_s, sv):>11.3g}{eps_r*epsilon_0/sv:>11.3g}"
-          f"{peak_over_relax(z_s, sv):>13.3g}")
-
-print("\na survey looking 500 m down, able to record for 10 ms:")
-for k, sv in media.items():
-    _tp = t_peak_em(500.0, sv)
-    print(f"  {k:<30} t_p = {_tp:.3g} s   {'inside' if _tp < 1e-2 else 'beyond'} the window")
-
-# --- self-check (leave this alone) ---
-_tf = np.logspace(-8, 1, 20001)
-for k, sv in media.items():
-    fw.check_scalar(f"t_p at {z_s:.0f} m in {k.split(',')[0]}", t_peak_em(z_s, sv),
-                    _tf[np.argmax(np.abs(E_step(z_s, _tf, sv)))], rtol=0.01, unit=" s")
-fw.check("basement to seawater is a factor 4e4 in arrival time",
-         np.isclose(t_peak_em(z_s, 4.0) / t_peak_em(z_s, 1e-4), 4e4, rtol=1e-9),
-         "t_p is linear in sigma, and the two conductivities differ by 4e4")
-```
-
-:::{admonition} Solution — Task 8
-:class: dropdown
-
-```python
-def t_peak_em(z, s=sigma):
-    return s * mu_0 * z**2 / 2
-
-def peak_over_relax(z, s):
-    return s**2 * mu_0 * z**2 / (2 * eps_r * epsilon_0)
-```
-:::
-
-:::{admonition} Depth maps onto arrival time, as $t_p\propto z^2$
-:class: important dropdown
-
-A layer ten times deeper answers a hundred times later: 63 µs at 100 m, 6.3 ms at 1 km, for $\sigma=0.01$ S/m. On the map your curve $t_p(z)$ runs along the shoulder of the diffusing field, because $|E_x|$ has fallen to $1/\sqrt e$ of its surface value exactly where $t = \sigma\mu z^2/2$. Time-domain electromagnetic soundings rest on this: the later part of a record senses the deeper Earth. In a more conductive Earth the arrival is later, since $t_p\propto\sigma$. The ratio $t_p/\tau_r$ is 7000 at 100 m and grows as $z^2$, so neglecting $\varepsilon\,\partial_t\boldsymbol{E}$ is well justified at these depths. The blurring of Task 5 applies here too: deep structure arrives late, and therefore blurred.
-
-The peak amplitude is 0.24 V/m at 100 m and 0.024 V/m at 1 km. A factor of ten in depth costs a factor of ten in signal and a factor of a hundred in time, which is the $1/\lvert x\rvert$ law of Task 4 with depth in place of distance along the wire.
-
-The chapter's three-dimensional impulse response peaks at $t_p=\sigma\mu r^2/6$, three times earlier than the $\sigma\mu z^2/2$ you found here, and its amplitude falls as $1/r^3$. Both follow from the same differentiation: a prefactor $t^{-p}$ gives $t_p=\sigma\mu r^2/(4p)$, with $p=1/2$ for the sheet and $p=3/2$ for the point.
-:::
-
-:::{admonition} Conductivity sets the clock, and it sets the margin twice over
-:class: important dropdown
-
-At 300 m the peak arrives after 0.23 s in seawater, 0.57 ms in sediments and 5.7 µs in basement. That is a factor $4\times10^{4}$ from basement to seawater, exactly the ratio of the two conductivities, because $t_p=\sigma\mu z^2/2$ is linear in $\sigma$. A conductive ground holds the field up; a resistive one lets it through almost at once.
-
-The margin behaves differently. $\tau_r=\varepsilon/\sigma$ grows as the ground becomes resistive while $t_p$ shrinks, so
-
-$$ \frac{t_p}{\tau_r} = \frac{\sigma^2\mu z^2}{2\varepsilon} $$
-
-carries $\sigma$ twice and falls a hundredfold for every tenfold drop in conductivity: $10^{10}$ in seawater, $6.4\times10^{4}$ in sediments, and **6.4 in basement**. The diffusive approximation is comfortable in the first two and running out in the third, and it is the *resistive* ground that breaks it, not the conductive one. Dropping $\varepsilon\,\partial_t\boldsymbol{E}$ was never a statement about depth. It is a statement about how fast charge can relax, and in a resistive ground it cannot relax quickly.
-
-The survey question resolves the same way from the other end. Looking 500 m down with a 10 ms record: seawater peaks at 0.63 s, far beyond the window, so the target is never reached in time. Sediments peak at 1.6 ms, comfortably inside. Basement peaks at 16 µs, inside the window but so early that a real transmitter is still switching off, and the useful signal is buried in the turn-off transient. Conductivity, not instrument quality, decides which depths a time-domain sounding can reach.
 :::
