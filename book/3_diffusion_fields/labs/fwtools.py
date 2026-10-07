@@ -264,8 +264,10 @@ def show_map(x, y, frames, values, *, value_name="t", value_fmt="{:.3g}", unit="
 
     fig = go.Figure(heat(0))
     if quiver is not None:
+        # cyan, not white: Inferno runs to near-white at the top, so white arrows
+        # vanish over the bright core exactly where the pattern is worth reading
         fig.add_trace(go.Scatter(x=quiver[0][0], y=quiver[0][1], mode="lines",
-                                 line=dict(color="white", width=1.3),
+                                 line=dict(color="#00A6D6", width=1.4),
                                  hoverinfo="skip", showlegend=False))
     data_k = (lambda k: [heat(k), go.Scatter(x=quiver[k][0], y=quiver[k][1])]) if quiver \
         else (lambda k: [heat(k)])
