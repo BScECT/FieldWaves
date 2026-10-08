@@ -1,7 +1,13 @@
 (subsec-wavetheory)=
 # Reflection and transmission at boundaries
 
-In this section, we will consider what happens at a boundary between two layers with different mechanical properties. Then we can show which characteristics are responsible for, e.g., a reflection. To that end, we will focus on the basic physical and theoretical principles of reflection and transmission in this section. The basic equations describing wave motion in one direction will be used to derive an expression for the reflection and transmission coefficient at a boundary between two layers with different wave speeds and densities. In the previous section, the solution for the wave equation in the frequency domain was given, i.e.:
+In this section, we will consider what happens at a boundary between two layers with different mechanical properties. Then we can show which characteristics are responsible for, e.g., a reflection. To that end, we will focus on the basic physical and theoretical principles of reflection and transmission in this section. The basic equations describing wave motion in one direction will be used to derive an expression for the reflection and transmission coefficient at a boundary between two layers with different wave speeds and densities. So in the movie we showed before (see again below), we consider only the part of the wave that is travelling purely downwards: it was already noticed that part of the wave is reflected at the boundary and part of it is transmitted. How much this is, and what it depends on, will be worked out below.
+
+```{video} figures/seismicwave_1layer_vz.mp4
+:width: 80%
+```
+
+In the previous section, the solution for the wave equation in the frequency domain was given, i.e.:
 
 $$
 P(x,\omega) = S(\omega) \exp (\pm i\omega x/c).

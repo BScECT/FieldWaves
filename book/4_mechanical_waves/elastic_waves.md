@@ -105,4 +105,4 @@ With respect to the (1-D) reflection coefficients for P- and S-waves at the boun
 - For P-waves, we require the continuity of the tensile stress $\tau_{xx}$ and the particle velocity $v_x$ at the interface, and
 - For S-waves we require the continuity of the shear stress $\tau_{zx}$ and the particle velocity $v_z$ at the interface.
 
-The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See *EXERCISES*)
+The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See the [*EXERCISES*](./exercises.md))

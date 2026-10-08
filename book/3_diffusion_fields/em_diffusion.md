@@ -208,7 +208,7 @@ $$
 \begin{aligned}
 -\partial_y H_z + \sigma E_x &= 0, \\
 \partial_x H_z + \sigma E_y &= 0, \\
-\partial_x H_y - \partial_y H_x + \sigma E_z &= -J_z^e, \\
+-\partial_x H_y + \partial_y H_x + \sigma E_z &= -J_z^e, \\
 \partial_y E_z + \mu\,\partial_t H_x &= 0, \\
 -\partial_x E_z + \mu\,\partial_t H_y &= 0, \\
 \partial_x E_y - \partial_y E_x + \mu\,\partial_t H_z &= 0 .
@@ -218,7 +218,7 @@ $$
 The fields that connect to the source are grouped as
 
 $$
-\partial_x H_y - \partial_y H_x + \sigma E_z = -J_z^e,
+-\partial_x H_y + \partial_y H_x + \sigma E_z = -J_z^e,
 $$ (eq:TEEy)
 
 $$
@@ -248,7 +248,7 @@ We are not going to derive solutions but give the electric and magnetic fields f
 
 $$
 \begin{aligned}
-E_z(x,y,t) &= \frac{\mu I}{4\pi t}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}\right), \\
+E_z(x,y,t) &= -\frac{\mu I}{4\pi t}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}\right), \\
 H_x(x,y,t) &= -\frac{\mu y I}{2\pi\varrho^2}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}\right), \\
 H_y(x,y,t) &= \frac{\mu x I}{2\pi\varrho^2}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}\right).
 \end{aligned}

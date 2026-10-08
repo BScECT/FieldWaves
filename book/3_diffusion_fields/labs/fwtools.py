@@ -6,8 +6,10 @@ exists so that your time goes on the physics -- series coefficients, decay
 rates, Gaussian kernels -- rather than on plotting boilerplate.
 
 The self-check functions have the same names and behaviour as in the Lab 1
-and Lab 2 module. Everything here is one-dimensional in space: fields are
-arrays of shape (nt, nx), one row per time.
+and Lab 2 module. The one-dimensional helpers take fields of shape (nt, nx),
+one row per time. ``show_map`` and ``show_isosurface`` take two- and
+three-dimensional fields, indexed as ``np.meshgrid(..., indexing='ij')``
+builds them, so ``F[ix, iy]`` sits at ``(x[ix], y[iy])``.
 
 Requires: numpy, matplotlib, plotly.
 """
@@ -21,6 +23,7 @@ import plotly.graph_objects as go
 
 __all__ = [
     "show_profiles", "show_spacetime", "show_spacetime_slider", "show_records",
+    "show_map", "show_isosurface",
     "check", "check_close", "check_abs", "check_scalar",
 ]
 
@@ -35,7 +38,8 @@ def _fmt(v, fmt):
 def show_profiles(x, frames, values, *, value_name="t", value_fmt="{:.3g}",
                   unit="", reference=None, reference_name="initial condition",
                   xlabel="x [m]", ylabel="", title="", ylim=None, height=430,
-                  ms_per_frame=90, colors=("#00A6D6", "#EC6842", "#7B61FF")):
+                  ms_per_frame=90, colors=("#00A6D6", "#EC6842", "#7B61FF"),
+                  log_x=False, log_y=False):
     """Profiles over time, with a play button and a draggable progress bar.
 
     ``frames`` is either one array of shape (len(values), nx), or a dict
@@ -74,8 +78,11 @@ def show_profiles(x, frames, values, *, value_name="t", value_fmt="{:.3g}",
 
     fig.update_layout(
         title=title, height=height, margin=dict(l=60, r=20, t=50, b=30),
-        xaxis_title=xlabel, yaxis_title=ylabel,
-        yaxis_range=[lo - pad, hi + pad], legend=dict(x=0.99, xanchor="right", y=0.99),
+        xaxis=dict(title=xlabel, type="log" if log_x else "linear"),
+        yaxis=dict(title=ylabel, type="log" if log_y else "linear",
+                   range=([np.log10(max(lo, 1e-300)), np.log10(max(hi, 1e-299))]
+                          if log_y else [lo - pad, hi + pad])),
+        legend=dict(x=0.99, xanchor="right", y=0.99),
         sliders=[dict(active=0, steps=steps, len=0.82, x=0.18, y=0, pad=dict(t=50, b=8),
                       currentvalue=dict(prefix=f"{value_name} = ", suffix=unit,
                                         font=dict(size=13)))],
@@ -180,6 +187,147 @@ def show_records(t, records, *, t_label="t [s]", y_label="T [K]", title="",
     ax.grid(alpha=0.3); ax.legend(fontsize=8)
     fig.tight_layout()
     plt.show()
+
+
+def _arrow_lines(X, Y, U, V, length):
+    """Unit arrows at (X, Y), as one broken line trace. NaN separates them."""
+    n = np.hypot(U, V)
+    n = np.where(n > 0, n, 1.0)
+    u, v = U / n * length, V / n * length
+    x0, y0 = X - 0.5 * u, Y - 0.5 * v
+    x1, y1 = X + 0.5 * u, Y + 0.5 * v
+    ang = np.arctan2(v, u)
+    b = 0.34 * length
+    lx, ly = x1 - b * np.cos(ang - 0.42), y1 - b * np.sin(ang - 0.42)
+    rx, ry = x1 - b * np.cos(ang + 0.42), y1 - b * np.sin(ang + 0.42)
+    nan = np.full_like(x0, np.nan)
+    xs = np.stack([x0, x1, nan, lx, x1, rx, nan], axis=-1).ravel()
+    ys = np.stack([y0, y1, nan, ly, y1, ry, nan], axis=-1).ravel()
+    return xs, ys
+
+
+def show_map(x, y, frames, values, *, value_name="t", value_fmt="{:.3g}", unit="",
+             x_label="x [m]", y_label="y [m]", c_label="", title="", signed=None,
+             arrows=None, arrow_every=8, zmin=None, zmax=None, per_frame_scale=False,
+             log_c=False, log_floor=1e-4, y_down=False, equal_aspect=True,
+             height=560, ms_per_frame=140):
+    """A field over a plane, with a play button and a draggable slider.
+
+    ``frames`` has shape (len(values), len(x), len(y)): one map per slider
+    position, indexed the way ``np.meshgrid(..., indexing='ij')`` builds it.
+    ``arrows`` is an optional pair ``(U, V)`` of the same shape, drawn as unit
+    arrows every ``arrow_every`` points to show direction only.
+    ``per_frame_scale=True`` rescales the colour axis on every frame, which
+    shows the shape of a field whose amplitude changes by decades.
+    ``log_c=True`` colours by the base-10 logarithm instead, keeping the shape
+    of the pattern readable where the amplitude spans several decades; values
+    below ``log_floor`` times the largest are clipped.
+    """
+    x, y = np.asarray(x, float), np.asarray(y, float)
+    frames = np.asarray(frames, float)
+    if log_c:
+        if signed:
+            raise ValueError("log_c colours a magnitude, so the field must not change sign")
+        signed = False
+        scale = np.nanmax(np.abs(frames), axis=(1, 2), keepdims=True) if per_frame_scale \
+            else np.nanmax(np.abs(frames))
+        frames = np.log10(np.maximum(np.abs(frames) / scale, log_floor))
+        per_frame_scale = False
+        zmin, zmax = np.log10(log_floor), 0.0
+    if signed is None:
+        signed = np.nanmin(frames) < 0 < np.nanmax(frames)
+    if per_frame_scale:
+        lim = [float(np.nanmax(np.abs(f))) or 1.0 for f in frames]
+        rng = [(-L, L) if signed else (0.0, L) for L in lim]
+    else:
+        hi = float(np.nanmax(np.abs(frames))) if signed else float(np.nanmax(frames))
+        lo = -hi if signed else float(min(0.0, np.nanmin(frames)))
+        rng = [(lo if zmin is None else zmin, hi if zmax is None else zmax)] * len(values)
+    if log_c:
+        rng = [(zmin, zmax)] * len(values)
+    cs = "RdBu_r" if signed else "Inferno"
+
+    def heat(k):
+        return go.Heatmap(z=frames[k].T, x=x, y=y, colorscale=cs,
+                          zmin=rng[k][0], zmax=rng[k][1], zsmooth="best",
+                          colorbar=dict(title=c_label))
+
+    quiver = None
+    if arrows is not None:
+        U, V = (np.asarray(a, float) for a in arrows)
+        sx, sy = x[::arrow_every], y[::arrow_every]
+        Xa, Ya = np.meshgrid(sx, sy, indexing="ij")
+        step = float(min(sx[1] - sx[0], sy[1] - sy[0])) * 0.85
+        quiver = [_arrow_lines(Xa, Ya, U[k][::arrow_every, ::arrow_every],
+                               V[k][::arrow_every, ::arrow_every], step)
+                  for k in range(len(values))]
+
+    fig = go.Figure(heat(0))
+    if quiver is not None:
+        # cyan, not white: Inferno runs to near-white at the top, so white arrows
+        # vanish over the bright core exactly where the pattern is worth reading
+        fig.add_trace(go.Scatter(x=quiver[0][0], y=quiver[0][1], mode="lines",
+                                 line=dict(color="#00A6D6", width=1.4),
+                                 hoverinfo="skip", showlegend=False))
+    data_k = (lambda k: [heat(k), go.Scatter(x=quiver[k][0], y=quiver[k][1])]) if quiver \
+        else (lambda k: [heat(k)])
+    fig.frames = [go.Frame(name=str(k), data=data_k(k),
+                           traces=list(range(len(fig.data)))) for k in range(len(values))]
+
+    still = dict(mode="immediate", frame=dict(duration=0, redraw=True),
+                 transition=dict(duration=0))
+    steps = [dict(method="animate", label=_fmt(v, value_fmt), args=[[str(k)], still])
+             for k, v in enumerate(values)]
+    fig.update_layout(
+        title=title, height=height, margin=dict(l=60, r=20, t=50, b=30),
+        xaxis=dict(title=x_label, constrain="domain"),
+        yaxis=dict(title=y_label, autorange="reversed" if y_down else True,
+                   scaleanchor="x" if equal_aspect else None, scaleratio=1),
+        sliders=[dict(active=0, steps=steps, len=0.80, x=0.18, y=0, pad=dict(t=50, b=8),
+                      currentvalue=dict(prefix=f"{value_name} = ", suffix=unit,
+                                        font=dict(size=13)))],
+        updatemenus=[dict(type="buttons", direction="left", showactive=False,
+                          x=0.0, y=0, xanchor="left", yanchor="top", pad=dict(t=55, b=8),
+                          buttons=[
+                              dict(label="\u25b6 play", method="animate",
+                                   args=[None, dict(mode="immediate", fromcurrent=False,
+                                                    frame=dict(duration=ms_per_frame, redraw=True),
+                                                    transition=dict(duration=0))]),
+                              dict(label="\u275a\u275a", method="animate",
+                                   args=[[None], still])])])
+    fig.show()
+
+
+def show_isosurface(x, y, z, V, *, levels=(0.1, 0.3, 0.6), opacity=0.3, c_label="",
+                    title="", wire=None, wire_name="source", x_label="x [m]",
+                    y_label="y [m]", z_label="z [m]", z_down=True, height=600):
+    """Nested translucent surfaces of constant ``V``, free to rotate and zoom.
+
+    ``V`` has shape (len(x), len(y), len(z)), built with ``indexing='ij'``.
+    ``levels`` are fractions of the largest value in ``V``. Transparency keeps
+    the inner surfaces visible through the outer ones. ``wire`` is an optional
+    (xs, ys, zs) polyline, e.g. the loop that generated the field.
+    """
+    x, y, z = (np.asarray(a, float) for a in (x, y, z))
+    V = np.asarray(V, float)
+    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
+    vmax = float(np.nanmax(V))
+    lo, hi = sorted(float(f) * vmax for f in (min(levels), max(levels)))
+
+    fig = go.Figure(go.Isosurface(
+        x=X.ravel(), y=Y.ravel(), z=Z.ravel(), value=V.ravel(),
+        isomin=lo, isomax=hi, surface_count=len(levels), opacity=opacity,
+        colorscale="Inferno", caps=dict(x_show=False, y_show=False, z_show=False),
+        colorbar=dict(title=c_label)))
+    if wire is not None:
+        fig.add_trace(go.Scatter3d(x=wire[0], y=wire[1], z=wire[2], mode="lines",
+                                   line=dict(color="#00A6D6", width=6), name=wire_name))
+    fig.update_layout(
+        title=title, height=height, margin=dict(l=0, r=0, t=50, b=0),
+        scene=dict(xaxis_title=x_label, yaxis_title=y_label, zaxis_title=z_label,
+                   zaxis=dict(autorange="reversed" if z_down else True),
+                   aspectmode="data"))
+    fig.show()
 
 
 # --------------------------------------------------------------------------
