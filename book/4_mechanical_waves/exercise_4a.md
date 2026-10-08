@@ -49,6 +49,27 @@ if not pathlib.Path(filename_npz).exists():
             + ". Is your_group_no a number from 0 to 15?")
     pathlib.Path(filename_npz).write_bytes(await response.bytes())
     print("fetched", filename_npz)
+
+# The hover read-out on the figures needs ipympl, which the browser lacks.
+try:
+    import ipympl                                      # noqa: F401
+except ModuleNotFoundError:
+    import micropip                 # browser only; locally, pip install ipympl
+    await micropip.install("ipympl")
+
+# Cosmetic only. ipympl stacks its toolbar vertically, which this theme stretches
+# across the page, and it names two of its icons in Font Awesome 4 while the book
+# ships Font Awesome 6.
+try:
+    from ipympl.backend_nbagg import Canvas
+    from IPython.display import display, HTML
+    Canvas.toolbar_position.default_value = "top"
+    display(HTML(r"<style>"
+                 r".jupyter-matplotlib-button .fa-square-o:before{content:'\f0c8'}"
+                 r".jupyter-matplotlib-button .fa-floppy-o:before{content:'\f0c7'}"
+                 r"</style>"))
+except Exception:
+    pass                            # the figures work regardless of how it looks
 ```
 
 Now you will read this wavefield data set, that includes the geometry of the data, so the positions of the source and receivers. To that end:
@@ -58,7 +79,7 @@ Now you will read this wavefield data set, that includes the geometry of the dat
 
 ```{code-cell} ipython3
 #%matplotlib qt
-%matplotlib inline
+%matplotlib ipympl
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -79,7 +100,8 @@ with open(filename_npz, "rb") as f:
 #print(x_receivers[1])
 #print(x_source)
 
-plt.figure( figsize = ( 12, 6 ) )
+plt.close("geometry")          # so a re-run redraws instead of stacking
+plt.figure( "geometry", figsize = ( 12, 6 ), dpi = 60 )  # fits the canvas to the page
 plt.plot(x_receivers,'o',color='b')
 plt.plot(x_source,'x',color='r', markersize=10)
 plt.legend(['x_receivers','x_source'])
@@ -149,7 +171,8 @@ t0            = 2*depth_reflect/c_directP
 tt_reflect[:] = np.sqrt(t0*t0 + (x_receivers[:]-x_source)*(x_receivers[:]-x_source)/(c_directP*c_directP))
 print('tt_reflect     = ',tt_reflect[0:3])
 
-plt.figure( figsize = ( 16, 12 ) )
+plt.close("traveltimes")          # so a re-run redraws instead of stacking
+plt.figure( "traveltimes", figsize = ( 16, 12 ), dpi = 45 )  # fits the canvas to the page
 plt.plot(x_receivers, tt_directP, 'x',color='b')
 plt.plot(x_receivers, tt_directSurf, 'x',color='c')
 plt.plot(x_receivers[0:i1], tt_refract[0:i1], 'x',color='g')

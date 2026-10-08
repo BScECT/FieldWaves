@@ -49,6 +49,27 @@ if not pathlib.Path(filename_npz).exists():
             + ". Is your_group_no a number from 0 to 15?")
     pathlib.Path(filename_npz).write_bytes(await response.bytes())
     print("fetched", filename_npz)
+
+# The hover read-out on the figures needs ipympl, which the browser lacks.
+try:
+    import ipympl                                      # noqa: F401
+except ModuleNotFoundError:
+    import micropip                 # browser only; locally, pip install ipympl
+    await micropip.install("ipympl")
+
+# Cosmetic only. ipympl stacks its toolbar vertically, which this theme stretches
+# across the page, and it names two of its icons in Font Awesome 4 while the book
+# ships Font Awesome 6.
+try:
+    from ipympl.backend_nbagg import Canvas
+    from IPython.display import display, HTML
+    Canvas.toolbar_position.default_value = "top"
+    display(HTML(r"<style>"
+                 r".jupyter-matplotlib-button .fa-square-o:before{content:'\f0c8'}"
+                 r".jupyter-matplotlib-button .fa-floppy-o:before{content:'\f0c7'}"
+                 r"</style>"))
+except Exception:
+    pass                            # the figures work regardless of how it looks
 ```
 
 Now you will read this wavefield data set, that includes the geometry of the data and data themselves. To that end:
@@ -58,7 +79,7 @@ Now you will read this wavefield data set, that includes the geometry of the dat
 
 ```{code-cell} ipython3
 #%matplotlib qt
-%matplotlib inline
+%matplotlib ipympl
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -81,16 +102,20 @@ with open(filename_npz, "rb") as f:
 #print(x_source)
 
 # Plot geometry of shot gather
-plt.figure( figsize = ( 12, 6 ) )
+plt.close("geometry")          # so a re-run redraws instead of stacking
+plt.figure( "geometry", figsize = ( 12, 6 ), dpi = 60 )  # fits the canvas to the page
 plt.plot(x_receivers,'o',color='b')
 plt.plot(x_source,'x',color='r', markersize=10)
 plt.legend(['x_receivers','x_source'])
 plt.xlabel('index'); plt.ylabel('Distance (m)')
 plt.title(' Distance of source and receivers versus index of array', fontsize=14 )
 plt.show()
+```
 
+```{code-cell} ipython3
 # Plot extracted shot gather
-plt.figure( figsize = ( 16, 12 ) )
+plt.close("shot gather")          # so a re-run redraws instead of stacking
+plt.figure( "shot gather", figsize = ( 16, 12 ), dpi = 45 )  # fits the canvas to the page
 maxAmplitude = 0.04 * np.max( np.abs(Data) )
 extent = [ np.min(x_receivers), np.max(x_receivers), np.max(timevector), np.min(timevector) ]
 # Standard colormap:
