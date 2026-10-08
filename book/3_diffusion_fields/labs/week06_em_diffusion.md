@@ -238,7 +238,7 @@ A long wire along $z$ carries a current switched on at $t=0$. Nothing depends on
 
 $$ E_z(\varrho,t) = -\frac{\mu I}{4\pi t}\exp\left(-\frac{\sigma\mu\varrho^2}{4t}\right),\qquad \varrho=\sqrt{x^2+y^2}. $$
 
-Negative, as the sheet's field was: the current is switched on, and the field it drives in the ground opposes it. The chapter prints this one without the minus sign, which is a slip; the sheet's {eq}`eq:ExtH` carries it.
+Negative, as the sheet's field was: the current is switched on, and the field it drives in the ground opposes it.
 
 The kernel is the same as the sheet's. The prefactor is now $t^{-1}$, so $p=1$.
 
