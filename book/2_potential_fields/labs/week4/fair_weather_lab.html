@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:12px;font:14px system-ui,sans-serif;color:#203541;background:#fff}
+p{line-height:1.45;margin:8px 0}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:15px 0}
+label{display:block;font-weight:600}
+input[type=range]{width:100%;accent-color:#007da5}
+button{font:inherit;padding:6px;background:white;border:1px solid #8a9da7;border-radius:4px;cursor:pointer}
+button:hover{background:#eef6f8}
+button[aria-pressed=true]{background:#007da5;border-color:#007da5;color:#fff}
+output{font-variant-numeric:tabular-nums;font-weight:400}
+.scroll{overflow-x:auto}
+.plots{display:grid;grid-template-columns:1fr;gap:6px;max-width:520px;margin:0 auto}
+figure{margin:0}
+figure figcaption{text-align:center;font-weight:600;font-size:13px;margin:6px 0}
+canvas{display:block;width:100%;height:auto;border:1px solid #d6dfe4;touch-action:manipulation}
+.legend{font-size:12px;color:#415764}
+.status{padding:8px;background:#eef6f8;font-variant-numeric:tabular-nums}
+@media(max-width:580px){.controls{grid-template-columns:1fr}body{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="controls">
+<div><label for="e0">Field strength E<sub>0</sub> (V/m): <output id="e0v"></output></label><input id="e0" type="range" min="50" max="300" step="10" value="100"></div>
+<div><label for="a">Object radius a (m): <output id="av"></output></label><input id="a" type="range" min="0" max="3" step="0.25" value="0"></div>
+<div><label for="xp">Charge position x (m): <output id="xpv"></output></label><input id="xp" type="range" min="-7.5" max="7.5" step="0.25" value="3"></div>
+<div><label for="zp">Charge position z (m): <output id="zpv"></output></label><input id="zp" type="range" min="0.25" max="9.75" step="0.25" value="4"></div>
+</div>
+<div>
+<button id="electron" type="button" aria-pressed="true">electron (&minus;e)</button>
+<button id="ion" type="button" aria-pressed="false">N<sub>2</sub><sup>+</sup> ion (+e)</button>
+<button id="reset" type="button">Reset</button>
+</div>
+<div class="scroll"><div class="plots">
+<figure><figcaption>Field strength |E|/E<sub>0</sub>, equipotentials (white), field lines (grey)</figcaption>
+<canvas id="map" width="640" height="400" aria-label="Fair-weather field above flat ground"></canvas></figure>
+<figure><figcaption>Profile along the vertical line through the test charge</figcaption>
+<canvas id="prof" width="640" height="200" aria-label="Potential and potential energy versus height"></canvas></figure>
+</div></div>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="legend">Equipotentials are drawn every E<sub>0</sub>&middot;1 m. The arrow on the test charge is the force F = qE, its length proportional to |F|. The grounded hemisphere (a &gt; 0) is a crude model of a person, a tree or a small hill.</p>
+<script>
+(()=>{
+'use strict';
+const $ = id => document.getElementById(id);
+const XMIN = -8, XMAX = 8, ZMIN = 0, ZMAX = 10;   // metres
+const map = $('map'), prof = $('prof');
+const mctx = map.getContext('2d'), pctx = prof.getContext('2d');
+let sign = -1;                                    // -1 electron, +1 ion
+
+// --- physics -------------------------------------------------------------
+// Grounded conducting hemisphere of radius a on flat ground in a uniform
+// downward field:  V = E0 z (1 - a^3/r^3),  r = hypot(x, z) >= a,  z >= 0.
+function fields(x, z, E0, a) {
+  if (a <= 0) return {V: E0 * z, Ex: 0, Ez: -E0};
+  const r = Math.max(Math.hypot(x, z), 1e-9);
+  if (r < a) return {V: 0, Ex: NaN, Ez: NaN};
+  const a3 = a * a * a, r3 = r * r * r, r5 = r3 * r * r;
+  return {
+    V:  E0 * z * (1 - a3 / r3),
+    Ex: -E0 * 3 * a3 * x * z / r5,
+    Ez: -E0 * (1 - a3 / r3 + 3 * a3 * z * z / r5)
+  };
+}
+// shape of the equipotentials, independent of E0:  V = E0 * phi
+const phi = (x, z, a) => a <= 0 ? z
+  : z * (1 - a * a * a / Math.pow(Math.max(Math.hypot(x, z), 1e-9), 3));
+
+// --- canvas helpers ------------------------------------------------------
+const px = x => (x - XMIN) / (XMAX - XMIN) * map.width;
+const py = z => map.height - (z - ZMIN) / (ZMAX - ZMIN) * map.height;
+
+const MAGMA = [[0,0,4],[81,18,124],[183,55,121],[252,137,97],[252,253,191]];
+function magma(t) {
+  t = Math.min(1, Math.max(0, t)) * (MAGMA.length - 1);
+  const i = Math.min(MAGMA.length - 2, Math.floor(t)), f = t - i;
+  const c0 = MAGMA[i], c1 = MAGMA[i + 1];
+  return [0,1,2].map(k => Math.round(c0[k] + f * (c1[k] - c0[k])));
+}
+
+function drawHeatmap(a) {
+  const img = mctx.createImageData(map.width, map.height), d = img.data;
+  for (let j = 0; j < map.height; j++) {
+    const z = ZMAX - (j + 0.5) / map.height * (ZMAX - ZMIN);
+    for (let i = 0; i < map.width; i++) {
+      const x = XMIN + (i + 0.5) / map.width * (XMAX - XMIN);
+      const k = 4 * (j * map.width + i);
+      const f = fields(x, z, 1, a);                 // ratio is independent of E0
+      let rgb;
+      if (Number.isNaN(f.Ex)) rgb = [90, 90, 90];   // inside the conductor
+      else rgb = magma(Math.hypot(f.Ex, f.Ez) / 3);
+      d[k] = rgb[0]; d[k+1] = rgb[1]; d[k+2] = rgb[2]; d[k+3] = 255;
+    }
+  }
+  mctx.putImageData(img, 0, 0);
+}
+
+// marching squares on phi, one polyline segment per cell
+function drawEquipotentials(a) {
+  const NX = 200, NY = 130;
+  const gx = i => XMIN + i * (XMAX - XMIN) / NX;
+  const gz = j => ZMIN + j * (ZMAX - ZMIN) / NY;
+  const val = [];
+  for (let j = 0; j <= NY; j++) {
+    val[j] = [];
+    for (let i = 0; i <= NX; i++) {
+      const x = gx(i), z = gz(j);
+      val[j][i] = (a > 0 && Math.hypot(x, z) < a) ? NaN : phi(x, z, a);
+    }
+  }
+  mctx.save();
+  mctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  mctx.lineWidth = 1;
+  mctx.beginPath();
+  for (let lev = 1; lev <= 10; lev++) {
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const v = [val[j][i], val[j][i+1], val[j+1][i+1], val[j+1][i]];
+        if (v.some(Number.isNaN)) continue;
+        const p = [[gx(i),gz(j)],[gx(i+1),gz(j)],[gx(i+1),gz(j+1)],[gx(i),gz(j+1)]];
+        const pts = [];
+        for (let e = 0; e < 4; e++) {
+          const b = (e + 1) % 4, v0 = v[e], v1 = v[b];
+          if ((v0 - lev) * (v1 - lev) < 0) {
+            const t = (lev - v0) / (v1 - v0);
+            pts.push([p[e][0] + t * (p[b][0] - p[e][0]),
+                      p[e][1] + t * (p[b][1] - p[e][1])]);
+          }
+        }
+        if (pts.length === 2) {
+          mctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+          mctx.lineTo(px(pts[1][0]), py(pts[1][1]));
+        }
+      }
+    }
+  }
+  mctx.stroke();
+  mctx.restore();
+}
+
+// field lines: follow -E downward from just below the top of the domain
+function drawFieldLines(a) {
+  mctx.save();
+  mctx.strokeStyle = 'rgba(210,210,210,0.75)';
+  mctx.lineWidth = 1;
+  for (let x0 = XMIN + 0.5; x0 <= XMAX - 0.5; x0 += 1.0) {
+    let x = x0, z = ZMAX - 0.1;
+    mctx.beginPath();
+    mctx.moveTo(px(x), py(z));
+    for (let step = 0; step < 4000; step++) {
+      const f = fields(x, z, 1, a);
+      if (Number.isNaN(f.Ex)) break;
+      const m = Math.hypot(f.Ex, f.Ez);
+      if (!(m > 1e-12)) break;
+      x += 0.02 * f.Ex / m;                       // travel along E (downward)
+      z += 0.02 * f.Ez / m;
+      if (z <= 0 || x < XMIN || x > XMAX) break;
+      if (a > 0 && Math.hypot(x, z) <= a) break;
+      mctx.lineTo(px(x), py(z));
+    }
+    mctx.stroke();
+  }
+  mctx.restore();
+}
+
+function drawCharge(E0, a, xp, zp) {
+  const f = fields(xp, zp, E0, a);
+  const col = sign < 0 ? '#1f77b4' : '#d62728';
+  if (Number.isNaN(f.Ex)) return f;
+  const s = 1.2 / E0;                             // metres per (V/m)
+  const x2 = xp + s * sign * f.Ex, z2 = zp + s * sign * f.Ez;
+  mctx.save();
+  mctx.strokeStyle = col; mctx.fillStyle = col; mctx.lineWidth = 3;
+  mctx.beginPath(); mctx.moveTo(px(xp), py(zp)); mctx.lineTo(px(x2), py(z2)); mctx.stroke();
+  const ang = Math.atan2(py(z2) - py(zp), px(x2) - px(xp)), h = 9;
+  mctx.beginPath();
+  mctx.moveTo(px(x2), py(z2));
+  mctx.lineTo(px(x2) - h * Math.cos(ang - 0.4), py(z2) - h * Math.sin(ang - 0.4));
+  mctx.lineTo(px(x2) - h * Math.cos(ang + 0.4), py(z2) - h * Math.sin(ang + 0.4));
+  mctx.closePath(); mctx.fill();
+  mctx.beginPath(); mctx.arc(px(xp), py(zp), 6, 0, 2 * Math.PI);
+  mctx.fill(); mctx.strokeStyle = '#000'; mctx.lineWidth = 1.5; mctx.stroke();
+  mctx.restore();
+  return f;
+}
+
+function drawGround() {
+  mctx.save();
+  mctx.strokeStyle = '#000'; mctx.lineWidth = 3;
+  mctx.beginPath(); mctx.moveTo(0, map.height - 1); mctx.lineTo(map.width, map.height - 1);
+  mctx.stroke();
+  mctx.restore();
+}
+
+function drawProfile(E0, a, xp, zp) {
+  const W = prof.width, H = prof.height, L = 60, R = 12, T = 10, B = 28;
+  pctx.clearRect(0, 0, W, H);
+  const Vmax = 10.5 * E0;
+  const X = V => L + (V + Vmax) / (2 * Vmax) * (W - L - R);
+  const Y = z => H - B - z / ZMAX * (H - T - B);
+  pctx.strokeStyle = '#98a8b2'; pctx.lineWidth = 1;
+  pctx.beginPath(); pctx.moveTo(L, Y(0)); pctx.lineTo(W - R, Y(0)); pctx.stroke();
+  pctx.beginPath(); pctx.moveTo(X(0), T); pctx.lineTo(X(0), H - B); pctx.stroke();
+  const curve = (fn, style, dash) => {
+    pctx.save(); pctx.setLineDash(dash); pctx.strokeStyle = style; pctx.lineWidth = 2;
+    pctx.beginPath();
+    for (let k = 0; k <= 200; k++) {
+      const z = ZMAX * k / 200, V = fields(xp, z, E0, a).V;
+      const xx = X(V), yy = Y(z);
+      k ? pctx.lineTo(xx, yy) : pctx.moveTo(xx, yy);
+    }
+    pctx.stroke(); pctx.restore();
+  };
+  const col = sign < 0 ? '#1f77b4' : '#d62728';
+  curve(z => fields(xp, z, E0, a).V, '#000', []);
+  pctx.save(); pctx.setLineDash([6, 4]); pctx.strokeStyle = col; pctx.lineWidth = 2;
+  pctx.beginPath();
+  for (let k = 0; k <= 200; k++) {
+    const z = ZMAX * k / 200, U = sign * fields(xp, z, E0, a).V;
+    const xx = X(U), yy = Y(z);
+    k ? pctx.lineTo(xx, yy) : pctx.moveTo(xx, yy);
+  }
+  pctx.stroke(); pctx.restore();
+  const Vp = fields(xp, zp, E0, a).V;
+  pctx.fillStyle = '#4a4a4a';
+  [Vp, sign * Vp].forEach(v => {
+    pctx.beginPath(); pctx.arc(X(v), Y(zp), 4, 0, 2 * Math.PI); pctx.fill();
+  });
+  pctx.fillStyle = '#203541'; pctx.font = '12px system-ui,sans-serif';
+  pctx.fillText('V [V]  or  U/e [eV]', W / 2 - 55, H - 8);
+  pctx.save(); pctx.translate(14, H / 2); pctx.rotate(-Math.PI / 2);
+  pctx.fillText('z [m]', 0, 0); pctx.restore();
+  pctx.fillText('V(z)', W - R - 92, T + 14);
+  pctx.fillStyle = col; pctx.fillText('U(z)/e', W - R - 48, T + 14);
+}
+
+function draw() {
+  const E0 = +$('e0').value, a = +$('a').value, xp = +$('xp').value, zp = +$('zp').value;
+  $('e0v').textContent = E0.toFixed(0);
+  $('av').textContent  = a.toFixed(2);
+  $('xpv').textContent = xp.toFixed(2);
+  $('zpv').textContent = zp.toFixed(2);
+  drawHeatmap(a);
+  drawFieldLines(a);
+  drawEquipotentials(a);
+  drawGround();
+  const f = drawCharge(E0, a, xp, zp);
+  drawProfile(E0, a, xp, zp);
+  const inside = Number.isNaN(f.Ex);
+  $('status').textContent = inside
+    ? 'The test charge is inside the conductor, where E = 0 and V = 0.'
+    : `V = ${f.V.toFixed(0)} V,   U = ${(sign * f.V).toFixed(0)} eV,   `
+      + `|E| = ${Math.hypot(f.Ex, f.Ez).toFixed(0)} V/m,   `
+      + `|F| = ${(1.602e-19 * Math.hypot(f.Ex, f.Ez)).toExponential(2)} N`;
+}
+
+function setCharge(s) {
+  sign = s;
+  $('electron').setAttribute('aria-pressed', String(s < 0));
+  $('ion').setAttribute('aria-pressed', String(s > 0));
+  draw();
+}
+
+['e0','a','xp','zp'].forEach(id => $(id).addEventListener('input', draw));
+$('electron').addEventListener('click', () => setCharge(-1));
+$('ion').addEventListener('click', () => setCharge(+1));
+$('reset').addEventListener('click', () => {
+  $('e0').value = 100; $('a').value = 0; $('xp').value = 3; $('zp').value = 4;
+  setCharge(-1);
+});
+draw();
+})();
+</script>
+</body>
+</html>

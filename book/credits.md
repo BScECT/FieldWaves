@@ -21,31 +21,6 @@ To recreate the website you have two options (more information in the [TeachBook
 ## License
 This book is [CC BY 4.0 licensed](https://creativecommons.org/licenses/by/4.0/) allowing you to share and adapt the material, as long as the source is named. External resources that are reused in this book are listed below.
 
-(external_resources)=
-### External resources
-
-Parts of this book are taken from other external resources and reused in various ways. If an author is not listed on a particular page, it is by the Authors, except as follows:
-
-The following pages are included directly from an external resource and are not edited by the course team:
-- The following pages includes text from {cite:t}`template`. Original content licensed under CC BY 4.0 License:
-  - [](./exercises.md)
-  - [](./exercises/002.md)
-  - [](./exercises/003.md)
-  - [](./exercises/004.md)
-  - [](./exercises/005.md)
-  - [](./exercises/006.md)
-  - [](./syntax_exercises.md)
-  - [](./syntax_exercises/007.md)
-  - [](./syntax_exercises/008.md)
-  - [](./syntax_exercises/009.md)
-  - [](./syntax_exercises/010.md)
-  - [](./syntax_exercises/011.md)
-  - [](./exercises/summary.md) 
-
-The following pages contain content written by others, part of which has been reused and/or modified by the course team:
-- Page [](./exercises/001.md) includes text from {cite:t}`template` and is edited to be made TU Delft-specific. Original content licensed under CC BY 4.0 License. 
-- Page [](./syntax_exercises/012.md) includes text from {cite:t}`template` and is edited to be made TU Delft-specific. Original content licensed under CC BY 4.0 License. 
-
 
 (editor)=
 ## About the Editors

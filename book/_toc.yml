@@ -65,8 +65,11 @@ parts:
       - file: 2_potential_fields/magnetic_field/exercises.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
+    - file: 2_potential_fields/labs/week4/week4_quiz.md
+    - file: 2_potential_fields/labs/week4/week4_quiz_solutions.md
+    - file: 2_potential_fields/labs/week4/week4_exercises.md
+    - file: 2_potential_fields/labs/week4/week4_exercises_solutions.md
     # - file: 2_potential_fields/gradient_fields.md
-    # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
   # - caption: Exercises
   #   chapters:
@@ -96,6 +99,31 @@ parts:
   #     - file: extension_exercises/014.md
   #     - file: extension_exercises/015.md
   #     - file: extension_exercises/016.md
+  - caption: Diffusive fields
+    chapters:
+    - file: 3_diffusion_fields/intro.md
+      sections:
+      - file: 3_diffusion_fields/heat_equation_1d.md
+      - file: 3_diffusion_fields/em_diffusion.md
+    - file: 3_diffusion_fields/labs/week05_diffusion.md
+    - file: 3_diffusion_fields/labs/week06_em_diffusion.md
+  - caption: Mechanical waves
+    chapters:
+    - file: 4_mechanical_waves/intro.md
+      sections:
+      - file: 4_mechanical_waves/basic_notions.md
+      - file: 4_mechanical_waves/snells_law.md
+      - file: 4_mechanical_waves/exercise_4a.md
+      - file: 4_mechanical_waves/field_recordings.md
+      - file: 4_mechanical_waves/exercise_4b.md
+      # - file: 4_mechanical_waves/fundamental_laws.md
+      # - file: 4_mechanical_waves/acoustic_waves.md
+      # - file: 4_mechanical_waves/wave_equation_solutions.md
+      # - file: 4_mechanical_waves/reflection_transmission.md
+      # - file: 4_mechanical_waves/elastic_waves.md
+      # - file: 4_mechanical_waves/exercises.md
+      # - file: 4_mechanical_waves/appendix_acoustic_1d.md
+      # - file: 4_mechanical_waves/appendix_strain_p_s.md
   - caption: Miscellaneous
     chapters:
     - file: references.md
