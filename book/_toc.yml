@@ -116,14 +116,14 @@ parts:
       - file: 4_mechanical_waves/exercise_4a.md
       - file: 4_mechanical_waves/field_recordings.md
       - file: 4_mechanical_waves/exercise_4b.md
-      - file: 4_mechanical_waves/fundamental_laws.md
-      - file: 4_mechanical_waves/acoustic_waves.md
-      - file: 4_mechanical_waves/wave_equation_solutions.md
-      - file: 4_mechanical_waves/reflection_transmission.md
-      - file: 4_mechanical_waves/elastic_waves.md
-      - file: 4_mechanical_waves/exercises.md
-      - file: 4_mechanical_waves/appendix_acoustic_1d.md
-      - file: 4_mechanical_waves/appendix_strain_p_s.md
+      # - file: 4_mechanical_waves/fundamental_laws.md
+      # - file: 4_mechanical_waves/acoustic_waves.md
+      # - file: 4_mechanical_waves/wave_equation_solutions.md
+      # - file: 4_mechanical_waves/reflection_transmission.md
+      # - file: 4_mechanical_waves/elastic_waves.md
+      # - file: 4_mechanical_waves/exercises.md
+      # - file: 4_mechanical_waves/appendix_acoustic_1d.md
+      # - file: 4_mechanical_waves/appendix_strain_p_s.md
   - caption: Miscellaneous
     chapters:
     - file: references.md
