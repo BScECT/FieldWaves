@@ -797,3 +797,14 @@ From that one kernel came three results a geophysicist uses directly. Arrival ti
 
 The magnetic field made the fourth point. For as long as the electric field is there, $(\nabla\times\boldsymbol H)_z=\sigma E_z$ is not zero, and the magnetic field is not a potential field. It becomes one only in the limit, which is where the magnetostatics of the earlier chapters lives.
 :::
+
+:::{admonition} Run this lab on your own machine
+:class: tip
+
+Save <a href="../../_sources/3_diffusion_fields/labs/week06_em_diffusion.ipynb" download>week06_em_diffusion.ipynb</a> and {download}`fwtools.py` into the same folder, then
+
+```bash
+pip install jupyterlab numpy scipy matplotlib plotly ipympl
+jupyter lab week06_em_diffusion.ipynb
+```
+:::

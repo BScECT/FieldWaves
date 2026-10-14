@@ -638,3 +638,14 @@ So the two knobs answer two different physical questions, one about the far fiel
 one about the source at early time. This is Task 6 read backwards. There we asked when a real
 boundary makes itself felt; here we ask how far away to put a fictitious one so that it never does.
 :::
+
+:::{admonition} Run this lab on your own machine
+:class: tip
+
+Save <a href="../../_sources/3_diffusion_fields/labs/week05_diffusion.ipynb" download>week05_diffusion.ipynb</a> and {download}`fwtools.py` into the same folder, then
+
+```bash
+pip install jupyterlab numpy scipy matplotlib plotly ipympl
+jupyter lab week05_diffusion.ipynb
+```
+:::

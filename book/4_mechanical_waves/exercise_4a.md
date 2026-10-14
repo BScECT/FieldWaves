@@ -183,3 +183,17 @@ plt.gca().invert_yaxis()
 plt.legend(['directP','directSurf','refraction','','reflection'])
 plt.show()
 ```
+
+:::{admonition} Run this exercise on your own machine
+:class: tip
+
+Save <a href="../_sources/4_mechanical_waves/exercise_4a.ipynb" download>exercise_4a.ipynb</a> and your own shot gather into the same folder, then
+
+```bash
+pip install jupyterlab numpy scipy matplotlib plotly ipympl
+jupyter lab exercise_4a.ipynb
+```
+
+Shot gather by group number:
+<a href="data/shot_group_0.npz" download>0</a> · <a href="data/shot_group_1.npz" download>1</a> · <a href="data/shot_group_2.npz" download>2</a> · <a href="data/shot_group_3.npz" download>3</a> · <a href="data/shot_group_4.npz" download>4</a> · <a href="data/shot_group_5.npz" download>5</a> · <a href="data/shot_group_6.npz" download>6</a> · <a href="data/shot_group_7.npz" download>7</a> · <a href="data/shot_group_8.npz" download>8</a> · <a href="data/shot_group_9.npz" download>9</a> · <a href="data/shot_group_10.npz" download>10</a> · <a href="data/shot_group_11.npz" download>11</a> · <a href="data/shot_group_12.npz" download>12</a> · <a href="data/shot_group_13.npz" download>13</a> · <a href="data/shot_group_14.npz" download>14</a> · <a href="data/shot_group_15.npz" download>15</a>
+:::
