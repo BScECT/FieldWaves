@@ -1,18 +1,24 @@
 # Wave fields in a fluid: acoustic (P) waves
 
-With acoustic waves, we assume a fluid in which no shear forces exist, and therefore only P-waves exist. Since waves are physical phenomena, they should have a relation to basic physical laws. The two laws applicable are the conservation of mass and Newton's second law. These two have been used in [the appendix on 1-D acoustic wave motion](./appendix_acoustic_1d.md) to derive the two equations governing the wave motion due to a P-wave. There are some simplifying assumptions in the derivation, one of them being that we consider a 1-dimensional wave. When we denote $p$ as the pressure and $v_x$ as the particle velocity, the conservation of mass leads to:
+With acoustic waves, we assume a fluid in which no shear forces exist, and therefore only P-waves exist. Since waves are physical phenomena, they should have a relation to basic physical laws. The two laws applicable are the conservation of mass and Newton's second law. These two have been used in [the appendix on 1-D acoustic wave motion](./appendix_acoustic_1d.md) to derive the two equations governing the wave motion due to a P-wave. There are some simplifying assumptions in the derivation, one of them being that we consider 1-dimensional wave motion. We derive the equations for the pressure $p$ and the particle velocity $v_x$ that are a function of both space and time, so:
+
+$$
+p = p(x,t) \quad \text{and} \quad  v_x = v_x(x,t).
+$$
+
+The conservation of mass leads to the following relation:
 
 $$
 - \frac{1}{K} \frac{\partial p}{\partial t} = \frac{\partial v_x}{\partial x}
 $$ (eq:eqdeform)
 
-in which $K$ is called the bulk modulus. The other relation follows from an application of Newton's law:
+in which $K$ is called the bulk modulus, a property of the medium. The other relation follows from an application of Newton's law:
 
 $$
 -\frac{\partial p}{\partial x} = \rho \frac{\partial v_x}{\partial t}
 $$ (eq:eqmotion)
 
-where $\rho$ denotes the mass density. This equation is called the equation of motion.
+where $\rho$ denotes the mass density, also a property of the medium. This equation is called the equation of motion.
 
 We are now going to combine these two equations. Therefore, we let the operator $\partial / \partial x$ work on the equation of motion:
 
@@ -44,11 +50,11 @@ Rewriting gives us the 1-Dimensional wave equation:
 $$
 \frac{\partial^2 p}{\partial x^2}
 	- \frac{1}{c^2} \frac{\partial^2p}{\partial t^2} = 0
-$$
+$$ (eq:waveqacp)
 
 in which $c$ can be seen as the velocity of the wave, for which we have: $c = \sqrt{K/ \rho}$.
 
-This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see also the [*EXERCISES*](./exercises.md)) that the particle velocity also satisfies the wave equation:
+This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see the [*EXERCISES*](./exercises.md)) that the particle velocity also satisfies the wave equation:
 
 $$
 \frac{\partial^2 v_x}{\partial x^2}
