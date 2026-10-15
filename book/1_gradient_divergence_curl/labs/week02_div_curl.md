@@ -1461,3 +1461,14 @@ Everything above was computed in soil, $k = 1.5$ W m⁻¹K⁻¹, giving $+5.0$ K
 
 The arithmetic is right and the answer is absurd. Identify the assumption that failed. Two are worth naming.
 :::
+
+:::{admonition} Run this lab on your own machine
+:class: tip
+
+Save <a href="../../_sources/1_gradient_divergence_curl/labs/week02_div_curl.ipynb" download>week02_div_curl.ipynb</a> and {download}`fwtools.py` into the same folder, then
+
+```bash
+pip install jupyterlab numpy scipy matplotlib plotly ipympl
+jupyter lab week02_div_curl.ipynb
+```
+:::
