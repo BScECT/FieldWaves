@@ -118,6 +118,8 @@ We recognize this equation as the equation of a straight line when $t$ is consid
 
 We have now derived the equations for the three rays, and we can plot their travel times as a function of distance $x$. This is done in {numref}`fig-raytimes`. This picture is important. When we measure seismic data in the field, the characteristics in this plot can be observed most of the time.
 
+In the [*EXERCISES* on travel times of seismic wave fields](./exercises_traveltimes.md) some other examples of rays and simple source-receiver configurations are considered.
+
 We considered travel times, but they are a result of a seismic wave field propagating in the subsurface. To get an idea of how a wave moves, we consider the movie below. A seismic source initiates a seismic wave at the top and the wave propagates outward (on a circle, for a homogeneous medium). Then later the wave encounters a boundary at which part of the wave is reflected and part of it is transmitted into the lower medium. There it travels with a higher speed; it can be seen that the wave travels faster along the boundary there. Then, part of it is diffracted back into the first medium (quite faint): that is the head wave, or critically refracted ray.
 
 ```{video} figures/seismicwave_1layer_vz.mp4
@@ -139,7 +141,7 @@ $$
 R = \frac{\rho_2 c_2 - \rho_1 c_1}{\rho_2 c_2 + \rho_1 c_1}
 $$
 
-That this is the case, will be derived from basic physical principles in a later section on wave theory. Obviously, the larger the impedance contrast between two layers, the higher the amplitude of the reflected wave. Notice that it is the impedance contrast that determines whether energy is reflected back or not; it may happen that the velocities and densities are different between two layers, but that the impedances are (nearly) the same. In that case, we will not see a reflection. We can now state another difference between refraction and reflection seismics. With refraction seismics we are only interested in traveltimes of the waves, so this means that we are interested in contrasts in velocities. This is different in reflection seismics. Then we are interested in the amplitude of the waves, and we will only measure an amplitude if there is a contrast in acoustic impedance in the subsurface.
+That this is the case, will be derived from basic physical principles in a later section on wave theory ([](./reflection_transmission.md)). Obviously, the larger the impedance contrast between two layers, the higher the amplitude of the reflected wave. Notice that it is the impedance contrast that determines whether energy is reflected back or not; it may happen that the velocities and densities are different between two layers, but that the impedances are (nearly) the same. In that case, we will not see a reflection. We can now state another difference between refraction and reflection seismics. With refraction seismics we are only interested in traveltimes of the waves, so this means that we are interested in contrasts in velocities. This is different in reflection seismics. Then we are interested in the amplitude of the waves, and we will only measure an amplitude if there is a contrast in acoustic impedance in the subsurface.
 
 Finally, we tabulate the most important differences between reflection and refraction seismic in {numref}`tab-diffref`.
 
