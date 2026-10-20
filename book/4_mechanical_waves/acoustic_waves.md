@@ -54,7 +54,7 @@ $$ (eq:waveqacp)
 
 in which $c$ can be seen as the velocity of the wave, for which we have: $c = \sqrt{K/ \rho}$.
 
-This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see the [*EXERCISES*](./exercises.md)) that the particle velocity also satisfies the wave equation:
+This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see the [*EXERCISES* on fundamental physical laws](#subsec-exerc-fund)) that the particle velocity also satisfies the wave equation:
 
 $$
 \frac{\partial^2 v_x}{\partial x^2}
@@ -68,3 +68,21 @@ Actually, the movie we showed before was generated using the above equations (bu
 ```{video} figures/seismicwave_1layer_vz.mp4
 :width: 80%
 ```
+
+(subsec-exerc-fund)=
+## Exercises on fundamental physical laws
+
+1. From the deformation equation and the equation of motion for acoustic waves ({eq}`eq:eqdeform` and {eq}`eq:eqmotion`) show that the particle velocity $v_x$ also satisfies the wave equation, i.e., {eq}`eq:waveqacv`.
+
+2. Here we look at deriving the wave equation in a different way:
+
+   - Show that from substituting the deformation equation {eq}`eq:eqdeform` and the equation of motion {eq}`eq:eqmotion` in the commutative property for the pressure, i.e.,
+
+     $$
+     \frac{\partial}{\partial x} \left( \frac{\partial p}{\partial t} \right)
+     =
+     \frac{\partial}{\partial t} \left( \frac{\partial p}{\partial x} \right),
+     $$
+
+     the wave equation for the particle velocity is nicely obtained.
+   - In the same way show that from substituting the deformation equation {eq}`eq:eqdeform` and the equation of motion {eq}`eq:eqmotion` in the commutative property for the *particle velocity*, as expressed in {eq}`eq:commut`, the wave equation for the pressure is nicely obtained.
