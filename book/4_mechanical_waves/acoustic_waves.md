@@ -54,7 +54,7 @@ $$ (eq:waveqacp)
 
 in which $c$ can be seen as the velocity of the wave, for which we have: $c = \sqrt{K/ \rho}$.
 
-This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see the [*EXERCISES*](./exercises.md)) that the particle velocity also satisfies the wave equation:
+This is the basic wave equation for one-dimensional acoustic waves. Equally well, we can derive from the same two equations {eq}`eq:eqdeform` and {eq}`eq:eqmotion` (see the [*EXERCISES* on fundamental physical laws](./exercises_fundamental.md)) that the particle velocity also satisfies the wave equation:
 
 $$
 \frac{\partial^2 v_x}{\partial x^2}

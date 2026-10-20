@@ -2,7 +2,7 @@
 
 ## Stress
 
-Here we define *stress*. Stress can be defined as the force per unit area exerted on a body across an imaginary surface (see also {numref}`fig-stressforce`). Since the dimension of stress is of a pressure, i.e., force per unit area, the quantities of stress are also given in the dimension of pressure, i.e., Pa. Therefore, the stress can be seen as the equivalent of pressure in an (elastic) solid. One can discern normal stress as the stress perpendicular to a surface, and shear stress as the one parallel to a surface. The normal stress is also called compressional or tensile stress. Since a stress can be in any direction to a surface, the stress can be decomposed into components perpendicular and parallel to the surface. This decomposition matrix is also called the stress tensor. In formula form, this can all be written as:
+Here, we define *stress*. Stress can be defined as the force per unit area exerted on a body across an imaginary surface (see also {numref}`fig-stressforce`). Since the dimension of stress is of a pressure, i.e., force per unit area, the quantities of stress are also given in the dimension of pressure, i.e., Pa. Therefore, the stress can be seen as the equivalent of pressure in an (elastic) solid. Normal stress can be defined as the stress perpendicular to a surface, and shear stress as the one parallel to a surface. The normal stress is also called compressional or tensile stress. Since a stress can be in any direction to a surface, the stress can be decomposed into components perpendicular and parallel to the surface. This decomposition matrix is also called the stress tensor. In formula form, this can all be written as:
 
 $$
   \frac{\underline{F}}{\Delta S} =
@@ -105,4 +105,4 @@ With respect to the (1-D) reflection coefficients for P- and S-waves at the boun
 - For P-waves, we require the continuity of the tensile stress $\tau_{xx}$ and the particle velocity $v_x$ at the interface, and
 - For S-waves we require the continuity of the shear stress $\tau_{zx}$ and the particle velocity $v_z$ at the interface.
 
-The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See the [*EXERCISES*](./exercises.md))
+The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See the [*EXERCISES* on P- and S-waves](./exercises_p_s_waves.md))

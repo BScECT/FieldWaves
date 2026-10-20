@@ -41,7 +41,7 @@ $$ (eq:solutionbvproblem)
 
 So, the pressure at a location $x$ gives a time-shifted version (by $x/c$) of the function $f(t)$ at the boundary $x=0$, which can physically be interpreted as a travelling wave. It behaves as a direct wave as discussed in [](./snells_law.md). It is a wave travelling in the *negative* $x-$direction: for a wave to maintain its shape as it moves (so time $t$ *increases*), the value $t+x/c$ must remain constant, and the distance $x$ must therefore *decrease*.
 
-Here, we used a boundary value at $x=0$ to get to the travelling-wave solution. However, an initial value at $t=0$ can also be used to get a similar solution: see the [*EXERCISES*](./exercises.md).
+Here, we used a boundary value at $x=0$ to get to the travelling-wave solution. However, an initial value at $t=0$ can also be used to get a similar solution: see the [*EXERCISE* on solutions of the wave equation](./exercises_wave_equation.md).
 
 In the same way, for the second of equations {eq}`eq:waveqaconeway`, when at the boundary $x=0$ the pressure field is equal to some function $g(t)$, we have the boundary-value problem:
 

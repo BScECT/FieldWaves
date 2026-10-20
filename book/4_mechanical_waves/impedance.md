@@ -41,6 +41,6 @@ Now, it can be observed that the particle velocity is a scaled version of the pr
 
 $$
 V_x(x,\omega) = \frac{P(x,\omega)}{\rho c}.
-$$
+$$ (eq:vxp_imp)
 
 The scaling factor ($\rho c$) is called the *seismic impedance*.
