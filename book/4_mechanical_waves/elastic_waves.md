@@ -105,4 +105,20 @@ With respect to the (1-D) reflection coefficients for P- and S-waves at the boun
 - For P-waves, we require the continuity of the tensile stress $\tau_{xx}$ and the particle velocity $v_x$ at the interface, and
 - For S-waves we require the continuity of the shear stress $\tau_{zx}$ and the particle velocity $v_z$ at the interface.
 
-The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See the [*EXERCISES* on P- and S-waves](./exercises_p_s_waves.md))
+The resulting expressions for the reflection and transmission coefficient are the same as for the acoustic case, only now the velocities are for the elastic solid. (See the [*EXERCISES* on P- and S-waves](#subsec-exerc-pands))
+
+(subsec-exerc-pands)=
+## Exercises on P- and S-waves
+
+1. From the deformation equation and the equation of motion for shear waves ({eq}`eq:deformS` and {eq}`eq:eqmotionS`) show that the particle velocity $v_z$ satisfies the wave equation.
+
+2. Here we consider shear waves:
+
+   - How can the solution of the wave equation for the shear stress ({eq}`eq:waveqStau`) be written?
+   - Based on this solution, *derive* the solution for the particle velocity $v_z$.
+   - What is the difference between the two? And how is that called?
+
+3. Here we consider shear waves arriving at an interface:
+
+   - When we look at a reflection and transmission across an interface between two materials: we have an incident S-wave coming from above. How would you write the wave field (shear stress and particle velocity) above the interface? And how below?
+   - At the interface, we require the continuity of the shear stress and particle velocity, as given above: from this, *derive* the reflection and transmission coefficients.

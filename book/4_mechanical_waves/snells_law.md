@@ -118,7 +118,7 @@ We recognize this equation as the equation of a straight line when $t$ is consid
 
 We have now derived the equations for the three rays, and we can plot their travel times as a function of distance $x$. This is done in {numref}`fig-raytimes`. This picture is important. When we measure seismic data in the field, the characteristics in this plot can be observed most of the time.
 
-In the [*EXERCISES* on travel times of seismic wave fields](./exercises_traveltimes.md) some other examples of rays and simple source-receiver configurations are considered.
+In the [*EXERCISES* on travel times of seismic wave fields](#subsec-exerc-traveltime) some other examples of rays and simple source-receiver configurations are considered.
 
 We considered travel times, but they are a result of a seismic wave field propagating in the subsurface. To get an idea of how a wave moves, we consider the movie below. A seismic source initiates a seismic wave at the top and the wave propagates outward (on a circle, for a homogeneous medium). Then later the wave encounters a boundary at which part of the wave is reflected and part of it is transmitted into the lower medium. There it travels with a higher speed; it can be seen that the wave travels faster along the boundary there. Then, part of it is diffracted back into the first medium (quite faint): that is the head wave, or critically refracted ray.
 
