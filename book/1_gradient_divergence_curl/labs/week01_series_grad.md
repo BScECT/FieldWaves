@@ -880,3 +880,15 @@ The rule generalises well beyond this lab: **impose a boundary condition you kno
 
 Parts 1–4 cover the gradient. **The divergence and the curl continue in Lab 2**, which is lectured next.
 :::
+
+
+:::{admonition} Run this lab on your own machine
+:class: tip
+
+Save <a href="../../_sources/1_gradient_divergence_curl/labs/week01_series_grad.ipynb" download>week01_series_grad.ipynb</a> and {download}`fwtools.py` into the same folder, then
+
+```bash
+pip install jupyterlab numpy scipy matplotlib plotly ipympl
+jupyter lab week01_series_grad.ipynb
+```
+:::

@@ -82,22 +82,112 @@ $$
 \oint_{\boldsymbol r}\boldsymbol\tau\cdot\boldsymbol v\,\mathrm{d}l = \int_{\boldsymbol r\in\mathbb{S}}\hat{\boldsymbol n}\cdot(\nabla\times\boldsymbol v)\,\mathrm{d}S .
 $$ (eq:stokes)
 
+## Vector identities with the curl
+
+The curl as expressed in {eq}`eq:curl` can be written as a matrix-vector operation,
+
+$$
+\nabla\times\boldsymbol v = \left(\begin{array}{ccc}
+0 & -\partial_z & \partial_y \\
+\partial_z & 0 & -\partial_x \\
+-\partial_y & \partial_x & 0
+\end{array}\right)\left(\begin{array}{c} v_x \\ v_y \\ v_z\end{array}\right).
+$$ (eq:curlmat)
+
+The matrix is antisymmetric and its diagonal is empty, which is another way of saying that no component of $\boldsymbol v$ contributes to the component of $\nabla\times\boldsymbol v$ along its own direction.
+
+The curl of a curl is given by
+
+$$
+\nabla\times\nabla\times\boldsymbol v = \nabla(\nabla\cdot\boldsymbol v) - \nabla^2\boldsymbol v,
+$$ (eq:curlcurl)
+
+where $\nabla^2 = \nabla\cdot\nabla$ is the Laplacian. The curl of the curl of a vector field is the gradient of the divergence of that field, given by the first term on the right-hand side, minus the divergence of the gradient of that field, given by the second term. In this case the evaluation in terms of vector operations is the same as in {eq}`eq:tripprod`, with $\boldsymbol a$ and $\boldsymbol b$ both replaced by $\nabla$.
+
+If the curl is taken of a vector product of two vector functions, the product rule for differentiation must be taken into account as well,
+
+$$
+\nabla\times(\boldsymbol v\times\boldsymbol w) = \boldsymbol v(\nabla\cdot\boldsymbol w) - \boldsymbol w(\nabla\cdot\boldsymbol v) + (\boldsymbol w\cdot\nabla)\boldsymbol v - (\boldsymbol v\cdot\nabla)\boldsymbol w .
+$$ (eq:curlvecprod)
+
+The first two terms take the divergence of $\boldsymbol w$ and of $\boldsymbol v$ and point the result along $\boldsymbol v$ and $-\boldsymbol w$ respectively, while the last two terms take the derivative of $\boldsymbol v$ and of $\boldsymbol w$ along the direction of $\boldsymbol w$ and $-\boldsymbol v$ respectively.
+
+The divergence operator can also act on the vector product of two functions, $\nabla\cdot(\boldsymbol v\times\boldsymbol w)$. This is evaluated with the vector rules of the exercises on coordinate systems, keeping the product rule for differentiation in mind, because the $\nabla$-operator acts on both $\boldsymbol v$ and $\boldsymbol w$. It is given by
+
+$$
+\nabla\cdot(\boldsymbol v\times\boldsymbol w) = \boldsymbol w\cdot(\nabla\times\boldsymbol v) - \boldsymbol v\cdot(\nabla\times\boldsymbol w).
+$$ (eq:divvecprod)
+
+The divergence of a vector product of two functions takes the curl of each of them, computes the scalar product with the other, and subtracts the results.
+
+## The magnetic field around an infinite current carrying wire
+
+In the chapter on Potential Fields you will investigate this problem a bit deeper, but here we use it to illustrate that a field that circulates around another field does not have a non-zero curl everywhere, and that it can have zero divergence as well. Let us take an infinitely long current carrying wire along the vertical axis. That makes it a two-dimensional problem, because nothing is changing in the $z$-direction. In cylindrical coordinates the magnetic field is given by
+
+$$
+\boldsymbol H = \frac{I}{2\pi\varrho}\hat{\boldsymbol\phi},
+$$ (eq:HJcyl)
+
+which in Cartesian coordinates is written as
+
+$$
+\boldsymbol H = \frac{I}{2\pi\varrho^2}\left(-y\,\hat{\boldsymbol x} + x\,\hat{\boldsymbol y}\right).
+$$ (eq:HJcart)
+
+The curl of this magnetic field has only a vertical component, as you can imagine from Ampère's law, because it states that $\nabla\times\boldsymbol H = \boldsymbol J$, with $\boldsymbol J$ the electric current density in the wire. We have to look only at the vertical component, because $\boldsymbol J$ has only a vertical component. We find
+
+$$
+\hat{\boldsymbol z}\cdot(\nabla\times\boldsymbol H) = \partial_x H_y - \partial_y H_x = \frac{I}{2\pi}\left(\partial_y\frac{y}{\varrho^2} + \partial_x\frac{x}{\varrho^2}\right) = 0, \qquad \text{for } \varrho>0 .
+$$
+
+We find that the magnetic field is curl-free everywhere outside the wire. The field rotates around the wire but it has zero curl. If we take the divergence of the magnetic field, we find
+
+$$
+\nabla\cdot\boldsymbol H = \partial_x H_x + \partial_y H_y = \frac{I}{2\pi}\left(-\partial_x\frac{y}{\varrho^2} + \partial_y\frac{x}{\varrho^2}\right) = 0, \qquad \text{for } \varrho>0 .
+$$
+
+We find that the magnetic field is divergence free as well, everywhere outside the wire. We investigate what happens at the wire. For that we take a planar circular area in the $(x,y)$-plane, as a cross-section that goes through the wire, but we do not specify the radius. We multiply Ampère's law with a unit vector in the vertical direction and integrate over the surface area $\mathbb{S}$ to find
+
+$$
+\int_{\mathbb{S}}\hat{\boldsymbol z}\cdot(\nabla\times\boldsymbol H)\,\mathrm{d}x\,\mathrm{d}y = \int_{\mathbb{S}}\hat{\boldsymbol z}\cdot\boldsymbol J\,\mathrm{d}x\,\mathrm{d}y .
+$$
+
+The right-hand side is identified as the current $I$ running in the wire, and we use Stokes' theorem on the left-hand side to arrive at
+
+$$
+\oint_{\partial\mathbb{S}}\boldsymbol\tau\cdot\boldsymbol H\,\mathrm{d}l .
+$$
+
+This is a line integral around the full circle, which is the boundary of the circular surface area that we started out with, and $\boldsymbol\tau$ is the unit tangent vector. In cylindrical coordinates, $\boldsymbol\tau\,\mathrm{d}l = \hat{\boldsymbol\phi}\,\varrho\,\mathrm{d}\phi$. Substituting this together with the expression of the magnetic field in {eq}`eq:HJcyl` in the above equation results in
+
+$$
+\oint_{\partial\mathbb{S}}\boldsymbol\tau\cdot\boldsymbol H\,\mathrm{d}l = \frac{I}{2\pi}\int_{\phi=0}^{2\pi}\mathrm{d}\phi = I,
+$$
+
+which is equal to the surface integral with the normal component of the current. In conclusion, the magnetic field has zero curl at any point outside the wire, but the line integral around any circle around the wire of the tangential component of the magnetic field is equal to the current flowing in the wire. This will come back when we discuss Potential Fields, and again when we discuss Electromagnetic Fields.
+
+## Sources of non-zero curl
+
+Rigid rotation and shear are two known causes for generating a field with non-zero curl.
+
 ## Exercises
 
 1. Use Stokes' theorem to evaluate $\oint_{\boldsymbol r}\boldsymbol\tau\,\mathrm{d}l$, where $\boldsymbol\tau$ is the unit tangent along the closed boundary of the area $\mathbb{S}$. The integration runs in the direction of circulation that forms a right-handed system with the unit normal vector on $\mathbb{S}$.
-2. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Stokes' integral theorem gives
+2. Use the matrix expression for the curl in {eq}`eq:curlmat` to find the matrix expression for the curl of the curl of $\boldsymbol v$, as expressed in vector form in {eq}`eq:curlcurl`.
+3. Give a detailed derivation to show that {eq}`eq:divvecprod` is correct.
+4. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\,p(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $p(\boldsymbol r)$ is a continuously differentiable scalar function, Stokes' integral theorem gives
 
     $$
     \oint_{\boldsymbol r}\boldsymbol\tau\,p\,\mathrm{d}l = \int_{\boldsymbol r\in\mathbb{S}}(\hat{\boldsymbol n}\times\nabla)p\,\mathrm{d}S,
     $$
 
     which is Stokes' theorem for the gradient.
-3. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Stokes' integral theorem gives
+5. Show that when $\boldsymbol v(\boldsymbol r) = \boldsymbol a\times\boldsymbol w(\boldsymbol r)$, where $\boldsymbol a$ is an arbitrary constant vector and $\boldsymbol w(\boldsymbol r)$ is a continuously differentiable vector function, Stokes' integral theorem gives
 
     $$
     \oint_{\boldsymbol r}\boldsymbol\tau\times\boldsymbol w\,\mathrm{d}l = \int_{\boldsymbol r\in\mathbb{S}}(\hat{\boldsymbol n}\times\nabla)\times\boldsymbol w\,\mathrm{d}S .
     $$
-4. Ampère's law is given by $\nabla\times\boldsymbol H = \boldsymbol J$, which states that the electric current is equal to the curl of the magnetic field. Convert this to integral form using Stokes' theorem, by using a flat surface $\mathbb{S}$ and choosing a unit normal vector $\hat{\boldsymbol n}$ on $\mathbb{S}$. You should find
+6. Ampère's law is given by $\nabla\times\boldsymbol H = \boldsymbol J$, which states that the electric current is equal to the curl of the magnetic field. Convert this to integral form using Stokes' theorem, by using a flat surface $\mathbb{S}$ and choosing a unit normal vector $\hat{\boldsymbol n}$ on $\mathbb{S}$. You should find
 
     $$
     \oint_{\boldsymbol r}\boldsymbol H\cdot\boldsymbol\tau\,\mathrm{d}l = \int_{\boldsymbol r\in\mathbb{S}}\hat{\boldsymbol n}\cdot\boldsymbol J\,\mathrm{d}S .
