@@ -51,7 +51,18 @@ Definition of stress components for stresses working on an infinitesimal paralle
 
 ## P-waves in an elastic solid
 
-For 1-D wave motion in the $x$-direction, Hooke's law gives for the plane tensile stress $\tau_{xx}$ (see [the appendix on strain, P- and S-waves](./appendix_strain_p_s.md)):
+When we consider 1-D wave motion in the $x$-direction in a 3-D world, the particle displacement for a horizontal stress field applied at the *plane* $x=0$ can be given as:
+
+$$
+   \underline{u} (x,y,z,t) =
+   \begin{pmatrix}
+     u_x(x,t) \\ 0 \\ 0
+   \end{pmatrix}.
+$$ (eq:uxP)
+
+It can be verified that this displacement field is curl-free (see the [*EXERCISES* on P- and S-waves](#subsec-exerc-pands)).
+
+Hooke's law gives for the plane tensile stress $\tau_{xx}$ (see [the appendix on strain, P- and S-waves](./appendix_strain_p_s.md)):
 
 $$
  \frac{\partial \tau_{xx}}{\partial t} = (\lambda + 2\mu)
@@ -77,7 +88,18 @@ where $c^2_P = (\lambda + 2\mu)/\rho$ is the squared P-wave velocity. This wave 
 
 ## S-waves in an elastic solid
 
-Let us now consider shear stresses which, as we shall see, will result in a wave equation for S-waves. To that end, we consider 1-D displacement in the $z$-direction for a wave propagating in the $x$-direction for the 1-D shear motion. The equivalent of Hooke's law for shear stress results in (see [the appendix on strain, P- and S-waves](./appendix_strain_p_s.md)):
+Let us now consider shear stresses which, as we shall see, will result in a wave equation for S-waves. To that end, we consider 1-D particle displacements in the $z$-direction in a 3-D world, for a wave propagating in the $x$-direction due to a vertical stress applied at the *plane* $x=0$, so:
+
+$$
+   \underline{u} (x,y,z,t) =
+   \begin{pmatrix}
+     0 \\ 0 \\ u_z(x,t)
+   \end{pmatrix}.
+$$ (eq:uxS)
+
+It can be verified that this displacement field is divergence-free (see the [*EXERCISES* on P- and S-waves](#subsec-exerc-pands)).
+
+The equivalent of Hooke's law for shear stress results in (see [the appendix on strain, P- and S-waves](./appendix_strain_p_s.md)):
 
 $$
  \frac{\partial \tau_{zx}}{\partial t} = \mu \frac{\partial v_z}{\partial x}
@@ -110,15 +132,19 @@ The resulting expressions for the reflection and transmission coefficient are th
 (subsec-exerc-pands)=
 ## Exercises on P- and S-waves
 
-1. From the deformation equation and the equation of motion for shear waves ({eq}`eq:deformS` and {eq}`eq:eqmotionS`) show that the particle velocity $v_z$ satisfies the wave equation.
+1. Show that the displacement field ({eq}`eq:uxP`) for a plane stress field in the $x$-direction, so for a P-wave, is curl-free.
 
-2. Here we consider shear waves:
+2. Show that the displacement field ({eq}`eq:uxS`) for a plane stress field in the $z$-direction, so for an S-wave, is divergence-free.
+
+3. From the deformation equation and the equation of motion for shear waves ({eq}`eq:deformS` and {eq}`eq:eqmotionS`) show that the particle velocity $v_z$ satisfies the wave equation.
+
+4. Here we consider shear waves:
 
    - How can the solution of the wave equation for the shear stress ({eq}`eq:waveqStau`) be written?
    - Based on this solution, *derive* the solution for the particle velocity $v_z$.
    - What is the difference between the two? And how is that called?
 
-3. Here we consider shear waves arriving at an interface:
+5. Here we consider shear waves arriving at an interface:
 
    - When we look at a reflection and transmission across an interface between two materials: we have an incident S-wave coming from above. How would you write the wave field (shear stress and particle velocity) above the interface? And how below?
    - At the interface, we require the continuity of the shear stress and particle velocity, as given above: from this, *derive* the reflection and transmission coefficients.

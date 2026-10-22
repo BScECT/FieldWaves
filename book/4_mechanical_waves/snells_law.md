@@ -28,7 +28,7 @@ $$
 \frac{\sin \theta_1}{c_1} = \frac{\sin \theta_2}{c_2}
 $$
 
-which is Snell's law for transmission through a boundary between two layers with different velocities. So far, we have taken general velocities $c_1$ and $c_2$. However, in a solid, two velocities exist, namely P- and S-wave velocities. Generally, when a P-wave is incident on a boundary, it can transmit as a P-wave into the second medium, but also as a S-wave. So in the case of the latter, Snell's law reads:
+which is Snell's law for transmission through a boundary between two layers with different velocities. So far, we have taken general velocities $c_1$ and $c_2$. However, in a solid, two velocities exist, namely P- and S-wave velocities. Generally, when a P-wave is incident on a boundary, it can transmit as a P-wave into the second medium, but also as an S-wave. So in the case of the latter, Snell's law reads:
 
 $$
 \frac{\sin \theta_P}{c_P} = \frac{\sin \theta_S}{c_S}
