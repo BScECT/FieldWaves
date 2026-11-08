@@ -124,6 +124,19 @@ parts:
       - file: 4_mechanical_waves/elastic_waves.md
       - file: 4_mechanical_waves/appendix_acoustic_1d.md
       - file: 4_mechanical_waves/appendix_strain_p_s.md
+  - caption: Electromagnetic waves
+    chapters:
+    - file: 5_electromagnetic_waves/intro.md
+      sections:
+      - file: 5_electromagnetic_waves/history_maxwell.md
+      - file: 5_electromagnetic_waves/plane_waves_1d.md
+      - file: 5_electromagnetic_waves/practice_1.md
+      - file: 5_electromagnetic_waves/waves_3d_energy_polarization.md
+      - file: 5_electromagnetic_waves/media_and_losses.md
+      - file: 5_electromagnetic_waves/practice_2_assessment.md
+      - file: 5_electromagnetic_waves/interface_scattering.md
+      - file: 5_electromagnetic_waves/multilayer_frequency_response.md
+      - file: 5_electromagnetic_waves/practice_3.md
   - caption: Miscellaneous
     chapters:
     - file: references.md

@@ -1,0 +1,43 @@
+<iframe title="Plane-wave pulse explorer" style="width:100%;height:650px;border:0" sandbox="allow-scripts" loading="lazy" srcdoc="&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;Plane-wave pulse explorer&lt;/title&gt;&lt;style&gt;
+*{box-sizing:border-box}body{font:15px system-ui,sans-serif;color:#243743;background:#fff;margin:0;padding:12px}label{display:block;font-weight:600;margin:8px 0}input[type=range]{width:100%;accent-color:#008dab}output{font-weight:400;font-variant-numeric:tabular-nums}button{font:inherit;border:1px solid #78909b;border-radius:4px;background:#fff;padding:6px 15px;cursor:pointer}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.plots{display:grid;grid-template-columns:1fr 1fr;gap:12px}canvas{width:100%;height:auto;border:1px solid #ccd8de;background:#fff}.readout{line-height:1.7;padding:8px 0;font-variant-numeric:tabular-nums}.hint{color:#435963;font-size:14px;margin:6px 0}.title{font-weight:600;margin:4px 0 8px} @media(max-width:650px){.plots,.controls{grid-template-columns:1fr}.hint{font-size:13px}}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class=&quot;title&quot;&gt;Follow a moving feature; watch from a fixed sensor&lt;/div&gt;
+&lt;div class=&quot;controls&quot;&gt;
+&lt;label&gt;Time: &lt;output id=&quot;time-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;time&quot; aria-label=&quot;Time in microseconds&quot; type=&quot;range&quot; min=&quot;0.1&quot; max=&quot;0.9&quot; step=&quot;0.01&quot; value=&quot;0.4&quot;&gt;&lt;/label&gt;
+&lt;label&gt;Sensor position: &lt;output id=&quot;sensor-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;sensor&quot; aria-label=&quot;Sensor position in metres&quot; type=&quot;range&quot; min=&quot;30&quot; max=&quot;270&quot; step=&quot;15&quot; value=&quot;150&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class=&quot;plots&quot;&gt;&lt;canvas id=&quot;space&quot; width=&quot;580&quot; height=&quot;300&quot; aria-label=&quot;Spatial snapshot of the asymmetric pulse&quot;&gt;&lt;/canvas&gt;&lt;canvas id=&quot;trace&quot; width=&quot;580&quot; height=&quot;300&quot; aria-label=&quot;Time record at a fixed sensor&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
+&lt;div id=&quot;values&quot; class=&quot;readout&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
+&lt;p class=&quot;hint&quot;&gt;Both vertical axes show Eₓ/E₀. Orange marks the moving peak in the snapshot and the current measurement in the sensor record. The dashed line in the snapshot is the fixed sensor. Read the steep side and long tail from left to right in each graph.&lt;/p&gt;
+&lt;button id=&quot;reset&quot; type=&quot;button&quot;&gt;Reset&lt;/button&gt;
+&lt;script&gt;
+&quot;use strict&quot;;
+const C=3e8;
+function pulse(tau){const s=tau/60e-9,w=1+0.65*Math.tanh(s);return Math.exp(-((s/w)**2));}
+function plot(id,fn,xmax,xlabel,title,colour,ymin=-1.2){
+ const el=document.getElementById(id),ctx=el.getContext(&#x27;2d&#x27;),W=el.width,H=el.height;
+ const L=48,R=18,T=32,B=46,ymax=1.3;
+ const xpx=x=&gt;L+x/xmax*(W-L-R),ypx=y=&gt;T+(ymax-y)/(ymax-ymin)*(H-T-B);
+ ctx.clearRect(0,0,W,H);ctx.font=&#x27;18px system-ui&#x27;;ctx.textAlign=&#x27;left&#x27;;ctx.fillStyle=&#x27;#243743&#x27;;ctx.fillText(title,L,19);
+ ctx.font=&#x27;17px system-ui&#x27;;
+ for(let j=0;j&lt;=4;j++){const x=xmax*j/4;ctx.strokeStyle=&#x27;#e5ecef&#x27;;ctx.beginPath();ctx.moveTo(xpx(x),T);ctx.lineTo(xpx(x),H-B);ctx.stroke();ctx.fillStyle=&#x27;#435963&#x27;;ctx.textAlign=&#x27;center&#x27;;ctx.fillText(Number(x.toPrecision(3)).toString(),xpx(x),H-B+18);}
+ for(const y of (ymin&gt;-.5?[0,.5,1]:[-1,-.5,0,.5,1])){ctx.strokeStyle=&#x27;#e5ecef&#x27;;ctx.beginPath();ctx.moveTo(L,ypx(y));ctx.lineTo(W-R,ypx(y));ctx.stroke();ctx.textAlign=&#x27;right&#x27;;ctx.fillStyle=&#x27;#435963&#x27;;ctx.fillText(y.toString(),L-7,ypx(y)+4);}
+ ctx.strokeStyle=&#x27;#627d89&#x27;;ctx.strokeRect(L,T,W-L-R,H-T-B);ctx.textAlign=&#x27;center&#x27;;ctx.fillStyle=&#x27;#243743&#x27;;ctx.fillText(xlabel,(L+W-R)/2,H-8);
+ ctx.save();ctx.beginPath();ctx.rect(L,T,W-L-R,H-T-B);ctx.clip();ctx.strokeStyle=colour;ctx.lineWidth=2.4;ctx.beginPath();
+ for(let j=0;j&lt;=900;j++){let x=xmax*j/900,y=fn(x);if(j===0)ctx.moveTo(xpx(x),ypx(y));else ctx.lineTo(xpx(x),ypx(y));}ctx.stroke();ctx.restore();
+ return {ctx,xpx,ypx,L,R,T,B,W,H};
+}
+function dot(p,x,y,colour){p.ctx.beginPath();p.ctx.arc(p.xpx(x),p.ypx(y),5,0,2*Math.PI);p.ctx.fillStyle=colour;p.ctx.fill();}
+function vertical(p,x){p.ctx.save();p.ctx.setLineDash([4,4]);p.ctx.strokeStyle=&#x27;#61747e&#x27;;p.ctx.beginPath();p.ctx.moveTo(p.xpx(x),p.T);p.ctx.lineTo(p.xpx(x),p.H-p.B);p.ctx.stroke();p.ctx.restore();}
+
+function update(){
+ const t=Number(document.getElementById(&#x27;time&#x27;).value)*1e-6,z=Number(document.getElementById(&#x27;sensor&#x27;).value),peak=C*t;
+ document.getElementById(&#x27;time-label&#x27;).value=(t*1e6).toFixed(2)+&#x27; μs&#x27;;document.getElementById(&#x27;sensor-label&#x27;).value=z.toFixed(0)+&#x27; m&#x27;;
+ const a=plot(&#x27;space&#x27;,x=&gt;pulse(t-x/C),300,&#x27;Position z (m)&#x27;,&#x27;Space at the selected time&#x27;,&#x27;#009fc4&#x27;,-.08);dot(a,peak,1,&#x27;#d26b26&#x27;);vertical(a,z);
+ const b=plot(&#x27;trace&#x27;,x=&gt;pulse(x*1e-6-z/C),1.2,&#x27;Time t (μs)&#x27;,&#x27;Time at the fixed sensor&#x27;,&#x27;#356a97&#x27;,-.08);dot(b,t*1e6,pulse(t-z/C),&#x27;#d26b26&#x27;);vertical(b,t*1e6);
+ const atPeak=(t-peak/C)*1e6,atSensor=(t-z/C)*1e6;
+ document.getElementById(&#x27;values&#x27;).textContent=&#x27;Moving peak: z = &#x27;+peak.toFixed(1)+&#x27; m; t − z/c = &#x27;+atPeak.toFixed(3)+&#x27; μs.  Fixed sensor: t − z/c = &#x27;+atSensor.toFixed(3)+&#x27; μs.&#x27;;
+}
+for(const id of [&#x27;time&#x27;,&#x27;sensor&#x27;])document.getElementById(id).addEventListener(&#x27;input&#x27;,update);
+document.getElementById(&#x27;reset&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{document.getElementById(&#x27;time&#x27;).value=&#x27;0.4&#x27;;document.getElementById(&#x27;sensor&#x27;).value=&#x27;150&#x27;;update();});update();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
