@@ -10,9 +10,10 @@ title: ECTB2140 Fields and Waves 2026
 The book is being written during the 2026-2027 run of ECTB2140, and the material is incomplete.
 
 - **Chapter 1, Gradient, divergence and curl**, is complete.
-- **Chapter 2, Potential fields**, is partly written.
+- **Chapter 2, Potential fields**, is complete (at least for now).
 - **Chapter 3, Diffusion fields**, is partly written.
 - **Chapter 4, Mechanical waves**, is partly written.
+- **Chapter 5, Electromagnetic waves**, is a work in progress.
 - Later chapters are not yet available here.
 
 
