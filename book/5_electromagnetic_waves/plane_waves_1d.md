@@ -1,8 +1,229 @@
 # One-dimensional plane electromagnetic waves
 
-An Earth Observation (EO) radar sends out a pulse and listens for an echo. The echo arrives later because the electromagnetic disturbance needs time to travel. What exactly is travelling? How do the electric and magnetic fields fit together? And why do radar people keep writing complex exponentials?
+An Earth Observation (EO) radar sends out a pulse and listens for an echo. The echo arrives later because the electromagnetic disturbance needs time to travel. What exactly is travelling, and how do the electric and magnetic fields fit together?
 
-We can answer these questions with mathematics that is already familiar from mechanical waves. We will start with a waveform, and then we will move to sinusoidal functions. Throughout this section we consider propagation through vacuum. For many radar paths through air this is a useful first approximation; propagation through materials will come later.
+## Changing fields sustain each other
+
+Consider a region of vacuum with no charges and no currents. We describe the magnetic field by the **magnetic field strength** $\vec H$, in A/m, rather than the flux density $\vec B$ used in {doc}`history_maxwell`. In vacuum,
+
+$$
+\vec B=\mu_0\vec H.
+$$
+
+This is the same $\vec H$ as in the {doc}`electromagnetic diffusion chapter <../3_diffusion_fields/em_diffusion>`: the same magnetic field, described by a different quantity. In terms of $\vec E$ and $\vec H$, Maxwell's equations are
+
+$$
+\begin{aligned}
+\vec\nabla\cdot\vec E&=0,
+&\vec\nabla\times\vec E&=-\mu_0\frac{\partial\vec H}{\partial t},\\
+\vec\nabla\cdot\vec H&=0,
+&\vec\nabla\times\vec H&=\epsilon_0\frac{\partial\vec E}{\partial t}.
+\end{aligned}
+$$ (eq:em-plane-maxwell-vacuum)
+
+The two divergence equations on the left say that this region contains no sources. The two curl equations on the right are the key to this whole chapter. Read them as sentences:
+
+- **Faraday's law:** a magnetic field that changes in time comes with an electric field that varies in space.
+- **Ampère–Maxwell law:** an electric field that changes in time comes with a magnetic field that varies in space.
+
+So the change in time of each field is tied to the variation in space of the other. A changing $\vec H$ requires a spatially varying $\vec E$. If that $\vec E$ is also changing, it requires a spatially varying $\vec H$, and so on. Neither field can change on its own. This back-and-forth coupling is what allows a disturbance to travel, as we show next.
+
+## Combining the curl equations gives a wave equation
+
+We eliminate $\vec H$ from the two curl equations in three steps.
+
+**1. Take the curl of Faraday's law.** For smooth fields we may swap the order of the space and time derivatives:
+
+$$
+\vec\nabla\times(\vec\nabla\times\vec E)=-\mu_0\frac{\partial}{\partial t}\left(\vec\nabla\times\vec H\right).
+$$
+
+**2. Substitute the Ampère–Maxwell law** for $\vec\nabla\times\vec H$:
+
+$$
+\vec\nabla\times(\vec\nabla\times\vec E)=-\mu_0\epsilon_0\frac{\partial^2\vec E}{\partial t^2}.
+$$
+
+The second time derivative appears because we have used both curl equations: a changing $\vec E$ is linked to $\vec H$, and that changing $\vec H$ is linked back to $\vec E$.
+
+**3. Simplify the left-hand side.** The vector identity
+
+$$
+\vec\nabla\times(\vec\nabla\times\vec E)=\vec\nabla(\vec\nabla\cdot\vec E)-\nabla^2\vec E,
+$$
+
+together with Gauss's law $\vec\nabla\cdot\vec E=0$, leaves only $-\nabla^2\vec E$. Cancelling the minus signs gives
+
+$$
+\boxed{\nabla^2\vec E=\frac{1}{c^2}\frac{\partial^2\vec E}{\partial t^2},
+\qquad c=\frac{1}{\sqrt{\mu_0\epsilon_0}}\simeq3.00\times10^8\ \mathrm{m/s}.}
+$$ (eq:em-plane-wave-equation)
+
+You have seen this derivation at the end of {doc}`history_maxwell`. The equation has the same structure as the {doc}`acoustic wave equation <../4_mechanical_waves/acoustic_waves>`; only the physical quantity and the speed have changed.
+
+Pause on that speed. The constant $\epsilon_0$ describes the force between static charges, as in a charged capacitor; $\mu_0$ describes the force between wires carrying steady currents. Neither involves anything moving quickly, let alone light. Yet together they give $1/\sqrt{\mu_0\epsilon_0}\simeq3.00\times10^8\ \mathrm{m/s}$, the measured speed of light. The electric and magnetic properties of empty space set how fast an electromagnetic disturbance travels, just as the bulk modulus $K$ and the density $\rho$ set $c=\sqrt{K/\rho}$ for sound.
+
+```{admonition} Use your intuition from mechanical waves
+:class: question
+
+For sound, the same two material properties $K$ and $\rho$ fix both the speed $c=\sqrt{K/\rho}$ and the {doc}`impedance <../4_mechanical_waves/impedance>` $\rho c=\sqrt{K\rho}$.
+
+1. Combine $\mu_0$ and $\epsilon_0$ into a quantity with units of ohms. Evaluate it. What might it describe?
+2. Inside a material, $\epsilon_0$ and $\mu_0$ are replaced by larger values $\epsilon$ and $\mu$. Would you expect light to travel faster or slower? The **refractive index** $n=c/v$ measures how much slower. Guess how $n$ depends on $\epsilon$ and $\mu$.
+3. Could two materials have the same wave speed but different impedances? What would a wave notice at the boundary between them?
+```
+
+```{admonition} Now for the magnetic field
+:class: question
+
+Repeat the three steps, starting from the curl of the Ampère–Maxwell law. Which of Maxwell's equations do you substitute in step 2, and which in step 3? Show that $\vec H$ satisfies the same wave equation, with the same speed $c$.
+```
+
+Each field satisfies its own wave equation, but the two are not independent. The curl equations still link them: once $\vec E$ is known, $\vec H$ follows.
+
+## A TEM wave travelling along z
+
+The wave equation {eq}`eq:em-plane-wave-equation` allows many kinds of waves. For now we'll pick the simplest one, and write it in a notation that shows each choice we make.
+
+**Choice 1: the wave travels along $z$, and it is uniform across every plane $z=\text{constant}$.** At any instant, the fields are the same everywhere on such a plane. This is a **uniform plane wave**. The fields depend only on $z$ and $t$, which we write as $(z,t)$, so every derivative with respect to $x$ or $y$ is zero.
+
+**Choice 2: the fields are perpendicular to the propagation direction.** Neither $\vec E$ nor $\vec H$ has a $z$ component. This is a **transverse electromagnetic (TEM)** wave, the kind of wave that travels through vacuum.
+
+**Choice 3: the $x$ axis points along $\vec E$.** We are free to orient the $x$ and $y$ axes this way.
+
+Together, these choices give
+
+$$
+\boxed{\vec E=\hat x\,E_x(z,t).}
+$$
+
+Each part of this expression carries one piece of information:
+
+| Notation | Meaning |
+|---|---|
+| $\hat x$ | the direction in which $\vec E$ points |
+| $E_x$ | the size of $\vec E$ in V/m, with a sign: negative means pointing along $-x$ |
+| $(z,t)$ | what $E_x$ depends on: position along $z$ and time, not $x$ or $y$ |
+
+The field *points* along $x$ but *varies* along $z$. These are different directions, and the notation keeps them apart: the direction is in the unit vector, the variation is in the brackets.
+
+```{admonition} Read the notation
+:class: question
+
+1. A field is written $\vec E=\hat y\,E_y(z,t)$. Which way does it point? Along which axis does it vary?
+2. Is $\vec E=\hat z\,E_z(z,t)$ a TEM wave travelling along $z$?
+3. Write the electric field of a TEM wave travelling along $x$, with $\vec E$ pointing along $z$.
+```
+
+### Where does the magnetic field point?
+
+Faraday's law tells us. Because $E_x$ depends only on $z$ and $t$, the curl of $\vec E$ has a single term:
+
+$$
+\vec\nabla\times\vec E=\hat y\,\frac{\partial E_x}{\partial z}.
+$$
+
+Faraday's law sets this equal to $-\mu_0\,\partial\vec H/\partial t$, so the changing magnetic field points along $y$:
+
+$$
+\boxed{\vec H=\hat y\,H_y(z,t).}
+$$
+
+In the same way, $\vec\nabla\times\vec H=-\hat x\,\partial H_y/\partial z$, which points along $x$, as the Ampère–Maxwell law requires.
+
+````{admonition} Check the curls
+:class: dropdown
+
+In Cartesian coordinates,
+
+$$
+\vec\nabla\times\vec E=
+\hat x\left(\frac{\partial E_z}{\partial y}-\frac{\partial E_y}{\partial z}\right)
++\hat y\left(\frac{\partial E_x}{\partial z}-\frac{\partial E_z}{\partial x}\right)
++\hat z\left(\frac{\partial E_y}{\partial x}-\frac{\partial E_x}{\partial y}\right).
+$$
+
+With $E_y=E_z=0$ and no dependence on $x$ or $y$, only $\hat y\,\partial E_x/\partial z$ survives. For $\vec H=\hat y\,H_y(z,t)$, only the term $-\hat x\,\partial H_y/\partial z$ survives.
+````
+
+With these fields, the two vector curl equations of {eq}`eq:em-plane-maxwell-vacuum` become two scalar equations:
+
+$$
+\boxed{
+\frac{\partial E_x}{\partial z}=-\mu_0\frac{\partial H_y}{\partial t},
+\qquad
+\frac{\partial H_y}{\partial z}=-\epsilon_0\frac{\partial E_x}{\partial t}.
+}
+$$ (eq:em-plane-coupled)
+
+This is the coupling from the start of this page, now for a single pair of components: the variation along $z$ of each field is tied to the change in time of the other. Differentiating the first equation with respect to $z$ and substituting the second, the wave equation reduces to
+
+$$
+\frac{\partial^2 E_x}{\partial z^2}=\frac{1}{c^2}\frac{\partial^2 E_x}{\partial t^2},
+$$ (eq:em-plane-wave-1d)
+
+and $H_y$ obeys the same equation. This means that to fully describe a TEM wave, we only need to write the equations for either the E or the H field! That saves us a bit of time and effort. 
+
+### Solving the wave equation
+
+Equation {eq}`eq:em-plane-wave-1d` is the **one-dimensional wave equation**: a linear, second-order partial differential equation in which the second derivative in space is proportional to the second derivative in time. It has exactly the form of the equation for acoustic pressure in {doc}`../4_mechanical_waves/acoustic_waves`, with $p$ replaced by $E_x$ and $x$ by $z$.
+
+Let us try a sinusoid:
+
+$$
+E_x(z,t)=E_0\cos(\omega t-kz).
+$$ (eq:em-plane-cos-trial)
+
+Here $E_0$ is the amplitude in V/m, $\omega$ is the angular frequency in rad/s, and $k$, the **wavenumber**, is its counterpart in space, in rad/m: it says how quickly the phase changes per metre. Each time derivative brings out a factor $\omega$, and each derivative along $z$ a factor $k$:
+
+$$
+\frac{\partial^2 E_x}{\partial t^2}=-\omega^2E_x,
+\qquad
+\frac{\partial^2 E_x}{\partial z^2}=-k^2E_x.
+$$
+
+Substituting into the wave equation gives $-k^2E_x=-(\omega^2/c^2)E_x$. For this to hold at every position and time,
+
+$$
+\boxed{k=\frac{\omega}{c}.}
+$$ (eq:em-plane-dispersion)
+
+Any frequency is allowed; the wave equation only fixes how the spatial frequency (aka the wavenumber) $k$ is tied to the temporal frequency $\omega$.
+
+**What does the solution look like?** At a fixed time, $E_x$ is a cosine in $z$, with crests a wavelength $\lambda=2\pi/k$ apart. At a fixed position, it oscillates in time with period $T=2\pi/\omega$. Now follow one crest. Its phase $\omega t-kz$ stays constant, so as time increases by $\Delta t$ the crest moves by $\Delta z$ with $\omega\Delta t-k\Delta z=0$:
+
+$$
+\frac{\Delta z}{\Delta t}=\frac{\omega}{k}=c.
+$$
+
+The whole pattern travels along $+z$ at the speed of light, as drawn in {numref}`fig:em-plane-tem`.
+
+```{figure} figures/plane_wave_tem.png
+:name: fig:em-plane-tem
+:width: 85%
+
+Snapshot of a sinusoidal TEM wave travelling along $+z$. The electric field (blue) points along $\pm x$ and the magnetic field (orange) along $\pm y$; both vary only along $z$. The fields, and the propagation direction, are mutually perpendicular. $\vec H$ is not drawn to scale relative to $\vec E$.
+```
+
+**Is the sinusoid the only solution?** No. Using $k=\omega/c$, our solution can be written as $E_0\cos\bigl(\omega(t-z/c)\bigr)$: it depends on $z$ and $t$ only through the combination $t-z/c$. Because the wave equation is linear, sums of solutions are also solutions. We may add sinusoids of different frequencies, with any amplitudes and phases, and every one of them travels at the same speed $c$. As you know from *Signals and Time Series*, such sums can build almost any signal $F(t)$. The result is a waveform $F(t-z/c)$ that travels along $+z$ without changing shape: the general travelling-wave solution you met for {doc}`acoustic waves <../4_mechanical_waves/wave_equation_solutions>`. The wave equation fixes the speed; the shape is set by the source. In practice, we will mostly work with a single sinusoid, and look at it more closely in {doc}`harmonic_waves`.
+
+```{admonition} Follow the solution
+:class: question
+
+1. Follow a crest of $E_0\cos(\omega t+kz)$. Which way does it move, and how fast?
+2. Two sensors, $30\ \mathrm{m}$ apart along $z$, record the same wave. What is the time delay between their records? Does it depend on the frequency?
+3. Substitute $E_x=E_0\cos(\omega t-kz)$ into the first equation of {eq}`eq:em-plane-coupled` to find $H_y$. Are $E_x$ and $H_y$ in phase? How is the ratio of their amplitudes related to the quantity in ohms you found earlier?
+```
+
+<!--
+
+PREVIOUS VERSION, kept for reference while this page is reworked. Not rendered.
+
+# One-dimensional plane electromagnetic waves
+
+An Earth Observation (EO) radar sends out a pulse and listens for an echo. The echo arrives later because the electromagnetic disturbance needs time to travel. What exactly is travelling? How do the electric and magnetic fields fit together?
+
+We can answer these questions with mathematics that is already familiar from mechanical waves. In this section we start with a general waveform; sinusoidal waves and complex notation follow in {doc}`harmonic_waves`. Throughout we consider propagation through vacuum. For many radar paths through air this is a useful first approximation; propagation through materials will come later.
 
 ## A familiar equation, with different fields
 
@@ -312,20 +533,7 @@ $$
 E_x(z,t)=F(t-z/c).
 $$
 
-If the source starts at $t=0$, a sensor at $z$ cannot see that onset until $t=z/c$. At the travelling onset, just as at any other marked feature, $t-z/c$ stays constant.
-
-### Radar: a delay becomes a distance
-
-For a radar receiving an echo from a stationary target, the pulse travels out and back. Approximating the path by vacuum,
-
-$$
-\Delta t=\frac{2R}{c},\qquad
-\boxed{R=\frac{c\Delta t}{2}.}
-$$
-
-Here $R$ is the distance along the line of sight, or **slant range**. At $R=600\ \mathrm{km}$, the round-trip time is about $4\ \mathrm{ms}$. We will deal with what creates an echo later; for now, its travel time already tells us something useful.
-
-Ground-penetrating radar uses the same basic idea below the surface. There, turning a delay into a depth also requires knowing the propagation speed in the ground. That is one reason to study materials later.
+If the source starts at $t=0$, a sensor at $z$ cannot see that onset until $t=z/c$. At the travelling onset, just as at any other marked feature, $t-z/c$ stays constant. In {doc}`radar_examples` we turn such a delay into a distance.
 
 ```{admonition} Follow the pulse
 :class: tip
@@ -337,207 +545,54 @@ Before changing time, predict the new position of the marked peak. Use the contr
 :file: interactives/pulse_embed.html
 ```
 
-## Harmonic waves: frequency in time and in space
-
-Now we are going to consider sinusoidal signals. As you know *Signals and Time Series*, most signals of interest can be build from a sumation of cosines and sines. Moreover, in many cases, most of the analysis of interest can be done considering a **monochromatic** wave, i.e. a cosine or a singe at a single frequency. We  choose a particular waveform:
-
-$$
-E_x(z,t)=E_0\cos(\omega t-kz+\phi).
-$$ (eq:em-plane-harmonic-real)
-
-At one position this is an oscillation in time. At one time it is an oscillation in space. The two frequencies are
-
-$$
-\omega=2\pi f=\frac{2\pi}{T},\qquad
-\boxed{k=\frac{2\pi}{\lambda}.}
-$$
-
-The **wavenumber $k$ is angular spatial frequency**: phase change per metre, measured in rad/m. It plays the same role for position that $\omega$ plays for time. If we count whole cycles rather than radians, the spatial frequency is $1/\lambda$, just as ordinary temporal frequency is $f=1/T$.
-
-| | Time, at fixed position | Space, at fixed time |
-|---|---|---|
-| One full cycle | Period $T$ in s | Wavelength $\lambda$ in m |
-| Cycles per unit | $f=1/T$ in Hz | $1/\lambda$ in cycles/m |
-| Radians per unit | $\omega=2\pi f$ in rad/s | $k=2\pi/\lambda$ in rad/m |
-
-For example, a wavelength of $3\ \mathrm{cm}$ means about $33$ cycles per metre, or $k\simeq209\ \mathrm{rad/m}$. Moving $1\ \mathrm{cm}$ along a snapshot changes the phase by one third of a cycle: $2\pi/3$ radians in magnitude. A larger wavenumber means more closely spaced oscillations, not a faster wave.
-
-```{figure} figures/plane_wave_spatial_frequency.png
-:name: fig:em-plane-spatial-frequency
-:width: 95%
-
-A harmonic wave viewed in time at one position (left) and in space at one time (right). Here $f=100\ \mathrm{MHz}$, $T=10\ \mathrm{ns}$, $\lambda\simeq3\ \mathrm{m}$ and $k\simeq2.09\ \mathrm{rad/m}$. These are two ways of looking at the same wave.
-```
-
-Follow a crest. Its phase stays constant:
-
-$$
-\omega t-kz+\phi=\text{constant}.
-$$
-
-For changes along that crest, $\omega\Delta t-k\Delta z=0$, and hence
-
-$$
-\frac{\Delta z}{\Delta t}=\frac{\omega}{k}=c,
-\qquad
-\boxed{\omega=ck.}
-$$
-
-This is the harmonic version of keeping $t-z/c$ constant. Frequency and wavenumber are linked by the propagation speed: $c=f\lambda$.
-
-```{admonition} Read a wave as a sentence
-:class: question
-
-A vacuum wave has $E_x=E_0\cos(2\pi\,10^8t-kz)$, using seconds and metres.
-
-1. Find $f$, $T$, $\lambda$ and $k$, with units.
-2. How much does its phase change over half a wavelength at one instant?
-3. What changes if the sign before $kz$ becomes positive?
-4. If the frequency doubles in vacuum, what happens to $k$, $\lambda$ and the speed?
-```
-
-## Complex fields: the usual working language
-
-Keeping track of amplitudes and phases with cosines soon gets tiresome. Euler's identity gives us a more convenient language:
-
-$$
-\cos\theta=\operatorname{Re}\{e^{i\theta}\}.
-$$
-
-We can represent the same harmonic field by the complex expression
-
-$$
-\boxed{E_x(z,t)=E_0e^{i(\omega t-kz+\phi)}.}
-$$ (eq:em-plane-harmonic-complex)
-
-Formally, the measurable field is the **real part** of this expression. In practice, we will use the same symbol and treat harmonic fields as complex-valued, remembering to take the real part when we want the physical field. This is standard working practice in electromagnetics; getting comfortable with it will make the subject much easier.
-
-We can also separate out the time dependence:
-
-$$
-E_x(z,t)=E_x(z)e^{i\omega t},\qquad
-E_x(z)=E_0e^{i\phi}e^{-ikz}.
-$$
-
-The time-independent complex amplitude $E_x(z)$ is called a **phasor**. It stores both amplitude and phase. To recover the physical field, use $\operatorname{Re}\{E_x(z)e^{i\omega t}\}$. Using the same symbol is slightly ambiguous, but the context tells us which representation we mean.
-
-### What do we gain?
-
-For a harmonic field,
-
-$$
-\frac{\partial\vec E}{\partial t}=i\omega\vec E,
-$$
-
-and for a wave travelling along $+z$,
-
-$$
-\frac{\partial\vec E}{\partial z}=-ik\vec E.
-$$
-
-Differentiation becomes multiplication. Maxwell's curl equations, written for the phasors, are then
-
-$$
-\vec\nabla\times\vec E=-i\omega\mu_0\vec H,
-\qquad
-\vec\nabla\times\vec H=i\omega\epsilon_0\vec E.
-$$ (eq:em-plane-phasor-maxwell)
-
-The curl still has its geometric meaning. Complex notation handles the harmonic time dependence; it does not replace vector calculus.
-
-There is a second payoff. Delaying a harmonic signal by $\Delta t$ multiplies it by
-
-$$
-e^{-i\omega\Delta t}.
-$$
-
-A one-way propagation distance $R$ therefore contributes $e^{-ikR}$. For a radar echo, the round-trip propagation contributes $e^{-i2kR}$, in addition to the target's own scattering response. Now a phase factor is a compact way of describing a journey.
-
-Our choice of $e^{+i\omega t}$ agrees with the {doc}`Fourier convention used for mechanical waves <../4_mechanical_waves/impedance>`. With this convention, a forward-travelling wave has $e^{-ikz}$. Changing convention is possible, but changing it halfway through a calculation is asking for trouble.
-
-### What about the pulse we started with?
-
-A pulse is not a single harmonic wave. Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
-
-```{admonition} Turn up the spatial frequency
-:class: tip
-
-Change the temporal frequency and compare the time trace with the spatial snapshot below. Predict what will happen to the spacing between crests before moving the slider. Watch $\omega$, $k$, $T$ and $\lambda$ together. Increasing frequency changes how many oscillations fit into a second and a metre; in vacuum it does not change the speed.
-```
-
-```{raw} html
-:file: interactives/frequency_embed.html
-```
-
-## The same mathematics on a transmission line
-
-The pulse also needs time to travel through the cable feeding a radar antenna. We can understand this using the same field equations, with **voltage and current** taking the roles of our two coupled quantities.
-
-Consider two ideal conducting plates, separated by a distance $d$ along $x$, wide along $y$, and extending along $z$. Let their width be $w\gg d$, so we can neglect fields near the side edges. Between them we use the same transverse fields $E_x(z,t)$ and $H_y(z,t)$.
-
-```{figure} figures/plane_wave_parallel_plates.png
-:name: fig:em-plane-line
-:width: 85%
-
-Cross-section of an ideal parallel-plate line, looking along $+z$. The electric field points across the gap. The magnetic field runs across the width. The conductor current $I$ is positive along $+z$ on the lower plate; the upper plate carries the return current. The geometry is schematic.
-```
-
-Define the voltage across the gap at a given $z$, and the current along the lower plate, by
-
-$$
-V(z,t)=dE_x(z,t),\qquad I(z,t)=wH_y(z,t).
-$$
-
-The first relation comes from integrating the electric field across the gap. The second comes from Ampère's law around the plate, neglecting edge fields. We now multiply the coupled field equations by $d$ and $w$:
-
-$$
-\frac{\partial V}{\partial z}
-=-\frac{\mu_0d}{w}\frac{\partial I}{\partial t},
-\qquad
-\frac{\partial I}{\partial z}
-=-\frac{\epsilon_0w}{d}\frac{\partial V}{\partial t}.
-$$
-
-The geometry gives two parameters,
-
-$$
-L'=\frac{\mu_0d}{w}\quad[\mathrm{H/m}],\qquad
-C'=\frac{\epsilon_0w}{d}\quad[\mathrm{F/m}],
-$$
-
-the **inductance per unit length** and **capacitance per unit length**. Here the prime means “per unit length”, not a derivative. Our equations become the **lossless telegrapher's equations**:
-
-$$
-\boxed{
-\frac{\partial V}{\partial z}=-L'\frac{\partial I}{\partial t},
-\qquad
-\frac{\partial I}{\partial z}=-C'\frac{\partial V}{\partial t}.
-}
-$$ (eq:em-plane-telegrapher)
-
-Differentiate the first equation with respect to $z$ and substitute the second. For constant line parameters,
-
-$$
-\frac{\partial^2 V}{\partial z^2}=L'C'\frac{\partial^2 V}{\partial t^2}.
-$$
-
-Another wave equation! Its speed and forward-wave voltage–current ratio are
-
-$$
-v_{\mathrm{line}}=\frac{1}{\sqrt{L'C'}},\qquad
-Z_0=\sqrt{\frac{L'}{C'}}.
-$$
-
-For these vacuum-filled plates, $v_{\mathrm{line}}=c$ and $Z_0=\eta_0d/w$. Both $Z_0$ and $\eta_0$ have units of ohms, but the line impedance also depends on geometry. Real cables contain other materials and have losses; we will return to those effects later.
-
-```{admonition} Recognize the structure
-:class: question
-
-Compare the telegrapher's equations with the coupled equations for $E_x,H_y$, and with the earlier equations for acoustic pressure and particle velocity. Which quantities play corresponding mathematical roles? Which physical directions are different?
-```
-
-We now have three settings—acoustics, unguided electromagnetic waves and transmission lines—with a common mathematical structure. Two coupled first-order equations give a wave equation; a waveform travels with a definite speed; and an impedance relates its two quantities. Recognizing that structure lets us reuse what we already know.
-
 ## Reading and sources
 
-The time-domain-first approach follows David H. Staelin's open [*Electromagnetics and Applications*](https://www.ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/mit6_013_s09_coursetextbook.pdf), §§2.2–2.3; §7.1 develops the transmission-line connection. The derivations here use the geometry and notation chosen for this book. A complementary treatment of one-dimensional waves and lines is Haus and Melcher's [*Electromagnetic Fields and Energy*, Chapter 14](https://ocw.mit.edu/courses/res-6-001-electromagnetic-fields-and-energy-spring-2008/pages/chapter-14/).
+The time-domain-first approach follows David H. Staelin's open [*Electromagnetics and Applications*](https://www.ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/mit6_013_s09_coursetextbook.pdf), §§2.2–2.3. The derivations here use the geometry and notation chosen for this book.
+
+REMOVED FROM "Solving the wave equation" (d'Alembert route with a pulse), 2026-11-11.
+
+As there, the equation factorizes into two first-order parts:
+
+$$
+\left(\frac{\partial}{\partial z}-\frac{1}{c}\frac{\partial}{\partial t}\right)
+\left(\frac{\partial}{\partial z}+\frac{1}{c}\frac{\partial}{\partial t}\right)E_x=0.
+$$
+
+Setting either factor to zero gives a one-way equation. The equation $\partial E_x/\partial z=-\frac{1}{c}\,\partial E_x/\partial t$ is solved by any function of $t-z/c$, and $\partial E_x/\partial z=+\frac{1}{c}\,\partial E_x/\partial t$ by any function of $t+z/c$. Because the wave equation is linear, we can add the two, giving the general solution
+
+$$
+\boxed{E_x(z,t)=F\!\left(t-\frac{z}{c}\right)+G\!\left(t+\frac{z}{c}\right).}
+$$ (eq:em-plane-general-solution)
+
+This is **d'Alembert's solution**. $F$ and $G$ are arbitrary functions with units of V/m: whatever shapes the sources produce.
+
+```{admonition} Check by substitution
+:class: dropdown
+
+Set $\tau=t-z/c$, so that $E_x=F(\tau)$, and write $F'$ for $dF/d\tau$. Since $\partial\tau/\partial t=1$ and $\partial\tau/\partial z=-1/c$, the chain rule gives
+
+$$
+\frac{\partial^2 E_x}{\partial t^2}=F''(\tau),
+\qquad
+\frac{\partial^2 E_x}{\partial z^2}=\frac{1}{c^2}F''(\tau).
+$$
+
+So $\partial^2E_x/\partial z^2=(1/c^2)\,\partial^2E_x/\partial t^2$ for *any* twice-differentiable $F$. The same steps work for $G(t+z/c)$: the two factors $+1/c$ again multiply to $1/c^2$.
+```
+
+**What does the solution look like?** Take $F$ alone and follow one recognizable feature, such as its peak. That feature belongs to one particular value of the argument, so
+
+$$
+t-\frac{z}{c}=\text{constant}.
+$$
+
+If time increases by $\Delta t$, the feature must move by $\Delta z=c\,\Delta t$. The whole waveform slides along $+z$ at speed $c$ **without changing shape**. Likewise, $G(t+z/c)$ slides along $-z$. The wave equation fixes the speed, but it leaves the shape free: the shape is set by the source, such as a radar transmitter.
+
+```{figure} figures/plane_wave_pulse.png
+:name: fig:em-plane-pulse
+:width: 95%
+
+Top: two spatial snapshots of an asymmetric pulse $F(t-z/c)$ travelling along $+z$. The marked peak keeps $t-z/c=0$. Bottom: the time record at $z=150\ \mathrm{m}$. Reading each graph from left to right, the shape is reversed: the sensor sees the steep front first, then the long tail.
+```
+
+-->
