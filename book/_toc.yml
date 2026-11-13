@@ -133,13 +133,15 @@ parts:
       - file: 5_electromagnetic_waves/harmonic_waves.md
       - file: 5_electromagnetic_waves/transmission_lines.md
       - file: 5_electromagnetic_waves/radar_examples.md
-      - file: 5_electromagnetic_waves/practice_1.md
-      - file: 5_electromagnetic_waves/waves_3d_energy_polarization.md
-      - file: 5_electromagnetic_waves/media_and_losses.md
-      - file: 5_electromagnetic_waves/practice_2_assessment.md
-      - file: 5_electromagnetic_waves/interface_scattering.md
-      - file: 5_electromagnetic_waves/multilayer_frequency_response.md
-      - file: 5_electromagnetic_waves/practice_3.md
+      # Hidden for now: these pages only contain a heading so far.
+      # Uncomment each one once it has content.
+      # - file: 5_electromagnetic_waves/practice_1.md
+      # - file: 5_electromagnetic_waves/waves_3d_energy_polarization.md
+      # - file: 5_electromagnetic_waves/media_and_losses.md
+      # - file: 5_electromagnetic_waves/practice_2_assessment.md
+      # - file: 5_electromagnetic_waves/interface_scattering.md
+      # - file: 5_electromagnetic_waves/multilayer_frequency_response.md
+      # - file: 5_electromagnetic_waves/practice_3.md
     - file: 5_electromagnetic_waves/labs/lab_em_waves.md
   - caption: Miscellaneous
     chapters:
