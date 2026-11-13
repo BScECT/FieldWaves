@@ -142,7 +142,7 @@ parts:
       # - file: 5_electromagnetic_waves/interface_scattering.md
       # - file: 5_electromagnetic_waves/multilayer_frequency_response.md
       # - file: 5_electromagnetic_waves/practice_3.md
-    - file: 5_electromagnetic_waves/labs/lab_em_waves.md
+    - file: 5_electromagnetic_waves/labs/lab_em_waves_solutions.md
   - caption: Miscellaneous
     chapters:
     - file: references.md
