@@ -66,13 +66,13 @@ A vacuum wave has $E_x=E_0\cos(2\pi\,10^8t-kz)$, using seconds and metres.
 Keeping track of amplitudes and phases with cosines soon gets tiresome. Euler's identity gives us a more convenient language:
 
 $$
-\cos\theta=\operatorname{Re}\{e^{i\theta}\}.
+\cos\theta=\operatorname{Re}\{e^{j\theta}\}.
 $$
 
-We can represent the same harmonic field by the complex expression
+Using $j$ for the imaginary unit, $j^2=-1$, we can represent the same harmonic field by the complex expression
 
 $$
-\boxed{E_x(z,t)=E_0e^{i(\omega t-kz+\phi)}.}
+\boxed{E_x(z,t)=E_0e^{j(\omega t-kz+\phi)}.}
 $$ (eq:em-plane-harmonic-complex)
 
 Formally, the measurable field is the **real part** of this expression. In practice, we will use the same symbol and treat harmonic fields as complex-valued, remembering to take the real part when we want the physical field. This is standard working practice in electromagnetics; getting comfortable with it will make the subject much easier.
@@ -80,37 +80,37 @@ Formally, the measurable field is the **real part** of this expression. In pract
 We can also separate out the time dependence:
 
 $$
-E_x(z,t)=E_x(z)e^{i\omega t},\qquad
-E_x(z)=E_0e^{i\phi}e^{-ikz}.
+E_x(z,t)=E_x(z)e^{j\omega t},\qquad
+E_x(z)=E_0e^{j\phi}e^{-jkz}.
 $$
 
-The time-independent complex amplitude $E_x(z)$ is called a **phasor**. It stores both amplitude and phase. To recover the physical field, use $\operatorname{Re}\{E_x(z)e^{i\omega t}\}$. Using the same symbol is slightly ambiguous, but the context tells us which representation we mean.
+The time-independent complex amplitude $E_x(z)$ is called a **phasor**. It stores both amplitude and phase. To recover the physical field, use $\operatorname{Re}\{E_x(z)e^{j\omega t}\}$. Using the same symbol is slightly ambiguous, but the context tells us which representation we mean.
 
 ### Simplifying derivatives using phasors
 
 For a harmonic field,
 
 $$
-\frac{\partial\vec E}{\partial t}=i\omega\vec E,
+\frac{\partial\vec E}{\partial t}=j\omega\vec E,
 $$
 
 and for a wave travelling along $+z$,
 
 $$
-\frac{\partial\vec E}{\partial z}=-ik\vec E.
+\frac{\partial\vec E}{\partial z}=-jk\vec E.
 $$
 
 Differentiation becomes multiplication. Maxwell's curl equations, written for the phasors, are then
 
 $$
-\vec\nabla\times\vec E=-i\omega\mu_0\vec H,
+\vec\nabla\times\vec E=-j\omega\mu_0\vec H,
 \qquad
-\vec\nabla\times\vec H=i\omega\epsilon_0\vec E.
+\vec\nabla\times\vec H=j\omega\epsilon_0\vec E.
 $$ (eq:em-plane-phasor-maxwell)
 
 The curl still has its geometric meaning. Complex notation handles the harmonic time dependence; it does not replace vector calculus.
 
-Our choice of $e^{+i\omega t}$ agrees with the {doc}`Fourier convention used for mechanical waves <../4_mechanical_waves/impedance>`. With this convention, a forward-travelling wave has $e^{-ikz}$. Changing convention is possible, but changing it halfway through a calculation is asking for trouble.
+Our choice of $e^{+j\omega t}$ agrees with the {doc}`Fourier convention used for mechanical waves <../4_mechanical_waves/impedance>`. With this convention, a forward-travelling wave has $e^{-jkz}$. Changing convention is possible, but changing it halfway through a calculation is asking for trouble.
 
 ### What about a radar pulse?
 

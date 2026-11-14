@@ -11,13 +11,28 @@ Consider two ideal conducting plates, separated by a distance $d$ along $x$, wid
 Cross-section of an ideal parallel-plate line, looking along $+z$. The electric field points across the gap. The magnetic field runs across the width. The conductor current $I$ is positive along $+z$ on the lower plate; the upper plate carries the return current. The geometry is schematic.
 ```
 
-Define the voltage across the gap at a given $z$, and the current along the lower plate, by
+The voltage across the gap at a given $z$ comes from integrating $E_x$ across the separation. To obtain the current, we need the magnetic boundary condition at a conductor surface.
+
+A **surface current density** $\vec K_s$ has units of A/m: current per unit width of the surface. For the wave field inside an ideal conductor, $\vec H=0$. Applying Ampère's law to a small loop across the surface gives
 
 $$
-V(z,t)=dE_x(z,t),\qquad I(z,t)=wH_y(z,t).
+\boxed{\vec K_s=\hat n\times\vec H_{\mathrm{gap}},}
 $$
 
-The first relation comes from integrating the electric field across the gap. The second comes from Ampère's law around the plate, neglecting edge fields. We now multiply the coupled field equations for $E_x$ and $H_y$ from {doc}`plane_waves_1d` by $d$ and $w$:
+where $\hat n$ points **from the conductor into the gap**. Only the tangential magnetic field contributes. At the lower plate, $\hat n=\hat x$ and $\vec H=H_y\hat y$, so $\vec K_s=H_y\hat z$. Integrating across the width of the plate gives the total current:
+
+$$
+I(z,t)=\int_0^w K_{s,z}(z,t)\,dy=wH_y(z,t).
+$$
+
+On the upper plate the normal reverses, giving the return current. We therefore have
+
+$$
+V(z,t)=\int_0^d E_x(z,t)\,dx=dE_x(z,t),\qquad
+I(z,t)=wH_y(z,t).
+$$
+
+The last equalities use the approximately uniform fields between the wide plates. We now multiply the coupled field equations for $E_x$ and $H_y$ from {doc}`plane_waves_1d` by $d$ and $w$:
 
 $$
 \frac{\partial V}{\partial z}

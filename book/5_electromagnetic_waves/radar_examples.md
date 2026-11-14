@@ -17,10 +17,10 @@ Ground-penetrating radar uses the same basic idea below the surface. There, turn
 
 ## A round trip becomes a phase
 
-For a harmonic signal, a one-way propagation distance $R$ contributes the factor $e^{-ikR}$. For a radar echo, the round-trip propagation therefore contributes
+Delaying a harmonic signal by $\Delta t$ multiplies it by $e^{-j\omega\Delta t}$. For a harmonic signal, a one-way propagation distance $R$ contributes the factor $e^{-jkR}$. For a radar echo, the round-trip propagation therefore contributes
 
 $$
-e^{-i2kR},
+e^{-j2kR},
 $$
 
 in addition to the target's own scattering response. Where the pulse picture turned a journey into a delay, the harmonic picture turns it into a phase.
