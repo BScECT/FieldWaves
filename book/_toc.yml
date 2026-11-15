@@ -126,21 +126,27 @@ parts:
       - file: 4_mechanical_waves/appendix_strain_p_s.md
   - caption: Electromagnetic waves
     chapters:
-    - file: 5_electromagnetic_waves/intro.md
+    - file: 5_electromagnetic_waves/00_intro.md
       sections:
-      - file: 5_electromagnetic_waves/history_maxwell.md
-      - file: 5_electromagnetic_waves/plane_waves_1d.md
-      - file: 5_electromagnetic_waves/harmonic_waves.md
-      - file: 5_electromagnetic_waves/transmission_lines.md
-      - file: 5_electromagnetic_waves/radar_examples.md
+      - file: 5_electromagnetic_waves/01_history_maxwell.md
+      - file: 5_electromagnetic_waves/02_00_plane_waves_and_phasors.md
+        sections:
+        - file: 5_electromagnetic_waves/02_01_plane_waves_1d.md
+        - file: 5_electromagnetic_waves/02_02_harmonic_waves.md
+        - file: 5_electromagnetic_waves/02_03_transmission_lines.md
+        - file: 5_electromagnetic_waves/02_04_radar_examples.md
+        # - file: 5_electromagnetic_waves/02_05_practice_1.md
+      - file: 5_electromagnetic_waves/03_00_waves_energy_polarization.md
+        sections:
+        - file: 5_electromagnetic_waves/03_01_waves_3d.md
+        - file: 5_electromagnetic_waves/03_02_energy_flow.md
+        - file: 5_electromagnetic_waves/03_03_polarization.md
+        # - file: 5_electromagnetic_waves/03_04_practice_2_assessment.md
       # Keep heading-only pages hidden until content is added.
-      # - file: 5_electromagnetic_waves/practice_1.md
-      - file: 5_electromagnetic_waves/waves_3d_energy_polarization.md
-      # - file: 5_electromagnetic_waves/media_and_losses.md
-      # - file: 5_electromagnetic_waves/practice_2_assessment.md
-      # - file: 5_electromagnetic_waves/interface_scattering.md
-      # - file: 5_electromagnetic_waves/multilayer_frequency_response.md
-      # - file: 5_electromagnetic_waves/practice_3.md
+      # - file: 5_electromagnetic_waves/04_media_and_losses.md
+      # - file: 5_electromagnetic_waves/05_01_interface_scattering.md
+      # - file: 5_electromagnetic_waves/05_02_multilayer_frequency_response.md
+      # - file: 5_electromagnetic_waves/05_03_practice_3.md
     - file: 5_electromagnetic_waves/labs/lab_em_waves_solutions.md
   - caption: Miscellaneous
     chapters:

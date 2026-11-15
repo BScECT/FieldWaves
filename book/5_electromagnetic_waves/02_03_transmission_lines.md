@@ -1,6 +1,6 @@
 # Transmission lines: the same mathematics
 
-A radar pulse also needs time to travel through the cable feeding the antenna. We can understand this using the same field equations as in {doc}`plane_waves_1d`, with **voltage and current** taking the roles of our two coupled quantities.
+A radar pulse also needs time to travel through the cable feeding the antenna. We can understand this using the same field equations as in {doc}`02_01_plane_waves_1d`, with **voltage and current** taking the roles of our two coupled quantities.
 
 Consider two ideal conducting plates, separated by a distance $d$ along $x$, wide along $y$, and extending along $z$. Let their width be $w\gg d$, so we can neglect fields near the side edges. Between them we use the same transverse fields $E_x(z,t)$ and $H_y(z,t)$.
 
@@ -32,7 +32,7 @@ V(z,t)=\int_0^d E_x(z,t)\,dx=dE_x(z,t),\qquad
 I(z,t)=wH_y(z,t).
 $$
 
-The last equalities use the approximately uniform fields between the wide plates. We now multiply the coupled field equations for $E_x$ and $H_y$ from {doc}`plane_waves_1d` by $d$ and $w$:
+The last equalities use the approximately uniform fields between the wide plates. We now multiply the coupled field equations for $E_x$ and $H_y$ from {doc}`02_01_plane_waves_1d` by $d$ and $w$:
 
 $$
 \frac{\partial V}{\partial z}

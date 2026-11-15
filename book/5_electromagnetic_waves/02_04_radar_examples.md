@@ -1,6 +1,6 @@
 # Radar examples
 
-An Earth Observation radar sends out a pulse and listens for an echo. With the travelling waves of {doc}`plane_waves_1d` and the complex notation of {doc}`harmonic_waves`, we can already say something useful about that echo, before asking what creates it.
+An Earth Observation radar sends out a pulse and listens for an echo. With the travelling waves of {doc}`02_01_plane_waves_1d` and the complex notation of {doc}`02_02_harmonic_waves`, we can already say something useful about that echo, before asking what creates it.
 
 ## A delay becomes a distance
 
