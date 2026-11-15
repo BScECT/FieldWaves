@@ -292,7 +292,7 @@ The connection with mechanical waves is particularly clear in interference: a re
 5. Why could successful predictions of forces between currents and induction leave room for both Weber's and Maxwell's accounts?
 ```
 
-The route to electromagnetic waves involved experiments, rival interpretations, analogies and revisions. The successful field equations survived changes in the physical mechanisms proposed to explain them. Their travelling-wave solutions connect electromagnetism with the mathematics of mechanical waves; {doc}`plane_waves_1d` will develop that connection using a simple geometry.
+The route to electromagnetic waves involved experiments, rival interpretations, analogies and revisions. The successful field equations survived changes in the physical mechanisms proposed to explain them. Their travelling-wave solutions connect electromagnetism with the mathematics of mechanical waves; {doc}`02_01_plane_waves_1d` will develop that connection using a simple geometry.
 
 ## Reading and sources
 

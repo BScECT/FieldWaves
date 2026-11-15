@@ -4,7 +4,7 @@ An Earth Observation (EO) radar sends out a pulse and listens for an echo. The e
 
 ## Changing fields sustain each other
 
-Consider a region of vacuum with no charges and no currents. We describe the magnetic field by the **magnetic field strength** $\vec H$, in A/m, rather than the flux density $\vec B$ used in {doc}`history_maxwell`. In vacuum,
+Consider a region of vacuum with no charges and no currents. We describe the magnetic field by the **magnetic field strength** $\vec H$, in A/m, rather than the flux density $\vec B$ used in {doc}`01_history_maxwell`. In vacuum,
 
 $$
 \vec B=\mu_0\vec H.
@@ -59,7 +59,7 @@ $$
 \qquad c=\frac{1}{\sqrt{\mu_0\epsilon_0}}\simeq3.00\times10^8\ \mathrm{m/s}.}
 $$ (eq:em-plane-wave-equation)
 
-You have seen this derivation at the end of {doc}`history_maxwell`. The equation has the same structure as the {doc}`acoustic wave equation <../4_mechanical_waves/acoustic_waves>`; only the physical quantity and the speed have changed.
+You have seen this derivation at the end of {doc}`01_history_maxwell`. The equation has the same structure as the {doc}`acoustic wave equation <../4_mechanical_waves/acoustic_waves>`; only the physical quantity and the speed have changed.
 
 Pause on that speed. The constant $\epsilon_0$ describes the force between static charges, as in a charged capacitor; $\mu_0$ describes the force between wires carrying steady currents. Neither involves anything moving quickly, let alone light. Yet together they give $1/\sqrt{\mu_0\epsilon_0}\simeq3.00\times10^8\ \mathrm{m/s}$, the measured speed of light. The electric and magnetic properties of empty space set how fast an electromagnetic disturbance travels, just as the bulk modulus $K$ and the density $\rho$ set $c=\sqrt{K/\rho}$ for sound.
 
@@ -205,7 +205,7 @@ The whole pattern travels along $+z$ at the speed of light, as drawn in {numref}
 Snapshot of a sinusoidal TEM wave travelling along $+z$. The electric field (blue) points along $\pm x$ and the magnetic field (orange) along $\pm y$; both vary only along $z$. The fields, and the propagation direction, are mutually perpendicular. $\vec H$ is not drawn to scale relative to $\vec E$.
 ```
 
-**Is the sinusoid the only solution?** No. Using $k=\omega/c$, our solution can be written as $E_0\cos\bigl(\omega(t-z/c)\bigr)$: it depends on $z$ and $t$ only through the combination $t-z/c$. Because the wave equation is linear, sums of solutions are also solutions. We may add sinusoids of different frequencies, with any amplitudes and phases, and every one of them travels at the same speed $c$. As you know from *Signals and Time Series*, such sums can build almost any signal $F(t)$. The result is a waveform $F(t-z/c)$ that travels along $+z$ without changing shape: the general travelling-wave solution you met for {doc}`acoustic waves <../4_mechanical_waves/wave_equation_solutions>`. The wave equation fixes the speed; the shape is set by the source. In practice, we will mostly work with a single sinusoid, and look at it more closely in {doc}`harmonic_waves`.
+**Is the sinusoid the only solution?** No. Using $k=\omega/c$, our solution can be written as $E_0\cos\bigl(\omega(t-z/c)\bigr)$: it depends on $z$ and $t$ only through the combination $t-z/c$. Because the wave equation is linear, sums of solutions are also solutions. We may add sinusoids of different frequencies, with any amplitudes and phases, and every one of them travels at the same speed $c$. As you know from *Signals and Time Series*, such sums can build almost any signal $F(t)$. The result is a waveform $F(t-z/c)$ that travels along $+z$ without changing shape: the general travelling-wave solution you met for {doc}`acoustic waves <../4_mechanical_waves/wave_equation_solutions>`. The wave equation fixes the speed; the shape is set by the source. In practice, we will mostly work with a single sinusoid, and look at it more closely in {doc}`02_02_harmonic_waves`.
 
 ```{admonition} Follow the solution
 :class: question
@@ -223,11 +223,11 @@ PREVIOUS VERSION, kept for reference while this page is reworked. Not rendered.
 
 An Earth Observation (EO) radar sends out a pulse and listens for an echo. The echo arrives later because the electromagnetic disturbance needs time to travel. What exactly is travelling? How do the electric and magnetic fields fit together?
 
-We can answer these questions with mathematics that is already familiar from mechanical waves. In this section we start with a general waveform; sinusoidal waves and complex notation follow in {doc}`harmonic_waves`. Throughout we consider propagation through vacuum. For many radar paths through air this is a useful first approximation; propagation through materials will come later.
+We can answer these questions with mathematics that is already familiar from mechanical waves. In this section we start with a general waveform; sinusoidal waves and complex notation follow in {doc}`02_02_harmonic_waves`. Throughout we consider propagation through vacuum. For many radar paths through air this is a useful first approximation; propagation through materials will come later.
 
 ## A familiar equation, with different fields
 
-At the end of {doc}`history_maxwell`, Maxwell's equations gave us
+At the end of {doc}`01_history_maxwell`, Maxwell's equations gave us
 
 $$
 \nabla^2\vec E=\frac{1}{c^2}\frac{\partial^2\vec E}{\partial t^2},
@@ -533,7 +533,7 @@ $$
 E_x(z,t)=F(t-z/c).
 $$
 
-If the source starts at $t=0$, a sensor at $z$ cannot see that onset until $t=z/c$. At the travelling onset, just as at any other marked feature, $t-z/c$ stays constant. In {doc}`radar_examples` we turn such a delay into a distance.
+If the source starts at $t=0$, a sensor at $z$ cannot see that onset until $t=z/c$. At the travelling onset, just as at any other marked feature, $t-z/c$ stays constant. In {doc}`02_04_radar_examples` we turn such a delay into a distance.
 
 ```{admonition} Follow the pulse
 :class: tip

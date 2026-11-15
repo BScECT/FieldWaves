@@ -1,6 +1,6 @@
 # Harmonic waves and complex notation
 
-In {doc}`plane_waves_1d` we found that a sinusoid $E_0\cos(\omega t-kz)$ solves the wave equation provided $k=\omega/c$, and that sums of such sinusoids give travelling waves of any shape. We now look more closely at a single sinusoid, and introduce the complex notation that radar engineers and electromagnetics textbooks use almost everywhere.
+In {doc}`02_01_plane_waves_1d` we found that a sinusoid $E_0\cos(\omega t-kz)$ solves the wave equation provided $k=\omega/c$, and that sums of such sinusoids give travelling waves of any shape. We now look more closely at a single sinusoid, and introduce the complex notation that radar engineers and electromagnetics textbooks use almost everywhere.
 
 ## Harmonic waves: frequency in time and in space
 
@@ -114,7 +114,7 @@ Our choice of $e^{+j\omega t}$ agrees with the {doc}`Fourier convention used for
 
 ### What about a radar pulse?
 
-A radar usually transmits a short pulse, not an endless sinusoid. A pulse is not a single harmonic wave, but, as we saw in {doc}`plane_waves_1d`, Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
+A radar usually transmits a short pulse, not an endless sinusoid. A pulse is not a single harmonic wave, but, as we saw in {doc}`02_01_plane_waves_1d`, Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
 
 ```{admonition} Turn up the spatial frequency
 :class: tip

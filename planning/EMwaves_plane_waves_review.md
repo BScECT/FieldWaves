@@ -1,6 +1,6 @@
 # Plane-wave draft — joint review
 
-First draft: 2026-11-08. Book source: `book/5_electromagnetic_waves/plane_waves_1d.md`.
+First draft: 2026-11-08. Book source: `book/5_electromagnetic_waves/02_01_plane_waves_1d.md`.
 
 ## Review in small passes
 

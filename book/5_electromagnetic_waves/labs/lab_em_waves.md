@@ -3,7 +3,7 @@
 :::{admonition} Pen-and-paper exercises
 :class: note
 
-These exercises accompany {doc}`../plane_waves_1d`, {doc}`../harmonic_waves` and {doc}`../radar_examples`. 
+These exercises accompany {doc}`../02_01_plane_waves_1d`, {doc}`../02_02_harmonic_waves` and {doc}`../02_04_radar_examples`.
 Use $c=3.00\times10^8\ \mathrm{m/s}$ and $\eta_0=\sqrt{\mu_0/\epsilon_0}\simeq377\ \Omega$ throughout.
 :::
 
