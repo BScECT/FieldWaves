@@ -226,7 +226,7 @@ $E_x$ along $z$ at $t=0$ and a quarter period later. In that time the whole patt
 $E_x$ along $z$ at $t=1\ \mu\mathrm{s}$ and $t=2\ \mu\mathrm{s}$, drawn for $\tau=0.1\ \mu\mathrm{s}$. The pulse keeps its shape as it travels $300\ \mathrm{m}$ along $+z$ in $1\ \mu\mathrm{s}$.
 ```
 
-(c) **Not valid.** Substituting into the wave equation gives $-k^2E_x=-(\omega^2/c^2)E_x$ with $k=2\omega/c$, that is $4\omega^2/c^2=\omega^2/c^2$, which is false. The pattern would travel at $\omega/k=c/2$, which would imply the wave is moving at half the speed of light, which is impossible in a vacuum (theoretically possible in a medium). 
+(c) **Not valid.** Substituting into the wave equation gives $-k^2E_x=-(\omega^2/c^2)E_x$ with $k=2\omega/c$, that is $4\omega^2/c^2=\omega^2/c^2$, which is false. The pattern would travel at $\omega/k=c/2$, which would imply the wave is moving at half the speed of light, which is impossible in a vacuum (possible in a medium with refractive index 2). 
 
 (d) **Not valid.** The field points along the propagation direction, so it is longitudinal, not transverse. Its divergence $\partial E_z/\partial z=E_0k\sin(\omega t-kz)$ is not zero, so it breaks Gauss's law in a region without charges. This type of wave can exist in an environment containing free charges, such as plasma. 
 :::
