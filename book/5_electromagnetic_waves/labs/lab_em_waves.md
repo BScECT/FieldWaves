@@ -15,10 +15,10 @@ The Sentinel-1 radar satellites transmit at $f=5.405\ \mathrm{GHz}$. Find the pe
 
 ### 2. Reading a phasor
 
-Using the $e^{+i\omega t}$ convention, a harmonic field has phasor
+Using the $e^{+j\omega t}$ convention, a harmonic field has phasor
 
 $$
-E_x(z)=3\,e^{i\pi/2}e^{-ikz}\ \mathrm{V/m}.
+E_x(z)=3\,e^{j\pi/2}e^{-jkz}\ \mathrm{V/m}.
 $$
 
 (a) Write the physical field $E_x(z,t)$, and evaluate it at $z=0$.
@@ -52,7 +52,7 @@ A radar satellite operating at $5.405\ \mathrm{GHz}$ observes a point on the gro
 
 (b) How many wavelengths fit into the round trip? Why is the absolute phase of a single echo not useful on its own for finding $R$?
 
-(c) Between two passes of the satellite, the ground moves $3\ \mathrm{mm}$ away from the radar along the line of sight. Using the round-trip factor $e^{-i2k\Delta R}$, find the change in echo phase.
+(c) Between two passes of the satellite, the ground moves $3\ \mathrm{mm}$ away from the radar along the line of sight. Using the round-trip factor $e^{-j2k\Delta R}$, find the change in echo phase.
 
 (d) What line-of-sight displacement changes the phase by exactly $2\pi$? What does this mean when you interpret a measured phase change?
 
