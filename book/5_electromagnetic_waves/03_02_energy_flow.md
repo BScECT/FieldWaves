@@ -126,10 +126,17 @@ For a travelling vacuum plane wave the two contributions are again equal, and $\
 For our diagonal wave, take the electric-field phasor
 
 $$
-\vec E(\vec r)=\hat yE_0e^{-jk(x+z)/\sqrt2},\qquad k=\omega/c,
+\vec E(\vec r)=\hat yE_0e^{-j\vec k\cdot\vec r},\qquad k=\omega/c,
 $$
 
-with real $E_0$ and propagation direction $\hat n=(\hat x+\hat z)/\sqrt2$.
+with vector wavenumber
+
+$$
+\vec k=\frac{k}{\sqrt2}\hat x+\frac{k}{\sqrt2}\hat z,
+\qquad \vec k\cdot\vec r=\frac{k(x+z)}{\sqrt2},
+$$
+
+Here $k=|\vec k|$ is the wavenumber (angular spatial frequency), $E_0$ is real, and the propagation direction is $\hat n=(\hat x+\hat z)/\sqrt2$.
 
 1. Find $\vec H$ from $\hat n\times\vec E/\eta_0$, then write $\vec H^*$ explicitly.
 2. Calculate $\vec E\times\vec H^*$ from its Cartesian components. What happens to the spatial phase factors?
@@ -144,9 +151,9 @@ with real $E_0$ and propagation direction $\hat n=(\hat x+\hat z)/\sqrt2$.
 The magnetic-field phasor and its conjugate are
 
 $$
-\vec H=\frac{E_0}{\eta_0\sqrt2}(-\hat x+\hat z)e^{-jk(x+z)/\sqrt2},
+\vec H=\frac{E_0}{\eta_0\sqrt2}(-\hat x+\hat z)e^{-j\vec k\cdot\vec r},
 \qquad
-\vec H^*=\frac{E_0}{\eta_0\sqrt2}(-\hat x+\hat z)e^{+jk(x+z)/\sqrt2}.
+\vec H^*=\frac{E_0}{\eta_0\sqrt2}(-\hat x+\hat z)e^{+j\vec k\cdot\vec r}.
 $$
 
 The opposite phase factors cancel, giving
@@ -159,7 +166,7 @@ $$
 \langle u\rangle=\frac{\epsilon_0E_0^2}{2}.
 $$
 
-A common phase shift also cancels as $e^{j\phi}e^{-j\phi}=1$: it changes the timing of the oscillation, not its average energy transport. Without the conjugate we would retain $e^{-2jk(x+z)/\sqrt2}$ and obtain a position-dependent result, even though this travelling plane wave has uniform average energy flux.
+A common phase shift also cancels as $e^{j\phi}e^{-j\phi}=1$: it changes the timing of the oscillation, not its average energy transport. Without the conjugate we would retain $e^{-2j\vec k\cdot\vec r}$ and obtain a position-dependent result, even though this travelling plane wave has uniform average energy flux.
 ```
 
 ## Spreading is not absorption

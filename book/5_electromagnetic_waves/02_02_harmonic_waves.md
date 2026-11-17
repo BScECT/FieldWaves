@@ -17,7 +17,7 @@ $$
 \boxed{k=\frac{2\pi}{\lambda}.}
 $$
 
-The **wavenumber $k$ is angular spatial frequency**: phase change per metre, measured in rad/m. It plays the same role for position that $\omega$ plays for time. If we count whole cycles rather than radians, the spatial frequency is $1/\lambda$, just as ordinary temporal frequency is $f=1/T$.
+The **wavenumber $k$** measures phase change per metre, in rad/m. It is an angular spatial frequency. It plays the same role for position that $\omega$ plays for time. If we count whole cycles rather than radians, the spatial frequency is $1/\lambda$, just as ordinary temporal frequency is $f=1/T$.
 
 | | Time, at fixed position | Space, at fixed time |
 |---|---|---|
@@ -116,7 +116,7 @@ Our choice of $e^{+j\omega t}$ agrees with the {doc}`Fourier convention used for
 
 A radar usually transmits a short pulse, not an endless sinusoid. A pulse is not a single harmonic wave, but, as we saw in {doc}`02_01_plane_waves_1d`, Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
 
-```{admonition} Turn up the spatial frequency
+```{admonition} Turn up the wavenumber
 :class: tip
 
 Change the temporal frequency and compare the time trace with the spatial snapshot below. Predict what will happen to the spacing between crests before moving the slider. Watch $\omega$, $k$, $T$ and $\lambda$ together. Increasing frequency changes how many oscillations fit into a second and a metre; in vacuum it does not change the speed.

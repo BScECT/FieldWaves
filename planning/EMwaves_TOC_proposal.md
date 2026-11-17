@@ -1,14 +1,14 @@
 # Electromagnetic waves — proposed table of contents, iteration 1
 
 Date: 2026-11-01  
-Status: overall TOC proposal for discussion; the historical section and plane-wave section have first drafts; the other sections are heading-only placeholders (updated 2026-11-08).  
+Status: planning document for discussion; history, plane waves and energy/polarization have drafts. Media section has its first draft and embedded explorers (2026-11-15). Older session outlines below retain the initial proposal.  
 Branch: `EMwaves`  
 Placement: after Mechanical waves, before Miscellaneous.  
 Book directory: `book/5_electromagnetic_waves/`
 
 ## Purpose and level
 
-Support the nine upcoming sessions in their proposed order. The historical section now has a first book-section draft, with separate teaching notes in `planning/EMwaves_history_lecture_notes.md`. The plane-wave section now has a first draft, embedded interactive explorations and review notes in `planning/EMwaves_plane_waves_review.md`. The chapter introduction and remaining seven section pages contain titles only. This document records the proposed overall scope for continued discussion.
+Support the original nine-session sequence. The historical and plane-wave sections have drafts and supporting material; the 3D-wave, energy and polarization section now also has a draft and embedded activities. The media section has a first draft, with the detailed outline in `planning/EMwaves_media_section_plan.md`; practice, interfaces and layers remain to be developed. This document records the overall scope for continued discussion.
 
 Use familiar mechanical-wave ideas as the starting point: travelling disturbances, wave speed, phase, impedance, reflection and transmission. Introduce each new EM idea through a physical picture, a simple geometry and then equations. Keep core derivations in Cartesian coordinates with one direction of spatial variation. Put longer vector derivations and additional generality in optional material if needed.
 
@@ -41,7 +41,7 @@ Detailed sequence proposed on 2026-11-08: [Plane-wave section plan](EMwaves_plan
 - Reduce Maxwell’s curl equations to two coupled scalar equations for a homogeneous, linear, isotropic, source-free, lossless medium.
 - Derive the scalar wave equation; reuse forward/backward travelling solutions and harmonic waves from mechanical waves.
 - Compare pressure/particle velocity with electric/magnetic fields: coupled equations, propagation speed, impedance and direction-dependent signs.
-- Introduce the telegrapher’s equations through voltage/current on a transmission line; map their mathematical structure to the EM field equations. Start lossless and return to loss terms in section 5.
+- Introduce the telegrapher’s equations through voltage/current on a transmission line; map their mathematical structure to the EM field equations. Keep the lossless bridge compact; the revised media plan does not require a second transmission-line derivation.
 
 ## 3. Practice: Maxwell’s equations and plane waves
 
@@ -62,15 +62,22 @@ File: `waves_3d_energy_polarization.md` — session 4
 - Explore linear, circular and elliptical polarization through the electric-field tip at a fixed location.
 - Optional: a fuller energy-conservation derivation and polarization handedness conventions.
 
-## 5. Lossless and lossy media
+## 5. Propagation through lossless and lossy media
 
-File: `media_and_losses.md` — session 5
+Current overview: `book/5_electromagnetic_waves/04_00_media_and_losses.md` — session 5 in the original schedule.
 
-- Physical roles of permittivity, permeability and conductivity; specify the simple material assumptions used throughout.
-- Distinguish phase change from amplitude decay; introduce attenuation, phase constant and complex impedance through a travelling harmonic wave.
-- Connect conduction and displacement currents to the earlier EM-diffusion chapter; distinguish wave-like and diffusion-dominated regimes.
-- Interpret penetration/skin depth and energy dissipation with simple examples.
-- Return to the telegrapher’s equation with loss terms; separate attenuation from dispersion.
+Revised TeachBook proposal, 2026-11-15: [Detailed structure, story and equations](EMwaves_media_section_plan.md). A first draft now follows this outline, with four linked subsection pages, three figures and two embedded explorers.
+
+- Thread: a radar wave enters the ground. Material response changes phase, amplitude and energy flux, and these changes carry information about the material.
+- Give ε and μ physical meaning through bound polarization, dipoles and magnetic response. Connect to the capacitor and soil's solid/air/water mixture; distinguish material polarization from wave polarization.
+- Recover lossless speed, wavelength and impedance before adding loss. Large ε alone does not imply attenuation.
+- Introduce delayed dielectric polarization and ε_d=ε′−jε″_d before conductivity. A short relaxation model connects a real response law to complex ε. Explicitly demonstrate loss and attenuation with σ=0.
+- Verify the dielectric wave with k=β−jα; recover H from curl and mean Poynting flux from the conjugated cross product. Use its divergence to identify dielectric heating. Distinguish field and power attenuation depths.
+- Then add mobile-charge conduction as a second mechanism: ε_eff=ε_d−jσ/ω. Include each loss once and use the same propagation equations.
+- Retrieve diffusion and skin depth as the conduction-dominated limit. State the frequency-dependent assumptions; the conductor square-root scaling is not universal.
+- Apply the full model to soils, freshwater/seawater and changing frequency. Include down-and-back echo attenuation without identifying it with a complete depth-of-investigation model.
+- Optional plasma exercise: sign of k², propagation versus evanescence, and decay without absorption. Keep magnetized-plasma/Faraday-rotation and group-delay developments outside the core.
+- Bridge to interfaces and layers through η and exp[−jk(ω)d]. Replace the original return to lossy telegrapher algebra with Earth-material interpretation and energy checks.
 
 ## 6. Practice and formative assessment
 
@@ -120,7 +127,7 @@ File: `practice_3.md` — session 9
 
 ## Authoring conventions for the next iteration
 
-- Retain the mechanical-wave Fourier transform convention (forward transform with `exp(-iωt)`, reconstruction with `exp(+iωt)`) and consistent forward propagation phases.
+- Retain the mechanical-wave Fourier transform convention (forward transform with a negative exponential, reconstruction with a positive exponential; use `j` for EM, hence `exp(+jωt)` and forward propagation `exp(-jkz)`) and consistent forward propagation phases.
 - Define symbols and units locally; show which geometry and material assumptions make each reduced equation valid.
 - Separate essential reasoning from optional derivations; keep practice close to the preceding material.
 - Revise this proposal and the heading-only scaffold together once the scope is agreed.

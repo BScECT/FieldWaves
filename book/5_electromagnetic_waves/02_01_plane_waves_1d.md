@@ -188,7 +188,7 @@ $$
 \boxed{k=\frac{\omega}{c}.}
 $$ (eq:em-plane-dispersion)
 
-Any frequency is allowed; the wave equation only fixes how the spatial frequency (aka the wavenumber) $k$ is tied to the temporal frequency $\omega$.
+Any frequency is allowed; the wave equation only fixes how the wavenumber $k$ is tied to the temporal frequency $\omega$.
 
 **What does the solution look like?** At a fixed time, $E_x$ is a cosine in $z$, with crests a wavelength $\lambda=2\pi/k$ apart. At a fixed position, it oscillates in time with period $T=2\pi/\omega$. Now follow one crest. Its phase $\omega t-kz$ stays constant, so as time increases by $\Delta t$ the crest moves by $\Delta z$ with $\omega\Delta t-k\Delta z=0$:
 

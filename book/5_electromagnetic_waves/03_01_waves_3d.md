@@ -184,6 +184,29 @@ $$
 
 The dot product $\hat n\cdot\vec r$ is distance along the propagation direction. At a fixed time, equal waveform arguments lie on planes perpendicular to $\hat n$.
 
+For harmonic waves, we collect the propagation direction and wavenumber in the **vector wavenumber** (also called the wave vector):
+
+$$
+\boxed{\vec k=k\hat n,\qquad k=|\vec k|=\frac{2\pi}{\lambda}.}
+$$
+
+The wavenumber is the angular spatial frequency, in rad/m. Its vector form also tells us the direction of propagation. The field phasor becomes
+
+$$
+\vec E(\vec r)=\vec p\,e^{-j\vec k\cdot\vec r},\qquad
+\vec k\cdot\vec r=k_xx+k_yy+k_zz.
+$$
+
+For the diagonal direction used below,
+
+$$
+\vec k=\frac{k}{\sqrt2}\hat x+\frac{k}{\sqrt2}\hat z,
+\qquad\vec k\cdot\vec r=\frac{k(x+z)}{\sqrt2}.
+$$
+
+The dot product packages the same spatial phase in a form that works for any propagation direction. The common $e^{j\omega t}$ is still understood.
+
+
 ```{admonition} A diagonal wave: read it, then check it
 :class: question
 
