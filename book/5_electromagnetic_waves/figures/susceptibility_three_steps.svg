@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="425" viewBox="0 0 1100 425">
+  <defs>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#007fa8"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#bd641d"/></marker>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#243743"/></marker>
+    <marker id="aoP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#bd641d"/></marker>
+    <g id="dip">
+      <ellipse cx="0" cy="0" rx="25" ry="11" fill="white" stroke="#c3d1d7"/>
+      <circle cx="-11" cy="0" r="8" fill="#007fa8"/>
+      <text x="-11" y="4.5" fill="white" font-size="13" text-anchor="middle">−</text>
+      <circle cx="11" cy="0" r="8" fill="#bd641d"/>
+      <text x="11" y="4.5" fill="white" font-size="13" text-anchor="middle">+</text>
+    </g>
+  </defs>
+  <rect width="1100" height="425" fill="white"/>
+  <g font-family="Arial,sans-serif" fill="#243743">
+    <text x="550" y="32" text-anchor="middle" font-size="23">Susceptibility in three steps</text>
+
+    <!-- panel frames -->
+    <rect x="20" y="50" width="340" height="360" rx="10" fill="#f7fafb" stroke="#c3d1d7"/>
+    <rect x="380" y="50" width="340" height="360" rx="10" fill="#f7fafb" stroke="#c3d1d7"/>
+    <rect x="740" y="50" width="340" height="360" rx="10" fill="#f7fafb" stroke="#c3d1d7"/>
+
+    <!-- ===== Panel 1: field pulls on the charges ===== -->
+    <text x="190" y="82" text-anchor="middle" font-size="19">1. The field pulls on the charges</text>
+    <path d="M70 120H290" stroke="#243743" stroke-width="2.5" marker-end="url(#ad)"/>
+    <text x="300" y="127" font-size="20" font-weight="bold">E</text>
+
+    <circle cx="190" cy="225" r="55" fill="none" stroke="#9fb3bc" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <ellipse cx="168" cy="225" rx="62" ry="51" fill="#007fa8" fill-opacity="0.18" stroke="#007fa8" stroke-width="1.5"/>
+    <text x="135" y="234" text-anchor="middle" font-size="28" fill="#007fa8">−</text>
+    <circle cx="210" cy="225" r="13" fill="#bd641d"/>
+    <text x="210" y="231" fill="white" font-size="19" text-anchor="middle">+</text>
+    <path d="M100 225H62" stroke="#007fa8" stroke-width="2.5" marker-end="url(#ab)"/>
+    <path d="M228 225H268" stroke="#bd641d" stroke-width="2.5" marker-end="url(#ao)"/>
+    <text x="190" y="156" text-anchor="middle" font-size="13" fill="#6b7f89">dashed: cloud with no field</text>
+
+    <text x="190" y="320" text-anchor="middle" font-size="16">Electrons shift against E,</text>
+    <text x="190" y="342" text-anchor="middle" font-size="16">the nucleus shifts with E:</text>
+    <text x="190" y="372" text-anchor="middle" font-size="16" font-weight="bold">each atom becomes a tiny dipole</text>
+
+    <!-- ===== Panel 2: material fills with dipoles ===== -->
+    <text x="550" y="82" text-anchor="middle" font-size="19">2. The material fills with dipoles</text>
+    <path d="M430 120H650" stroke="#243743" stroke-width="2.5" marker-end="url(#ad)"/>
+    <text x="660" y="127" font-size="20" font-weight="bold">E</text>
+
+    <use href="#dip" x="460" y="165"/><use href="#dip" x="520" y="165"/><use href="#dip" x="580" y="165"/><use href="#dip" x="640" y="165"/>
+    <use href="#dip" x="460" y="205"/><use href="#dip" x="520" y="205"/><use href="#dip" x="580" y="205"/><use href="#dip" x="640" y="205"/>
+    <use href="#dip" x="460" y="245"/><use href="#dip" x="520" y="245"/><use href="#dip" x="580" y="245"/><use href="#dip" x="640" y="245"/>
+
+    <path d="M450 285H645" stroke="#bd641d" stroke-width="5" marker-end="url(#aoP)"/>
+    <text x="550" y="322" text-anchor="middle" font-size="20"><tspan font-weight="bold">P</tspan> = ε<tspan font-size="14" dy="5">0</tspan><tspan dy="-5">χ</tspan><tspan font-size="14" dy="5">e</tspan><tspan dy="-5" font-weight="bold"> E</tspan></text>
+    <text x="550" y="350" text-anchor="middle" font-size="16">P: dipole moment per volume</text>
+    <text x="550" y="372" text-anchor="middle" font-size="16" font-weight="bold">χ<tspan font-size="12" dy="4">e</tspan><tspan dy="-4">: how much P per unit push</tspan></text>
+
+    <!-- ===== Panel 3: dipoles push back ===== -->
+    <text x="910" y="82" text-anchor="middle" font-size="19">3. The dipoles push back</text>
+    <path d="M790 120H1010" stroke="#243743" stroke-width="2.5" marker-end="url(#ad)"/>
+    <text x="1020" y="127" font-size="20" font-weight="bold">E</text>
+    <text x="910" y="146" text-anchor="middle" font-size="13" fill="#6b7f89">applied</text>
+
+    <rect x="800" y="158" width="220" height="132" rx="4" fill="#f1f5f6" stroke="#c3d1d7"/>
+    <g font-size="20" text-anchor="middle">
+      <text x="815" y="182" fill="#007fa8">−</text><text x="815" y="207" fill="#007fa8">−</text><text x="815" y="232" fill="#007fa8">−</text><text x="815" y="257" fill="#007fa8">−</text><text x="815" y="282" fill="#007fa8">−</text>
+      <text x="1005" y="182" fill="#bd641d">+</text><text x="1005" y="207" fill="#bd641d">+</text><text x="1005" y="232" fill="#bd641d">+</text><text x="1005" y="257" fill="#bd641d">+</text><text x="1005" y="282" fill="#bd641d">+</text>
+    </g>
+    <text x="910" y="190" text-anchor="middle" font-size="14" fill="#007fa8">field of the dipoles</text>
+    <path d="M970 206H850" stroke="#007fa8" stroke-width="2.5" marker-end="url(#ab)"/>
+    <text x="910" y="248" text-anchor="middle" font-size="14">smaller net field</text>
+    <path d="M870 266H950" stroke="#243743" stroke-width="2.5" marker-end="url(#ad)"/>
+
+    <text x="910" y="322" text-anchor="middle" font-size="17"><tspan font-weight="bold">D</tspan> = ε<tspan font-size="12" dy="4">0</tspan><tspan dy="-4" font-weight="bold">E</tspan> + <tspan font-weight="bold">P</tspan> = ε<tspan font-size="12" dy="4">0</tspan><tspan dy="-4">(1 + χ</tspan><tspan font-size="12" dy="4">e</tspan><tspan dy="-4">)</tspan><tspan font-weight="bold">E</tspan></text>
+    <text x="910" y="350" text-anchor="middle" font-size="16">ε<tspan font-size="12" dy="4">r</tspan><tspan dy="-4"> = 1 + χ</tspan><tspan font-size="12" dy="4">e</tspan><tspan dy="-4"> &gt; 1</tspan></text>
+    <text x="910" y="372" text-anchor="middle" font-size="16" font-weight="bold">so the wave slows: c<tspan font-size="12" dy="4">p</tspan><tspan dy="-4"> = c / √(1 + χ</tspan><tspan font-size="12" dy="4">e</tspan><tspan dy="-4">)</tspan></text>
+  </g>
+</svg>

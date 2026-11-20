@@ -318,6 +318,12 @@ $$
 
 The polarization density supplies a fraction $\chi_e/(1+\chi_e)=2.15/3.15\simeq68\%$ of $\mathbf{D}$.
 
+```{figure} ../figures/susceptibility_three_steps.svg
+:width: 100%
+
+Susceptibility in three steps: the field displaces bound charge, the material fills with dipoles ($\mathbf{P}=\epsilon_0\chi_e\mathbf{E}$), and their field opposes the applied one, giving $\epsilon_r = 1+\chi_e$.
+```
+
 (e) The pulse travels down and back through the ice at $c_p$:
 
 $$

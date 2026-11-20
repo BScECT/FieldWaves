@@ -153,7 +153,8 @@ parts:
       # - file: 5_electromagnetic_waves/05_02_multilayer_frequency_response.md
       # - file: 5_electromagnetic_waves/05_03_practice_3.md
     - file: 5_electromagnetic_waves/labs/lab_em_waves_solutions.md
-    - file: 5_electromagnetic_waves/labs/lab2_em_waves.md
+    - file: 5_electromagnetic_waves/labs/lab2_em_waves_solutions.md
+    - file: 5_electromagnetic_waves/labs/lab2_em_waves_quiz.md
   - caption: Miscellaneous
     chapters:
     - file: references.md
