@@ -236,7 +236,7 @@ $$
 :::
 
 
-### 4. Radar sounding of an ice sheet
+### Formative assessment
 
 Airborne radars measure the thickness of ice sheets by sending 60 MHz waves down through the ice and timing the echo from the bedrock. Glacier ice is (approximately) lossless and non-magnetic. It responds to an electric field with a polarization density $\mathbf{P}=\epsilon_0\chi_e\mathbf{E}$, where $\chi_e=2.15$ is its electric susceptibility.
 
