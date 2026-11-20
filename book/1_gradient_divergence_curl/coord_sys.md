@@ -29,6 +29,18 @@ $$
 \boldsymbol r = x\hat{\boldsymbol x} + y\hat{\boldsymbol y} + z\hat{\boldsymbol z}.
 $$
 
+Each base vector can be obtained by differentiating the position vector with respect to the corresponding coordinate,
+
+$$
+\hat{\boldsymbol x} = \partial_x\boldsymbol r,
+\qquad
+\hat{\boldsymbol y} = \partial_y\boldsymbol r,
+\qquad
+\hat{\boldsymbol z} = \partial_z\boldsymbol r.
+$$ (eq:cartbase)
+
+We use this construction again below to find the base vectors of the cylindrical and spherical coordinate systems, where the derivatives do not come out with unit length and a normalisation factor is needed.
+
 It is customary in the Earth Sciences to let the positive $\hat{\boldsymbol z}$-axis point downward, as depicted in {numref}`fig-cartframe`.
 
 ```{figure} figures/Cartframe.png
@@ -66,7 +78,7 @@ $$
 \boldsymbol r' = \hat{\boldsymbol e}_x(x-\lambda_x) + \hat{\boldsymbol e}_y(y-\lambda_y) + \hat{\boldsymbol e}_z(z-\lambda_z).
 $$
 
-Since distance should be invariant under rotation, only orthogonal tensors $\{\hat{\boldsymbol e}_x,\hat{\boldsymbol e}_y,\hat{\boldsymbol e}_z\}$ describe a rotation, and when these vectors have unit amplitude they span a base for the new frame of reference, in which case they are orthonormal vectors.
+Since distance should be invariant under rotation, only orthogonal tensors $\{\hat{\boldsymbol e}_x,\hat{\boldsymbol e}_y,\hat{\boldsymbol e}_z\}$ describe a rotation, and when these vectors have unit amplitude they span a base for the new frame of reference, in which case they are orthonormal vectors, as shown in {numref}`fig-rotcartframe`.
 
 ```{figure} figures/rotCartframe.png
 :name: fig-rotcartframe
@@ -113,6 +125,18 @@ $$
 \qquad
 \hat{\boldsymbol x} = \hat{\boldsymbol y}\times\hat{\boldsymbol z}.
 $$
+
+You will also encounter triple vector products of the kind $\boldsymbol a\times(\boldsymbol b\times\boldsymbol c)$, which can be evaluated as
+
+$$
+\boldsymbol a\times(\boldsymbol b\times\boldsymbol c) = (\boldsymbol a\cdot\boldsymbol c)\boldsymbol b - (\boldsymbol a\cdot\boldsymbol b)\boldsymbol c .
+$$ (eq:tripprod)
+
+The result lies in the plane spanned by $\boldsymbol b$ and $\boldsymbol c$, because $\boldsymbol b\times\boldsymbol c$ is perpendicular to that plane and the second cross product turns the result back into it. The order of the brackets matters, $\boldsymbol a\times(\boldsymbol b\times\boldsymbol c)\ne(\boldsymbol a\times\boldsymbol b)\times\boldsymbol c$. The following identity can be useful as well,
+
+$$
+\boldsymbol a\times(\boldsymbol b\times\boldsymbol c) + \boldsymbol b\times(\boldsymbol c\times\boldsymbol a) = (\boldsymbol a\times\boldsymbol b)\times\boldsymbol c .
+$$ (eq:tripprod2)
 
 ## Curvilinear coordinate systems
 
@@ -282,13 +306,26 @@ $$
 ## Exercises
 
 1. What is the length of the vector function $\boldsymbol v$?
-2. Show that $\hat{\boldsymbol x} = \partial\boldsymbol r/\partial x$.
-3. A two-dimensional rectangle in the plane $z=0$ is spanned by the two vectors $\boldsymbol d_x = d_x\hat{\boldsymbol x}$ and $\boldsymbol d_y = d_y\hat{\boldsymbol y}$, where $d_x$ and $d_y$ are the lengths in the $x$- and $y$-directions, respectively, and $\hat{\boldsymbol n}$ is the unit normal on the rectangle pointing in the positive $z$-direction. Give a geometrical interpretation of the product $\hat{\boldsymbol n}\cdot(\boldsymbol d_x\times\boldsymbol d_y)$.
-4. A three-dimensional rectangle, a brick, with dimensions $d_x,d_y,d_z$ is spanned by the three vectors $\boldsymbol d_x = d_x\hat{\boldsymbol x}$, $\boldsymbol d_y = d_y\hat{\boldsymbol y}$ and $\boldsymbol d_z = d_z\hat{\boldsymbol z}$. Give a geometrical interpretation of the product $\boldsymbol d_x\cdot(\boldsymbol d_y\times\boldsymbol d_z)$.
-5. Consider a smooth surface $\mathbb{S}$ with unique unit normal vector $\hat{\boldsymbol n}$. Show that any vector quantity $\boldsymbol H$ can be composed as $\boldsymbol H = (\hat{\boldsymbol n}\cdot\boldsymbol H)\hat{\boldsymbol n} + (\hat{\boldsymbol n}\times\boldsymbol H)\times\hat{\boldsymbol n}$ and give a geometric interpretation of the two terms.
-6. A smooth surface $\mathbb{S}$ has a unique unit normal vector $\hat{\boldsymbol n}$. Decompose the gradient operator into a part tangential and a part normal to the surface $\mathbb{S}$.
-7. Use the same reasoning as in the exercise above and find $\hat{\boldsymbol r} = A_r\,\partial\boldsymbol r/\partial r$, $\hat{\boldsymbol\phi} = A_\phi\,\partial\boldsymbol r/\partial\phi$, and $\hat{\boldsymbol\theta} = A_\theta\,\partial\boldsymbol r/\partial\theta$. Carry out the differentiations and find the coefficients $(A_r,A_\phi,A_\theta)$ by requiring that these vectors have unit length. These results should lead to an expression for the unit vectors of the spherical coordinate system in Cartesian coordinates.
-8. The upper right-hand side of the matrix of {numref}`tab-direction-cosines` is left empty. The $3\times3$ block in the bottom-left corner of the table relates the unit vectors of the spherical reference frame to those of the Cartesian reference frame. Suppose we write this as
+2. Show that $\boldsymbol a\cdot(\boldsymbol b\times\boldsymbol c) = \boldsymbol b\cdot(\boldsymbol c\times\boldsymbol a) = \boldsymbol c\cdot(\boldsymbol a\times\boldsymbol b)$.
+3. Evaluate
+
+    $$
+    \begin{aligned}
+    \hat{\boldsymbol x}&\cdot(\hat{\boldsymbol y}\times\hat{\boldsymbol z}), &\qquad
+    \hat{\boldsymbol x}&\cdot(\hat{\boldsymbol z}\times\hat{\boldsymbol y}), \\
+    \hat{\boldsymbol y}&\cdot(\hat{\boldsymbol x}\times\hat{\boldsymbol z}), &\qquad
+    \hat{\boldsymbol y}&\cdot(\hat{\boldsymbol z}\times\hat{\boldsymbol x}), \\
+    \hat{\boldsymbol z}&\cdot(\hat{\boldsymbol y}\times\hat{\boldsymbol x}), &\qquad
+    \hat{\boldsymbol z}&\cdot(\hat{\boldsymbol x}\times\hat{\boldsymbol y}).
+    \end{aligned}
+    $$
+4. A two-dimensional rectangle in the plane $z=0$ is spanned by the two vectors $\boldsymbol d_x = d_x\hat{\boldsymbol x}$ and $\boldsymbol d_y = d_y\hat{\boldsymbol y}$, where $d_x$ and $d_y$ are the lengths in the $x$- and $y$-directions, respectively, and $\hat{\boldsymbol n}$ is the unit normal on the rectangle pointing in the positive $z$-direction. Give a geometrical interpretation of the product $\hat{\boldsymbol n}\cdot(\boldsymbol d_x\times\boldsymbol d_y)$.
+5. A three-dimensional rectangle, a brick, with dimensions $d_x,d_y,d_z$ is spanned by the three vectors $\boldsymbol d_x = d_x\hat{\boldsymbol x}$, $\boldsymbol d_y = d_y\hat{\boldsymbol y}$ and $\boldsymbol d_z = d_z\hat{\boldsymbol z}$. Give a geometrical interpretation of the product $\boldsymbol d_x\cdot(\boldsymbol d_y\times\boldsymbol d_z)$.
+6. Evaluate $(\boldsymbol a\times\boldsymbol b)\times\boldsymbol c$.
+7. Consider a smooth surface $\mathbb{S}$ with unique unit normal vector $\hat{\boldsymbol n}$. Show that any vector quantity $\boldsymbol H$ can be composed as $\boldsymbol H = (\hat{\boldsymbol n}\cdot\boldsymbol H)\hat{\boldsymbol n} + (\hat{\boldsymbol n}\times\boldsymbol H)\times\hat{\boldsymbol n}$ and give a geometric interpretation of the two terms.
+8. A smooth surface $\mathbb{S}$ has a unique unit normal vector $\hat{\boldsymbol n}$. Decompose the gradient operator into a part tangential and a part normal to the surface $\mathbb{S}$.
+9. Find $\hat{\boldsymbol r} = A_r\,\partial\boldsymbol r/\partial r$, $\hat{\boldsymbol\phi} = A_\phi\,\partial\boldsymbol r/\partial\phi$, and $\hat{\boldsymbol\theta} = A_\theta\,\partial\boldsymbol r/\partial\theta$. Carry out the differentiations and find the coefficients $(A_r,A_\phi,A_\theta)$ by requiring that these vectors have unit length. These results should lead to an expression for the unit vectors of the spherical coordinate system in Cartesian coordinates.
+10. The upper right-hand side of the matrix of {numref}`tab-direction-cosines` is left empty. The $3\times3$ block in the bottom-left corner of the table relates the unit vectors of the spherical reference frame to those of the Cartesian reference frame. Suppose we write this as
 
     $$
     \left(\begin{array}{c} \hat{\boldsymbol r} \\ \hat{\boldsymbol\phi} \\ \hat{\boldsymbol\theta}\end{array}\right)
@@ -301,7 +338,7 @@ $$
     -\sin(\phi) & \cos(\phi) & 0 \\
     \cos(\phi)\cos(\theta) & \sin(\phi)\cos(\theta) & -\sin(\theta)
     \end{array}\right).
-    $$
+    $$ (eq:Rmat)
 
     Show that
 
@@ -311,5 +348,16 @@ $$
     $$
 
     where $\mathsf{R}^{t}$ denotes the transpose of $\mathsf{R}$. Then show that $\mathsf{R}\mathsf{R}^{t} = \mathsf{I}$, where $\mathsf{I}$ is the $3\times3$ unit matrix, implying that the transpose of $\mathsf{R}$ is equal to its inverse. This follows from the fact that $\mathsf{R}$ is a matrix of orthonormal vectors and is therefore an orthonormal matrix.
-9. Give explicit expressions for the base vectors of the spherical reference frame by carrying out the matrix-vector multiplication of {eq}`eq:sphCar`. Notice that all three base vectors depend on both angles. This implies that the base vectors are not constant but depend on position! The spherical reference frame is not an inertial frame.
-10. Carry out the following differentiations: $\partial\hat{\boldsymbol r}/\partial\theta$, $\partial\hat{\boldsymbol\theta}/\partial\theta$, $\partial\hat{\boldsymbol\phi}/\partial\theta$ and $\partial\hat{\boldsymbol r}/\partial\phi$, $\partial\hat{\boldsymbol\theta}/\partial\phi$, $\partial\hat{\boldsymbol\phi}/\partial\phi$.
+11. Give explicit expressions for the base vectors of the spherical reference frame by carrying out the matrix-vector multiplication of {eq}`eq:sphCar`, with the rotation matrix given by {eq}`eq:Rmat`. You should find that
+
+    $$
+    \hat{\boldsymbol r} = \left(\begin{array}{c} \cos(\phi)\sin(\theta) \\ \sin(\phi)\sin(\theta) \\ \cos(\theta)\end{array}\right),
+    \qquad
+    \hat{\boldsymbol\theta} = \left(\begin{array}{c} \cos(\phi)\cos(\theta) \\ \sin(\phi)\cos(\theta) \\ -\sin(\theta)\end{array}\right),
+    \qquad
+    \hat{\boldsymbol\phi} = \left(\begin{array}{c} -\sin(\phi) \\ \cos(\phi) \\ 0\end{array}\right).
+    $$
+
+    Notice that each base vector depends on at least one angle. This implies that the base vectors are not constant but depend on position! The spherical reference frame is not an inertial frame.
+12. Evaluate $\hat{\boldsymbol r}\times\hat{\boldsymbol\phi}$, $\hat{\boldsymbol r}\times\hat{\boldsymbol\theta}$, and $\hat{\boldsymbol\phi}\times\hat{\boldsymbol\theta}$.
+13. Carry out the following differentiations: $\partial\hat{\boldsymbol r}/\partial\theta$, $\partial\hat{\boldsymbol\theta}/\partial\theta$, $\partial\hat{\boldsymbol\phi}/\partial\theta$ and $\partial\hat{\boldsymbol r}/\partial\phi$, $\partial\hat{\boldsymbol\theta}/\partial\phi$, $\partial\hat{\boldsymbol\phi}/\partial\phi$, and express them all in terms of $\hat{\boldsymbol r}$, $\hat{\boldsymbol\theta}$ and $\hat{\boldsymbol\phi}$.

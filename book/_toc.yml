@@ -65,8 +65,11 @@ parts:
       - file: 2_potential_fields/magnetic_field/exercises.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes.md
     - file: 2_potential_fields/labs/week3_gravity_and_potential/week3_exersizes_solutions.md
+    - file: 2_potential_fields/labs/week4/week4_quiz.md
+    - file: 2_potential_fields/labs/week4/week4_quiz_solutions.md
+    - file: 2_potential_fields/labs/week4/week4_exercises.md
+    - file: 2_potential_fields/labs/week4/week4_exercises_solutions.md
     # - file: 2_potential_fields/gradient_fields.md
-    # - file: 2_potential_fields/divergence_free_fields.md
     # - file: 2_potential_fields/curl_free_fields.md
   # - caption: Exercises
   #   chapters:
@@ -96,6 +99,61 @@ parts:
   #     - file: extension_exercises/014.md
   #     - file: extension_exercises/015.md
   #     - file: extension_exercises/016.md
+  - caption: Diffusive fields
+    chapters:
+    - file: 3_diffusion_fields/intro.md
+      sections:
+      - file: 3_diffusion_fields/heat_equation_1d.md
+      - file: 3_diffusion_fields/em_diffusion.md
+    - file: 3_diffusion_fields/labs/week05_diffusion.md
+    - file: 3_diffusion_fields/labs/week06_em_diffusion.md
+  - caption: Mechanical waves
+    chapters:
+    - file: 4_mechanical_waves/intro.md
+      sections:
+      - file: 4_mechanical_waves/basic_notions.md
+      - file: 4_mechanical_waves/snells_law.md
+      - file: 4_mechanical_waves/exercise_4a.md
+      - file: 4_mechanical_waves/field_recordings.md
+      - file: 4_mechanical_waves/exercise_4b.md
+      - file: 4_mechanical_waves/fundamental_laws.md
+      - file: 4_mechanical_waves/acoustic_waves.md
+      - file: 4_mechanical_waves/wave_equation_solutions.md
+      - file: 4_mechanical_waves/impedance.md
+      - file: 4_mechanical_waves/reflection_transmission.md
+      - file: 4_mechanical_waves/elastic_waves.md
+      - file: 4_mechanical_waves/appendix_acoustic_1d.md
+      - file: 4_mechanical_waves/appendix_strain_p_s.md
+  - caption: Electromagnetic waves
+    chapters:
+    - file: 5_electromagnetic_waves/00_intro.md
+      sections:
+      - file: 5_electromagnetic_waves/01_history_maxwell.md
+      - file: 5_electromagnetic_waves/02_00_plane_waves_and_phasors.md
+        sections:
+        - file: 5_electromagnetic_waves/02_01_plane_waves_1d.md
+        - file: 5_electromagnetic_waves/02_02_harmonic_waves.md
+        - file: 5_electromagnetic_waves/02_03_transmission_lines.md
+        - file: 5_electromagnetic_waves/02_04_radar_examples.md
+        # - file: 5_electromagnetic_waves/02_05_practice_1.md
+      - file: 5_electromagnetic_waves/03_00_waves_energy_polarization.md
+        sections:
+        - file: 5_electromagnetic_waves/03_01_waves_3d.md
+        - file: 5_electromagnetic_waves/03_02_energy_flow.md
+        - file: 5_electromagnetic_waves/03_03_polarization.md
+        # - file: 5_electromagnetic_waves/03_04_practice_2_assessment.md
+      - file: 5_electromagnetic_waves/04_00_media_and_losses.md
+        sections:
+        - file: 5_electromagnetic_waves/04_01_material_response.md
+        - file: 5_electromagnetic_waves/04_02_lossy_dielectrics.md
+        - file: 5_electromagnetic_waves/04_03_conductors_and_skin_depth.md
+        - file: 5_electromagnetic_waves/04_04_radar_penetration.md
+      # Keep heading-only pages hidden until content is added.
+      # - file: 5_electromagnetic_waves/05_01_interface_scattering.md
+      # - file: 5_electromagnetic_waves/05_02_multilayer_frequency_response.md
+      # - file: 5_electromagnetic_waves/05_03_practice_3.md
+    - file: 5_electromagnetic_waves/labs/lab_em_waves_solutions.md
+    - file: 5_electromagnetic_waves/labs/lab2_em_waves.md
   - caption: Miscellaneous
     chapters:
     - file: references.md

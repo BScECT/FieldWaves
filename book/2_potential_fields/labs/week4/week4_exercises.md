@@ -1,0 +1,389 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+# Lab 4: Electrostatic and Magnetic Fields
+
+## 1. Explore a spherical capacitor
+
+Two concentric conducting shells with free space between them, an **inner shell** of radius $R_E=6370\ \text{km}$ (the Earth) held at $V=0$, and an **outer shell** of radius $R_I$ (the ionosphere) held at $V=V_o$, is the same setup as the Earth-ionosphere model in the {doc}`week 4 quiz <week4_quiz>`. Between the shells, the potential takes the form
+
+```{math}
+V(r) = A + \frac{B}{r}, \qquad R_E \le r \le R_I,
+```
+
+with $A$ and $B$ fixed entirely by the two boundary conditions $V(R_E)=0$ and $V(R_I)=V_o$. Inside the inner shell $V=0$ (it is a conductor), and outside the outer shell $V=V_o$ with $\vec E = 0$ (the shells enclose zero net charge together).
+
+Use the sliders below to change the outer radius $R_I$ (km) and the outer voltage $V_o$ (kV, 0 to 200), and watch $V(r)$ and $E(r)=-dV/dr$ update. **The radial axis in the plots is not to scale**: the gap between the shells (tens to thousands of km) is stretched for readability against Earth's 6370 km radius.
+
+```{code-cell} ipython3
+:tags: [remove-input, remove-output]
+
+import numpy as np
+
+def solve_coefficients(r_inner, r_outer, v_outer):
+    """Solve A, B given V(r_inner) = 0 and V(r_outer) = v_outer."""
+    b = v_outer / (1.0 / r_outer - 1.0 / r_inner)
+    a = -b / r_inner
+    return a, b
+
+def potential(r, r_inner, r_outer, v_outer):
+    a, b = solve_coefficients(r_inner, r_outer, v_outer)
+    r = np.asarray(r, float)
+    v = np.full_like(r, v_outer, dtype=float)
+    between = (r >= r_inner) & (r <= r_outer)
+    v[between] = a + b / r[between]
+    v[r < r_inner] = 0.0
+    return v
+
+def field(r, r_inner, r_outer, v_outer):
+    """E(r) = -dV/dr = B / r**2 between the shells, else zero."""
+    _, b = solve_coefficients(r_inner, r_outer, v_outer)
+    r = np.asarray(r, float)
+    e = np.zeros_like(r, dtype=float)
+    between = (r >= r_inner) & (r <= r_outer)
+    e[between] = b / r[between] ** 2
+    return e
+
+# Boundary conditions and the field-potential relation, checked at an example (r_i, r_o, V_o).
+r_i, r_o, v_o = 6370.0, 6470.0, 1.0e5
+np.testing.assert_allclose(potential(r_i, r_i, r_o, v_o), 0.0, atol=1e-9)
+np.testing.assert_allclose(potential(r_o, r_i, r_o, v_o), v_o)
+r_mid = 0.5 * (r_i + r_o)
+eps = 1e-3
+numeric_e = -(potential(r_mid + eps, r_i, r_o, v_o) - potential(r_mid - eps, r_i, r_o, v_o)) / (2 * eps)
+np.testing.assert_allclose(numeric_e, field(r_mid, r_i, r_o, v_o), rtol=1e-6)
+print("Boundary conditions and E = -dV/dr checks passed.")
+```
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+
+for _candidate in (
+    Path("spherical_capacitor_lab.html"),
+    Path("book/2_potential_fields/labs/week4/spherical_capacitor_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("spherical_capacitor_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+
+display({"text/html": '<iframe title="Interactive spherical capacitor explorer" '
+             'style="width:100%;height:680px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
+
+### Explore, predict, explain
+
+1. **Reproduce the quiz numbers.** Set $R_I = 6470$ km (100 km altitude) and $V_o = 100$ kV, matching the week 4 quiz. Read off $A$ and $B$, and compare them to the closed-form expressions you derived by hand. Then check the field at 50 km altitude (probe $r=6420$ km) against your answer to part (e).
+2. **Move the outer shell farther away.** Keep $V_o$ fixed and increase $R_I$. Does $|B|$ grow or shrink? Explain why the field between the shells changes even though $V_o$ has not.
+3. **Increase $V_o$ toward 200 kV.** What happens to the field magnitude at a fixed altitude? Is the relationship linear?
+4. **Move the probe outside $R_I$ and inside $R_E$.** Confirm that $V$ is constant and $E=0$ in both regions, consistent with each shell being an equipotential conductor.
+
+## 2. Charges in the fair-weather field
+
+On a clear day, the air above flat, open ground carries a downward electric field (W4L1, slides 16–17):
+```{math}
+\vec{E} \approx -E_0\,\hat{z}, \qquad E_0 \approx 100\ \mathrm{V/m}, \qquad V(z) = E_0 z \quad \text{with } V(0) = 0.
+```
+Cosmic rays continuously ionise the air, producing free electrons and positive ions such as $\mathrm{N_2^+}$. Wind also lifts charged mineral dust from deserts into the atmosphere. Use $e = 1.602\cdot 10^{-19}\ \mathrm{C}$, $g = 9.81\ \mathrm{m/s^2}$ and $1\ \mathrm{eV} = 1.602\cdot 10^{-19}\ \mathrm{J}$ (the energy an elementary charge gains across $1\ \mathrm{V}$).
+ 
+Parts (a)–(d) of this exercise are question 2 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
+ 
+(e) In the undisturbed fair-weather field, the potential difference between $z=0$ and $z=2\ \mathrm{m}$ is $200\ \mathrm{V}$ (quiz part (a)). You are standing on the ground and are about $2\ \mathrm{m}$ tall. Is there a $200\ \mathrm{V}$ potential difference between your head and your feet? Sketch how the equipotentials change around you and explain your reasoning. *Hint:* you are a conductor connected to the ground (W4L1, slide 14).
+ 
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for parts (a), (b) and (d) of the quiz.
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+
+import numpy as np
+ 
+e  = 1.602e-19     # elementary charge [C]
+E0 = 100.0         # fair-weather field strength [V/m]
+g  = 9.81          # gravitational acceleration [m/s^2]
+ 
+def V_fair(z):
+    """Fair-weather potential above flat ground, V(0) = 0."""
+    return ___
+ 
+# (b), (c): move each particle from z = 0 to z = 10 m
+dV = V_fair(10.0) - V_fair(0.0)
+for name, q in [("electron", -e), ("N2+ ion ", +e)]:
+    dU = ___                 # change in potential energy [J]
+    W  = ___                 # work done by the field [J]
+    Fz = ___                 # z-component of F = qE, with E = -E0 z_hat [N]
+    print(f"{name}: dV = {dV:.0f} V, dU = {dU:+.2e} J = {dU/e:+.0f} eV, "
+          f"W_field = {W:+.2e} J, F_z = {Fz:+.1e} N")
+ 
+# (d): dust grain levitated by the fair-weather field
+a_d, rho_d = 1e-6, 2650.0    # radius [m], density [kg/m^3]
+m_d = ___                    # mass of the grain [kg]
+q_d = ___                    # charge magnitude for |qE| = mg [C]
+print(f"m = {m_d:.2e} kg, |q| = {q_d:.2e} C = {q_d/e:.0f} excess electrons")
+ 
+# self-check
+assert np.isclose(V_fair(2.0), 200.0), "V(2 m) should be 200 V"
+assert np.isclose(q_d / e, 6.8e3, rtol=0.02), "check the mass or the force balance"
+print("Self-check passed.")
+```
+ 
+The explorer below shows the fair-weather field over flat ground. You can add a grounded conducting hemisphere of radius $a$, a crude model of a person, a tree or a small hill. Its potential is
+```{math}
+V(\vec{r}) = E_0 z\left(1 - \frac{a^3}{r^3}\right), \qquad z \geq 0,\ r \geq a.
+```
+The upper panel shows the field strength $|\vec{E}|/E_0$ in colour, the equipotentials in white (every $E_0\cdot 1\ \mathrm{m}$), the field lines in grey, and the force $\vec{F} = q\vec{E}$ on the test charge as an arrow. The lower panel shows $V(z)$ and $U(z)/e$ along the vertical line through the test charge.
+ 
+1. With $a = 0$, move the test charge up and down. Check your answers to quiz parts (a) and (b).
+2. Switch between the electron and the ion. Which quantities change, and which stay the same? (W4L1, slide 9)
+3. Set $a = 1\ \mathrm{m}$. Where do the equipotentials crowd together? Read $|\vec{E}|$ just above the top of the object and near its base. Use this to check your sketch for (e).
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+
+for _candidate in (
+    Path("fair_weather_lab.html"),
+    Path("book/2_potential_fields/labs/week4/fair_weather_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("fair_weather_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+
+display({"text/html": '<iframe title="Interactive fair-weather field explorer" '
+             'style="width:100%;height:820px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
+
+
+## 3. Explore Earth's dipole field
+ 
+Far from a compact current system, its magnetic field is that of a dipole (W4L2, slides 14–15). Earth's main field is modelled as a dipole at Earth's centre. As in the lecture, let $\hat m=\hat z$, let $\theta$ be the angle measured from $\hat m$, and work in the $x$–$z$ plane with $\hat r=\sin\theta\,\hat x+\cos\theta\,\hat z$ (slide 22). The field is
+```{math}
+\vec B = B_*\left(\frac{R}{r}\right)^3\left[3(\hat m\cdot\hat r)\,\hat r-\hat m\right],
+\qquad B_*=\frac{\mu_0|\vec m|}{4\pi R^3}.
+```
+For Earth, take $R=a=6371\ \mathrm{km}$ and $B_*\approx 29.7\ \mu\mathrm{T}$ (called $B_0$ in the teachbook section *Earth as a Magnetic Dipole*). For the present polarity, $\hat m$ points toward the **southern** end of the dipole axis: $\theta=0$ is the southern end, $\theta=\pi$ the northern end, and $\theta=\pi/2$ the dipole equator.
+ 
+Parts (a)–(d) of this exercise are question 3 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
+ 
+(e) The quiz quotes the component form of the dipole field; here you derive it. Repeat part (b) of the quiz for a general $\theta$ at $r=a$.
+1. Write $\hat z=\cos\theta\,\hat r-\sin\theta\,\hat\theta$, with $\hat\theta=\cos\theta\,\hat x-\sin\theta\,\hat z$ pointing along the ground toward the northern end of the axis. Show that the field has a radial component $B_r=2B_*\cos\theta$ and a horizontal component $B_\theta=B_*\sin\theta$.
+2. Use the dipole latitude $\lambda_m=\theta-\pi/2$ (positive in the northern hemisphere) to show that the angle $I$ below the horizontal satisfies $\tan I=2\tan\lambda_m$. Check it against quiz part (b).
+3. A navigator measures $I=70^\circ$. What is the dipole latitude? Near which latitudes does a small error in $I$ matter least?
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for parts (a)–(d) of the quiz and part (e).
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+ 
+import numpy as np
+ 
+B_star = 29.7e-6                 # B_* for Earth [T]
+a      = 6371e3                  # R = a, Earth's reference radius [m]
+m_hat  = np.array([0.0, 1.0])    # (x, z): m_hat = z_hat, toward the SOUTHERN end of the axis
+ 
+def B_dipole(theta, r):
+    """Dipole field (Bx, Bz) [T] at polar angle theta (from m_hat) and distance r [m]."""
+    r_hat = np.array([np.sin(theta), np.cos(theta)])
+    return ___                   # B_* (a/r)^3 [3 (m.r) r - m]
+ 
+def below_horizontal(theta, r):
+    """Angle [deg] between B and the local horizontal, positive when B points into the ground."""
+    r_hat = np.array([np.sin(theta), np.cos(theta)])
+    B = B_dipole(theta, r)
+    B_radial = ___               # component of B along r_hat (positive = out of the ground)
+    return np.degrees(np.arcsin(-B_radial / np.linalg.norm(B)))
+ 
+# (a), (b): at the surface
+for name, th in [("southern end", 0.0), ("dipole equator", np.pi/2),
+                 ("northern end", np.pi), ("45 deg N", 3*np.pi/4)]:
+    B = B_dipole(th, a)
+    Bx, Bz = np.round(B / B_star, 2) + 0.0          # + 0.0 avoids printing -0.00
+    I = round(below_horizontal(th, a), 1) + 0.0
+    print(f"{name:15s} B/B* = ({Bx:+.2f}, {Bz:+.2f}),  "
+          f"|B| = {np.linalg.norm(B)*1e6:5.1f} uT,  below horizontal = {I:+6.1f} deg")
+ 
+# (c): Swarm at 450 km altitude above 45 deg N
+r_swarm = ___
+print(f"(c) |B| at Swarm altitude = {np.linalg.norm(B_dipole(3*np.pi/4, r_swarm))*1e6:.1f} uT,"
+      f"  below horizontal = {below_horizontal(3*np.pi/4, r_swarm):.1f} deg")
+ 
+# (d): distance at which the field has dropped to 1% of its surface value
+r_1pct = ___
+print(f"(d) r = {r_1pct/a:.2f} a = {r_1pct/1e3:.0f} km")
+ 
+# (e): dipole latitude for a measured angle I = 70 deg, from tan I = 2 tan(lambda_m)
+lam_nav = ___                    # [rad]
+print(f"(e) I = 70 deg  ->  lambda_m = {np.degrees(lam_nav):.1f} deg N")
+ 
+# self-check
+assert np.isclose(np.linalg.norm(B_dipole(np.pi/2, a)), B_star)
+assert np.isclose(np.linalg.norm(B_dipole(3*np.pi/4, a)), 47.0e-6, rtol=1e-3)
+assert np.isclose(below_horizontal(3*np.pi/4, a), 63.43, atol=0.01)
+assert np.isclose(np.linalg.norm(B_dipole(3*np.pi/4, r_swarm)), 38.3e-6, rtol=2e-3)
+assert np.isclose(np.linalg.norm(B_dipole(np.pi, r_1pct)) / np.linalg.norm(B_dipole(np.pi, a)), 0.01)
+assert np.isclose(np.degrees(lam_nav), 53.95, atol=0.01)
+print("Self-check passed.")
+```
+ 
+The explorer below draws the dipole field lines in the $x$–$z$ plane, oriented as in the lecture ($\hat m=\hat z$ up the page, so the southern end of Earth's axis is at the top). Choose a probe point with $\theta$ and $r/a$. At the probe, the blue, red and black arrows show the head-to-tail construction of the bracket $3(\hat m\cdot\hat r)\hat r-\hat m$. The dashed line is the local horizontal. The lower-left panel shows $|\vec B|$ along the radial line through the probe on log–log axes. The lower-right panel shows the angle below the horizontal and $|\vec B|/B_*$ at the surface as functions of $\theta$.
+ 
+1. At $r/a=1$, set $\theta=0^\circ$, $90^\circ$ and $135^\circ$ to check your answers to quiz parts (a) and (b), then $180^\circ$ to see the northern end.
+2. Press *Swarm altitude*. Which numbers change, and which stay the same? Do the arrows at the probe change? (W4L2, slide 15)
+3. In the lower-left panel, why is the curve a straight line? Read off where it crosses the $1\%$ line and compare with quiz part (d). By what factor does $|\vec B|$ drop between $r/a=1$ and $2$? (W4L2, slide 18)
+4. In the lower-right panel, where is the field vertical, where is it horizontal, and where is $|\vec B|$ largest and smallest? Where does the angle change fastest with $\theta$? Relate this to part (e).
+```{code-cell} ipython3
+:tags: [remove-input]
+ 
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+ 
+for _candidate in (
+    Path("earth_dipole_lab.html"),
+    Path("book/2_potential_fields/labs/week4/earth_dipole_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("earth_dipole_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+ 
+display({"text/html": '<iframe title="Interactive Earth dipole explorer" '
+             'style="width:100%;height:1180px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```
+ 
+
+## 4. Explore a current loop and its dipole field
+ 
+Far from a compact current loop, its magnetic field is that of a dipole (W4L2, slide 14). A circular loop carrying current $I$ around an area $A$ has the magnetic moment
+```{math}
+\vec m = IA\,\hat n,
+```
+where $\hat n$ is the normal to the loop given by the right-hand rule: curl the fingers along the current, and the thumb gives $\hat n$. Use $\mu_0 = 4\pi\cdot10^{-7}\ \mathrm{T\,m/A}$.
+ 
+Parts (a)–(d) of this exercise are question 4 of the {doc}`week 4 quiz <week4_quiz>`. Work through them first; the Python cell and the explorer below let you check those answers and extend them to part (e).
+ 
+(e) Return to the core loop of quiz part (b). An observer stands on Earth's surface above the northern end of the axis, at distance $z = a$ from the centre of the loop. How large is the error of the dipole formula there? How far from Earth's centre, in units of $a$, would the observer have to be for the dipole formula to be accurate to within $10\%$? What does this tell you about the single-loop picture of the geodynamo?
+ 
+### Check your answers with Python
+ 
+Fill in the blanks (`___`) and run the cell to check your numbers for parts (a)–(d) of the quiz and part (e). The last blank, `z_10`, is the height where the dipole formula becomes accurate to within $10\%$; compare it with explorer question 4.
+ 
+```{code-cell} ipython3
+:tags: [skip-execution]
+ 
+import numpy as np
+ 
+mu0 = 4e-7 * np.pi                     # [T m/A]
+a, B_star, R_c = 6371e3, 29.7e-6, 3480e3   # Earth radius [m], B_* [T], outer-core radius [m]
+ 
+# (a), (b): Earth's moment and the equivalent core current
+m_earth = ___                          # from B_* = mu0 m / (4 pi a^3)  [A m^2]
+I_core  = ___                          # from m = I * pi R_c^2  [A]
+print(f"(a) m = {m_earth:.2e} A m^2     (b) I = {I_core:.2e} A")
+ 
+def B_loop_axis(z, I, R):
+    """Exact field on the axis of a circular loop of radius R [T]."""
+    return mu0 * I * R**2 / (2 * (R**2 + z**2)**1.5)
+ 
+def B_dip_axis(z, m):
+    """Dipole formula on the axis [T]."""
+    return ___
+ 
+# (c), (d): the survey loop
+R_L, I_L = 50.0, 10.0
+m_L = ___                              # moment of the survey loop [A m^2]
+print(f"(c) m = {m_L:.3g} A m^2")
+for z in (100.0, 250.0):                # (d): z = 2 R_L and z = 5 R_L
+    B_ex, B_dp = B_loop_axis(z, I_L, R_L), B_dip_axis(z, m_L)
+    print(f"(d) at z = {z:.0f} m: exact {B_ex*1e9:.2f} nT, dipole {B_dp*1e9:.2f} nT, "
+          f"ratio {B_dp/B_ex:.2f}")
+z_10 = ___                             # height where B_dip / B_loop = 1.1 [m]
+print(f"    dipole formula within 10% beyond z = {z_10:.0f} m = {z_10/R_L:.1f} R_L")
+ 
+# (e): the core loop seen from Earth's surface on the axis
+ratio_core = B_dip_axis(a, m_earth) / B_loop_axis(a, I_core, R_c)
+print(f"(e) z/R_c = {a/R_c:.2f}: dipole / exact = {ratio_core:.2f};  "
+      f"10% needs r = {z_10/R_L * R_c / a:.2f} a")
+ 
+# self-check
+assert np.isclose(m_earth, 7.68e22, rtol=2e-3) and np.isclose(I_core, 2.02e9, rtol=5e-3)
+assert np.isclose(m_L, 7.854e4, rtol=1e-3)
+assert np.isclose(B_dip_axis(100.0, m_L) / B_loop_axis(100.0, I_L, R_L), 1.398, atol=1e-3)
+assert np.isclose(B_dp / B_ex, 1.061, atol=1e-3)            # last loop value: z = 250 m
+assert np.isclose(z_10, 195.2, atol=0.5)
+assert np.isclose(ratio_core, 1.48, atol=0.01)
+print("Self-check passed.")
+```
+ 
+The explorer below shows a circular loop seen edge-on, with its axis vertical. The upper panel compares the exact field lines of the loop (solid) with those of a point dipole with the same moment (dashed), in units of the loop radius $R_L$. The lower-left panel shows $|\vec B|$ on the axis on log–log axes, for the loop radius and current you choose. The lower-right panel shows the ratio of the dipole formula to the exact field, with a line at $10\%$.
+ 
+1. Keep $R_L = 50\ \mathrm{m}$ and $I = 10\ \mathrm{A}$ and set $z/R_L = 2$. Check your answers to quiz part (d).
+2. In the upper panel, where do the solid and dashed field lines agree, and where do they differ most? What does "far from a compact loop" (W4L2, slide 14) mean in this picture?
+3. Change $R_L$ and $I$. Does the curve in the lower-right panel change? Explain why. What does change in the lower-left panel?
+4. Find the value of $z/R_L$ where the ratio drops to $1.1$, so that the dipole formula is accurate to within $10\%$. Compare it with your results at $2R_L$ and $5R_L$ in quiz part (d). Then set $z/R_L \approx 1.85$ to check part (e).
+```{code-cell} ipython3
+:tags: [remove-input]
+ 
+# The HTML contains all controls and drawing code, with no external dependencies.
+# An iframe keeps the explorer independent of the page styles.
+import html as html_module
+from pathlib import Path
+from IPython.display import display
+ 
+for _candidate in (
+    Path("current_loop_lab.html"),
+    Path("book/2_potential_fields/labs/week4/current_loop_lab.html"),
+):
+    if _candidate.exists():
+        explorer_html = _candidate.read_text()
+        break
+else:
+    from pyodide.http import pyfetch
+    _r = await pyfetch("current_loop_lab.html")
+    explorer_html = (await _r.bytes()).decode()
+ 
+display({"text/html": '<iframe title="Interactive current loop explorer" '
+             'style="width:100%;height:1120px;border:0" '
+             'sandbox="allow-scripts" srcdoc="' + html_module.escape(explorer_html, quote=True)
+             + '"></iframe>'}, raw=True)
+```

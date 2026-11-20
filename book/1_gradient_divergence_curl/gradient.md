@@ -54,7 +54,7 @@ $$
 \end{aligned}
 $$ (eq:gradr)
 
-From the final expression, we observe that the result is the normalised distance vector. This is what we call the outward unit normal to the spherical surface. It points away from the origin of the reference frame. The physical interpretation is that the gradient of the distance to the origin of the reference frame finds the direction in which the distance increases the most. The vector is placed perpendicular to the iso-surface of the function. We investigate whether this is a general property of the gradient.
+From the final expression, we observe that the result is the normalised distance vector. This is what we call the outward unit normal to the spherical surface. It points away from the origin of the reference frame. The geometrical interpretation is that the gradient of the distance to the origin of the reference frame finds the direction in which the distance increases the most. The vector is placed perpendicular to the iso-surface of the function. We investigate whether this is a general property of the gradient.
 
 Now let us take a different distance, namely relative to an arbitrary other point $\boldsymbol r'$ in space. In that case the displacement vector is given by
 
