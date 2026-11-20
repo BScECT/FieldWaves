@@ -1,7 +1,7 @@
 # Plane waves in one spatial dimension — proposed section sequence
 
 Date: 2026-11-08. Status: first book-section draft written on 2026-11-08; ready for joint review.
-Target: `book/5_electromagnetic_waves/plane_waves_1d.md`.
+Target: `book/5_electromagnetic_waves/02_01_plane_waves_1d.md`.
 Companion to `planning/EMwaves_TOC_proposal.md`; this develops its section 2 without replacing the overall chapter plan.
 
 ## Purpose and level

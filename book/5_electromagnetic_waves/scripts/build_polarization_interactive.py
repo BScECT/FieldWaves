@@ -1,0 +1,110 @@
+"""Build the embedded polarization/linear-receiver explorer.
+
+Python prepares self-contained HTML; controls and animation run in the browser on
+static TeachBook hosting, matching the existing in-page activities. No notebook,
+external libraries or running Python kernel are required by students.
+"""
+from pathlib import Path
+import html
+ROOT = Path(__file__).resolve().parents[1]
+STYLE = '''
+*{box-sizing:border-box}body{font:15px system-ui,sans-serif;color:#243743;background:white;margin:0;padding:12px}h2{font-size:20px;margin:0 0 8px}p{line-height:1.5;margin:8px 0}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}label{display:block;font-weight:600}output{display:block;font-weight:400;font-variant-numeric:tabular-nums;margin:4px 0}input[type=range]{width:100%;accent-color:#008dab}select,button{font:inherit;background:white;border:1px solid #78909b;border-radius:4px;padding:6px 10px}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #009fc4;outline-offset:2px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.plots{display:grid;grid-template-columns:1fr 1fr;gap:12px}canvas{display:block;width:100%;height:auto;border:1px solid #d5e0e5}.hint{font-size:14px;color:#435963}.phasor{font-family:ui-monospace,monospace;overflow-wrap:anywhere;font-size:14px;line-height:1.7}.power{margin:14px 0}.bar-track{height:22px;width:100%;background:#e6edf0;border:1px solid #a2b5bf}.bar{height:100%;background:#bf6419;width:0%}.bar-scale{display:flex;justify-content:space-between;font-size:13px}.readout{font-variant-numeric:tabular-nums}#message{min-height:2.8em}.phase-control{margin-top:12px}details{font-size:14px;line-height:1.6}summary{cursor:pointer}@media(max-width:650px){.plots,.controls{grid-template-columns:1fr}.controls{gap:10px}}
+'''
+BODY = '''
+<h2>What does the receiving antenna see?</h2>
+<p>A GNSS-like circular signal is a useful starting point. Here we receive it with an <strong>ideal short linear antenna</strong>: its straight axis picks out one component of the electric field. Switch to a linear signal to compare. Incident average intensity stays fixed.</p>
+<div class="controls">
+<label>Signal polarization<output id="signal-label"></output><select id="signal" aria-label="Incident signal polarization"><option value="linear">Linear</option><option value="circular" selected>Circular</option></select></label>
+<label>Antenna azimuth θ<output id="theta-label"></output><input id="theta" aria-label="Antenna azimuth in the transverse plane" type="range" min="0" max="360" step="1" value="0"></label>
+<label>Angle to propagation β<output id="beta-label"></output><input id="beta" aria-label="Angle of antenna axis to propagation" type="range" min="0" max="90" step="1" value="90"></label>
+</div>
+<div class="actions"><button id="aligned" type="button">Antenna along x</button><button id="crossed" type="button">Antenna along y</button><button id="longitudinal" type="button">Antenna along propagation</button><button id="reset" type="button">Reset</button></div>
+<p class="hint">Predict first: rotate the antenna while it stays transverse (β = 90°). Does received power change for each signal type? Then tilt it into the propagation direction (β = 0°).</p>
+<div class="plots"><canvas id="scene" width="620" height="400" aria-label="Oblique three-dimensional view of the transverse electric field, its tip trace, and the linear antenna axis"></canvas><canvas id="voltage" width="620" height="400" aria-label="Instantaneous received voltage versus oscillation phase, on a fixed vertical scale"></canvas></div>
+<div class="phase-control"><label>Oscillation phase ωt<output id="phase-label"></output><input id="phase" type="range" min="0" max="360" step="any" value="45" aria-label="Oscillation phase in degrees"></label><button id="play" type="button" aria-pressed="false">Play</button> <span class="hint">Animation is slowed down; the receiver is fixed at z = 0.</span></div>
+<div class="power"><p id="power-value" class="readout" aria-live="polite"></p><div id="power-meter" class="bar-track" role="meter" aria-label="Average received power relative to aligned linear reference" aria-valuemin="0" aria-valuemax="100"><div id="power-bar" class="bar"></div></div><div class="bar-scale"><span>0%</span><span>50%</span><span>100%: aligned linear reference</span></div></div>
+<p id="message" aria-live="polite"></p>
+<div class="phasor"><div id="field-phasor"></div><div id="axis-vector"></div><div id="voltage-phasor"></div><div id="instant-voltage"></div></div>
+<details><summary>Field, voltage and power</summary>
+<p>With the common factor e<sup>−jkz</sup> understood, the incident phasors are E/E₀ = x̂ (linear) and E/E₀ = (x̂ + jŷ)/√2 (circular). Both have the same E · E* = E₀² and incident average flux E₀²/(2η₀). Circular handedness is left unlabelled until a viewing convention is specified.</p>
+<p>Antenna axis: â = sin β cos θ x̂ + sin β sin θ ŷ + cos β ẑ.<br>Normalized voltage phasor: q = (E/E₀) · â.<br>Real instantaneous voltage: v/v<sub>ref,peak</sub> = Re{q e<sup>jωt</sup>}.<br>Average received power: P/P<sub>ref</sub> = |q|², where P<sub>ref</sub> is the average power for the aligned linear signal with the same receiver and incident intensity.</p>
+<p>The voltage plot and power bar keep fixed scales. Rotating an ideal linear antenna within the transverse plane receives half the reference power from the circular signal; tilting it along propagation gives zero. This is a comparison with an ideal linear antenna, while GNSS receiver antennas are commonly designed for circular polarization.</p>
+</details>
+'''
+JS = r'''
+"use strict";
+const $=id=>document.getElementById(id),D=Math.PI/180;
+let playing=false,raf=null,lastTime=null;
+const clean=x=>Math.abs(x)<1e-12?0:x;
+function model(signal,theta,beta,phase){
+ const t=theta*D,b=beta*D,w=phase*D;
+ const a=[clean(Math.sin(b)*Math.cos(t)),clean(Math.sin(b)*Math.sin(t)),clean(Math.cos(b))];
+ const factor=signal==='linear'?1:1/Math.sqrt(2),qr=clean(a[0]*factor),qi=signal==='linear'?0:clean(a[1]*factor);
+ const E=[factor*Math.cos(w),signal==='linear'?0:-factor*Math.sin(w),0];
+ const power=qr*qr+qi*qi,voltage=qr*Math.cos(w)-qi*Math.sin(w);
+ return {signal,theta,beta,phase,a,E,qr,qi,power,voltage,factor};
+}
+function arrow(c,p,q,col,width=3){
+ c.strokeStyle=col;c.fillStyle=col;c.lineWidth=width;c.beginPath();c.moveTo(...p);c.lineTo(...q);c.stroke();let dx=q[0]-p[0],dy=q[1]-p[1];if(Math.hypot(dx,dy)<2)return;let a=Math.atan2(dy,dx);c.beginPath();c.moveTo(...q);c.lineTo(q[0]-12*Math.cos(a-.38),q[1]-12*Math.sin(a-.38));c.lineTo(q[0]-12*Math.cos(a+.38),q[1]-12*Math.sin(a+.38));c.closePath();c.fill();
+}
+function scene(s){
+ const c=$('scene').getContext('2d');c.clearRect(0,0,620,400);c.font='20px system-ui';c.fillStyle='#243743';c.textAlign='left';c.fillText('Field and antenna at the receiver',25,28);
+ // Orthographic view: camera azimuth -55 degrees, elevation 25 degrees.
+ const az=-55*D,el=25*D;
+ const p=v=>[302+123*(-Math.sin(az)*v[0]+Math.cos(az)*v[1]),219-123*(-Math.sin(el)*Math.cos(az)*v[0]-Math.sin(el)*Math.sin(az)*v[1]+Math.cos(el)*v[2])];
+ const zero=p([0,0,0]);
+ c.beginPath();for(const [i,v] of [[-1.12,-1.12,0],[1.12,-1.12,0],[1.12,1.12,0],[-1.12,1.12,0]].entries()){if(i===0)c.moveTo(...p(v));else c.lineTo(...p(v));}c.closePath();c.fillStyle='#f0f7fa';c.fill();c.strokeStyle='#c4d9e1';c.lineWidth=1;c.stroke();
+ for(const [v,label] of [[[1.5,0,0],'x'],[[0,1.5,0],'y'],[[0,0,1.25],'+z: propagation']]){let end=p(v);arrow(c,zero,end,'#7a8e97',1.5);c.fillStyle='#435963';c.font='17px system-ui';c.fillText(label,end[0]+7,end[1]-4);}
+ c.strokeStyle='#72b9cc';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();for(let i=0;i<=160;i++){let t=2*Math.PI*i/160,v=[s.factor*Math.cos(t),s.signal==='linear'?0:-s.factor*Math.sin(t),0];if(i===0)c.moveTo(...p(v));else c.lineTo(...p(v));}c.stroke();c.setLineDash([]);
+ const a1=p(s.a.map(x=>-1.12*x)),a2=p(s.a.map(x=>1.12*x));c.strokeStyle='#bf6419';c.lineWidth=7;c.beginPath();c.moveTo(...a1);c.lineTo(...a2);c.stroke();
+ for(const end of [a1,a2]){c.fillStyle='#bf6419';c.beginPath();c.arc(...end,4,0,2*Math.PI);c.fill();}
+ arrow(c,zero,p(s.E),'#007fa8',4);
+ c.fillStyle='#007fa8';c.font='17px system-ui';c.fillText('Blue: real E field',25,344);c.fillStyle='#bf6419';c.fillText('Orange: linear antenna axis',25,369);c.fillStyle='#435963';c.fillText('Dashed: field-tip path',330,369);
+}
+function voltagePlot(s){
+ const c=$('voltage').getContext('2d'),L=65,R=20,T=65,B=63,W=620,H=400;
+ const xp=t=>L+t/360*(W-L-R),yp=v=>T+(1.15-v)/2.3*(H-T-B);
+ c.clearRect(0,0,W,H);c.fillStyle='#243743';c.font='20px system-ui';c.textAlign='left';c.fillText('Received voltage: one oscillation',25,28);c.font='16px system-ui';c.fillText('Voltage / aligned-linear peak voltage',L,51);
+ for(const v of [-1,-.5,0,.5,1]){c.strokeStyle='#e1e9ed';c.lineWidth=1;c.beginPath();c.moveTo(L,yp(v));c.lineTo(W-R,yp(v));c.stroke();c.fillStyle='#435963';c.textAlign='right';c.fillText(String(v),L-10,yp(v)+5);}
+ for(const t of [0,90,180,270,360]){c.strokeStyle='#e1e9ed';c.beginPath();c.moveTo(xp(t),T);c.lineTo(xp(t),H-B);c.stroke();c.fillStyle='#435963';c.textAlign='center';c.fillText(t+'°',xp(t),H-B+23);}
+ c.strokeStyle='#bf6419';c.lineWidth=3;c.beginPath();for(let i=0;i<=720;i++){let t=i/2,v=s.qr*Math.cos(t*D)-s.qi*Math.sin(t*D);if(i===0)c.moveTo(xp(t),yp(v));else c.lineTo(xp(t),yp(v));}c.stroke();
+ c.setLineDash([4,4]);c.strokeStyle='#637b87';c.lineWidth=1.5;c.beginPath();c.moveTo(xp(s.phase),T);c.lineTo(xp(s.phase),H-B);c.stroke();c.setLineDash([]);c.fillStyle='#243743';c.beginPath();c.arc(xp(s.phase),yp(s.voltage),5,0,2*Math.PI);c.fill();
+ c.strokeStyle='#718793';c.lineWidth=1;c.strokeRect(L,T,W-L-R,H-T-B);c.font='18px system-ui';c.textAlign='center';c.fillStyle='#243743';c.fillText('Oscillation phase ωt',(L+W-R)/2,H-15);
+}
+function signed(z){return (z<0?'−':'+')+' '+Math.abs(z).toFixed(3)}
+function update(){
+ const s=model($('signal').value,Number($('theta').value),Number($('beta').value),Number($('phase').value));
+ $('signal-label').value=s.signal==='linear'?'Fixed x direction':'Equal components, quarter-cycle offset';
+ $('theta-label').value=s.theta.toFixed(0)+'° around propagation';$('beta-label').value=s.beta===0?'0°: parallel to propagation':s.beta===90?'90°: transverse':s.beta.toFixed(0)+'° to propagation';$('phase-label').value=s.phase.toFixed(0)+'°';
+ scene(s);voltagePlot(s);
+ const percent=100*s.power;$('power-value').textContent='Average received power: '+percent.toFixed(1)+'% of the aligned-linear reference. Incident average intensity is unchanged.';
+ $('power-bar').style.width=percent+'%';$('power-meter').setAttribute('aria-valuenow',String(percent));$('power-meter').setAttribute('aria-valuetext',percent.toFixed(1)+' percent of reference power');
+ $('field-phasor').textContent='At z = 0: E/E₀ = '+(s.signal==='linear'?'x̂':'(x̂ + jŷ)/√2')+'; common time factor eʲωᵗ understood.';
+ $('axis-vector').textContent='â = '+s.a[0].toFixed(3)+' x̂ '+signed(s.a[1])+' ŷ '+signed(s.a[2])+' ẑ';
+ const ph=s.power<1e-20?'phase undefined at zero signal':'phase '+(Math.atan2(s.qi,s.qr)/D).toFixed(1)+'°';
+ $('voltage-phasor').textContent='Voltage phasor q = '+s.qr.toFixed(3)+' '+signed(s.qi)+' j; |q| = '+Math.sqrt(s.power).toFixed(3)+'; '+ph+'.';
+ $('instant-voltage').textContent='Instantaneous voltage / reference peak = '+clean(s.voltage).toFixed(3)+'. Average power ratio = |q|² = '+s.power.toFixed(3)+'.';
+ $('message').textContent=s.beta===0?'No reception: the antenna points along propagation, but E is transverse. Its projection onto the antenna axis is zero.':s.signal==='circular'?(s.beta===90?'Circular signal, transverse linear antenna: 50% reference power at every azimuth. Rotate it to see the voltage phase shift.':'Tilting towards propagation reduces the received component. For this circular signal, power ratio = ½ sin²β.'):(s.power<1e-20?'No reception: this antenna is perpendicular to the linear electric field.':'Linear signal: average power ratio = sin²β cos²θ. Try rotating the antenna through 90°.');
+ window.polarizationState=s;
+}
+function stop(){playing=false;if(raf!==null)cancelAnimationFrame(raf);raf=null;lastTime=null;$('play').textContent='Play';$('play').setAttribute('aria-pressed','false');}
+function tick(now){if(!playing)return;if(lastTime!==null)$('phase').value=String((Number($('phase').value)+Math.min(now-lastTime,100)*.09)%360);lastTime=now;update();raf=requestAnimationFrame(tick);}
+$('play').addEventListener('click',()=>{if(playing){stop();return;}playing=true;lastTime=null;$('play').textContent='Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(tick);});
+for(const id of ['signal','theta','beta'])$(id).addEventListener('input',update);
+$('phase').addEventListener('input',()=>{stop();update();});
+for(const [id,t,b] of [['aligned',0,90],['crossed',90,90],['longitudinal',0,0]])$(id).addEventListener('click',()=>{$('theta').value=String(t);$('beta').value=String(b);update();});
+$('reset').addEventListener('click',()=>{stop();$('signal').value='circular';$('theta').value='0';$('beta').value='90';$('phase').value='45';update();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+update();
+'''
+
+def build():
+    dest = ROOT / 'interactives'
+    dest.mkdir(exist_ok=True)
+    title = 'Polarization and an ideal linear receiving antenna'
+    page = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + title + '</title><style>' + STYLE + '</style></head><body>' + BODY + '<script>' + JS + '</script></body></html>'
+    (dest / 'polarization.html').write_text(page)
+    (dest / 'polarization_embed.html').write_text('<iframe title="' + title + '" style="width:100%;height:1350px;border:0" sandbox="allow-scripts" loading="lazy" srcdoc="' + html.escape(page, quote=True) + '"></iframe>\n')
+
+if __name__ == '__main__':
+    build()

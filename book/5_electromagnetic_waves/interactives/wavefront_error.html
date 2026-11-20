@@ -1,0 +1,72 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spherical versus plane-wave error at oblique incidence</title><style>
+*{box-sizing:border-box}body{font:15px system-ui,sans-serif;color:#243743;background:white;margin:0;padding:12px}h2{font-size:20px;margin:0 0 8px}p{line-height:1.45;margin:8px 0}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}label{display:block;font-weight:600}output{font-weight:400;display:block;font-variant-numeric:tabular-nums;margin:4px 0}input{width:100%;accent-color:#008dab}.plots{display:grid;grid-template-columns:1fr 1fr;gap:12px}canvas{width:100%;height:auto;border:1px solid #d5e0e5}#geometry{display:block;width:min(100%,650px);margin:auto;border:0}.readout{font-variant-numeric:tabular-nums;font-size:16px}#phase-state{font-weight:600}button{font:inherit;padding:5px 15px;background:white;border:1px solid #78909b;border-radius:4px}.hint{font-size:14px;color:#435963}details{font-size:14px;line-height:1.6}summary{cursor:pointer}@media(max-width:620px){.plots,.controls{grid-template-columns:1fr}.controls{gap:10px}body{font-size:14px}}
+</style></head><body>
+<h2>When does a spherical wave stop looking planar?</h2>
+<p>A satellite illuminates a horizontal ground patch at <strong>30° from zenith</strong>. The plane wave is tangent-matched at the patch centre: it already includes the phase slope along the ground. The error below is the curvature it misses.</p>
+<canvas id="geometry" width="780" height="210" aria-label="Oblique illumination at thirty degrees from zenith of a horizontal patch centred at x equals zero"></canvas>
+<div class="controls">
+<label>Source–centre distance R<output id="range-label"></output><input id="range" type="range" min="2" max="3.301029995663981" step="any" value="2.903089986991944" aria-label="Source to patch centre slant distance in kilometres"></label>
+<label>Ground patch half-width L<output id="width-label"></output><input id="width" type="range" min="1" max="3.301029995663981" step="any" value="2.176091259055681" aria-label="Ground patch half width in metres"></label>
+<label>Wavelength λ<output id="wavelength-label"></output><input id="wavelength" type="range" min="0" max="6" step="1" value="1" aria-label="Wavelength selection"></label>
+</div>
+<p class="hint">Distance and patch-size sliders are logarithmic: equal moves multiply their values. Predict first: which curve changes if you choose a shorter wavelength? What if you double the patch width? The two plots have different units; use the numerical errors below them.</p>
+<div class="plots"><canvas id="amplitude" width="600" height="340" aria-label="Signed spherical amplitude departure from constant plane wave amplitude across the ground patch"></canvas><canvas id="phase" width="600" height="340" aria-label="Unwrapped magnitude of phase error of the tangent plane wave across the ground patch"></canvas></div>
+<div class="readout" aria-live="polite"><p id="amplitude-value"></p><p id="phase-value"></p><p id="phase-state"></p></div>
+<p class="hint">Amplitude is normalized to the exact field at the centre. Phase error is unwrapped: we do not hide full cycles by reducing it modulo 2π. The dashed phase guide is π/4 radians (45°), our working tolerance for phase error rather than a sharp physical boundary.</p>
+<details><summary>What is being compared?</summary>
+<p>Source position: (−R sin 30°, R cos 30°). Ground points: (x, 0), with −L ≤ x ≤ L; the vertical coordinate is positive upwards.</p>
+<p>Exact source distance: r(x) = √(R² + 2Rx sin 30° + x²).<br>Local plane-wave distance: rₚ(x) = R + x sin 30°.<br>Exact amplitude / centre amplitude: R/r(x); plane-wave amplitude / centre amplitude: 1.<br>Signed amplitude difference: 100[R/r(x) − 1] %.<br>Phase-error magnitude: (2π/λ)[r(x) − rₚ(x)].</p>
+<p>This scalar propagation comparison holds source strength and its angular radiation factor fixed across the patch. It isolates spherical spreading and wavefront curvature, before surface reflection or absorption.</p>
+</details>
+<p><button id="reset" type="button">Reset</button></p>
+<script>
+"use strict";
+const wavelengths=[.01,.03,.1,.3,1,3,10],theta=Math.PI/6,PHASE_LIMIT=Math.PI/4;
+function sample(x,R,lambda){
+ const rp=R+x*Math.sin(theta), r=Math.hypot(x+R*Math.sin(theta),R*Math.cos(theta));
+ // Rationalized difference avoids subtracting almost equal source distances.
+ const dr=x*x*Math.cos(theta)**2/(r+rp);
+ return {r,rp,amplitude:100*(R/r-1),phase:2*Math.PI/lambda*dr};
+}
+function arrow(ctx,x1,y1,x2,y2,colour){
+ ctx.strokeStyle=colour;ctx.fillStyle=colour;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();let a=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.4),y2-12*Math.sin(a-.4));ctx.lineTo(x2-12*Math.cos(a+.4),y2-12*Math.sin(a+.4));ctx.closePath();ctx.fill();
+}
+function geometry(){
+ const c=document.getElementById('geometry').getContext('2d');c.clearRect(0,0,780,210);c.font='19px system-ui';c.fillStyle='#243743';c.textAlign='left';
+ c.fillText('Oblique illumination',30,25);
+ c.strokeStyle='#738565';c.lineWidth=3;c.beginPath();c.moveTo(75,178);c.lineTo(705,178);c.stroke();
+ c.strokeStyle='#009fc4';c.lineWidth=7;c.beginPath();c.moveTo(345,178);c.lineTo(535,178);c.stroke();
+ c.fillStyle='#243743';c.fillText('−L',332,204);c.fillText('0',433,204);c.fillText('+L',522,204);c.fillText('ground x',594,204);
+ c.setLineDash([5,5]);c.strokeStyle='#8b9ca5';c.lineWidth=1.5;c.beginPath();c.moveTo(440,178);c.lineTo(440,32);c.stroke();c.setLineDash([]);c.fillText('zenith',451,40);
+ arrow(c,357,34,440,178,'#007fa8');c.fillStyle='#007fa8';c.fillText('from source',202,65);c.fillText('R',370,115);
+ c.strokeStyle='#647982';c.lineWidth=1.5;c.beginPath();c.arc(440,178,67,-Math.PI/2-Math.PI/6,-Math.PI/2);c.stroke();c.fillStyle='#243743';c.fillText('30°',397,92);
+}
+function plot(id,fn,L,ymin,ymax,title,ylabel,colour,guide){
+ const el=document.getElementById(id),c=el.getContext('2d'),W=el.width,H=el.height,left=91,right=22,top=51,bottom=57;
+ const xp=x=>left+(x+L)/(2*L)*(W-left-right),yp=y=>top+(ymax-y)/(ymax-ymin)*(H-top-bottom);
+ c.clearRect(0,0,W,H);c.fillStyle='#243743';c.font='20px system-ui';c.textAlign='left';c.fillText(title,left,24);c.font='16px system-ui';c.fillText(ylabel,left,44);
+ const fmt=y=>Math.abs(y)<1e-12?'0':Number(y.toPrecision(3)).toString();
+ for(let i=0;i<=4;i++){let y=ymin+(ymax-ymin)*i/4;c.strokeStyle='#e4ecef';c.lineWidth=1;c.beginPath();c.moveTo(left,yp(y));c.lineTo(W-right,yp(y));c.stroke();c.fillStyle='#435963';c.textAlign='right';c.fillText(fmt(y),left-8,yp(y)+5);}
+ for(let i=0;i<=4;i++){let x=-L+2*L*i/4;c.strokeStyle='#e4ecef';c.beginPath();c.moveTo(xp(x),top);c.lineTo(xp(x),H-bottom);c.stroke();c.fillStyle='#435963';c.textAlign='center';c.fillText(fmt(x),xp(x),H-bottom+23);}
+ function line(y,label){c.setLineDash([6,5]);c.strokeStyle='#637c89';c.lineWidth=1.5;c.beginPath();c.moveTo(left,yp(y));c.lineTo(W-right,yp(y));c.stroke();c.setLineDash([]);if(label){c.font='15px system-ui';c.textAlign='right';c.fillStyle='#435963';c.fillText(label,W-right-5,yp(y)-6);}}
+ if(guide!==null&&guide>=ymin&&guide<=ymax)line(guide,id==='phase'?'π/4 rad':'plane wave');
+ c.save();c.beginPath();c.rect(left,top,W-left-right,H-top-bottom);c.clip();c.strokeStyle=colour;c.lineWidth=3;c.beginPath();for(let i=0;i<=700;i++){let x=-L+2*L*i/700,y=fn(x);if(i===0)c.moveTo(xp(x),yp(y));else c.lineTo(xp(x),yp(y));}c.stroke();c.restore();
+ c.strokeStyle='#718793';c.lineWidth=1;c.strokeRect(left,top,W-left-right,H-top-bottom);c.font='18px system-ui';c.textAlign='center';c.fillStyle='#243743';c.fillText('Ground displacement x (m)',(left+W-right)/2,H-10);
+}
+function update(){
+ const R=10**Number(document.getElementById('range').value)*1000,L=10**Number(document.getElementById('width').value),lambda=wavelengths[Number(document.getElementById('wavelength').value)];
+ const ends=[sample(-L,R,lambda),sample(L,R,lambda)],amp=Math.max(...ends.map(s=>Math.abs(s.amplitude))),phase=Math.max(...ends.map(s=>s.phase));
+ document.getElementById('range-label').value=Number((R/1000).toPrecision(4))+' km (slant distance)';document.getElementById('width-label').value=Number(L.toPrecision(4))+' m (full width '+Number((2*L).toPrecision(4))+' m)';document.getElementById('wavelength-label').value=lambda+' m; f ≈ '+(0.3/lambda).toPrecision(3)+' GHz';
+ plot('amplitude',x=>sample(x,R,lambda).amplitude,L,-amp*1.15,amp*1.15,'Amplitude departure','Difference from plane-wave amplitude (%)','#007fa8',0);
+ plot('phase',x=>sample(x,R,lambda).phase,L,0,Math.max(1.05,phase*1.18),'Phase error from curvature','Magnitude of unwrapped error (rad)','#bf6419',PHASE_LIMIT);
+ document.getElementById('amplitude-value').textContent='Maximum amplitude departure: '+amp.toPrecision(3)+'% of the centre amplitude.';
+ document.getElementById('phase-value').textContent='Maximum phase error: '+phase.toPrecision(3)+' rad ('+(phase*180/Math.PI).toPrecision(3)+'°), or '+(phase/(2*Math.PI)).toPrecision(3)+' cycles.';
+ document.getElementById('phase-state').textContent=phase>=PHASE_LIMIT?'Phase error exceeds π/4 radians (45°). Compare that with the amplitude departure.':'Phase error is below π/4 radians (45°). Try a wider patch or shorter wavelength.';
+ document.getElementById('range').setAttribute('aria-valuetext',Number((R/1000).toPrecision(4))+' kilometres');
+ document.getElementById('width').setAttribute('aria-valuetext',Number(L.toPrecision(4))+' metres half-width');
+ window.wavefrontState={R,L,lambda,amp,phase};
+}
+for(const id of ['range','width','wavelength'])document.getElementById(id).addEventListener('input',update);
+document.getElementById('reset').addEventListener('click',()=>{document.getElementById('range').value=String(Math.log10(800));document.getElementById('width').value=String(Math.log10(150));document.getElementById('wavelength').value='1';update();});
+geometry();update();
+</script></body></html>

@@ -3,7 +3,7 @@
 :::{admonition} Pen-and-paper exercises
 :class: note
 
-These exercises accompany {doc}`../plane_waves_1d`, {doc}`../harmonic_waves` and {doc}`../radar_examples`. 
+These exercises accompany {doc}`../02_01_plane_waves_1d`, {doc}`../02_02_harmonic_waves` and {doc}`../02_04_radar_examples`.
 Use $c=3.00\times10^8\ \mathrm{m/s}$ and $\eta_0=\sqrt{\mu_0/\epsilon_0}\simeq377\ \Omega$ throughout.
 :::
 
@@ -29,10 +29,10 @@ The phase changes by about $113$ radians, or $18$ cycles, per metre along the pr
 
 ### 2. Reading a phasor
 
-Using the $e^{+i\omega t}$ convention, a harmonic field has phasor
+Using the $e^{+j\omega t}$ convention, a harmonic field has phasor
 
 $$
-E_x(z)=3\,e^{i\pi/2}e^{-ikz}\ \mathrm{V/m}.
+E_x(z)=3\,e^{j\pi/2}e^{-jkz}\ \mathrm{V/m}.
 $$
 
 (a) Write the physical field $E_x(z,t)$, and evaluate it at $z=0$.
@@ -44,10 +44,10 @@ $$
 :::{admonition} Solution
 :class: dropdown
 
-(a) Multiply by $e^{i\omega t}$ and take the real part:
+(a) Multiply by $e^{j\omega t}$ and take the real part:
 
 $$
-E_x(z,t)=\operatorname{Re}\left\{3\,e^{i(\omega t-kz+\pi/2)}\right\}
+E_x(z,t)=\operatorname{Re}\left\{3\,e^{j(\omega t-kz+\pi/2)}\right\}
 =3\cos(\omega t-kz+\pi/2)=-3\sin(\omega t-kz)\ \mathrm{V/m}.
 $$
 
@@ -55,7 +55,7 @@ At $z=0$, $E_x(0,t)=-3\sin\omega t\ \mathrm{V/m}$.
 
 (b) Along $+z$: the phase $\omega t-kz$ stays constant when $z$ increases with $t$.
 
-(c) $E_x(z)=3\,e^{i\pi/2}e^{+ikz}\ \mathrm{V/m}$.
+(c) $E_x(z)=3\,e^{j\pi/2}e^{+jkz}\ \mathrm{V/m}$.
 :::
 
 ### 3. The magnetic field of a harmonic wave
@@ -112,23 +112,23 @@ $$
 :::{admonition} Solution with phasors
 :class: dropdown
 
-Write each field as a phasor times $e^{i\omega t}$, so that every time derivative becomes a factor $i\omega$. The coupled equations become
+Write each field as a phasor times $e^{j\omega t}$, so that every time derivative becomes a factor $j\omega$. The coupled equations become
 
 $$
 \begin{aligned}
-(-ik) E_x &= -\mu_0 (i\omega) H_y,\\
-(-ik) H_y &= -\epsilon_0 (i\omega) E_x.
+(-jk) E_x &= -\mu_0 (j\omega) H_y,\\
+(-jk) H_y &= -\epsilon_0 (j\omega) E_x.
 \end{aligned}
 $$
 
-(a) The wave $E_0\cos(\omega t-kz)$ has phasor $E_x(z)=E_0e^{-ikz}$. The first equation gives
+(a) The wave $E_0\cos(\omega t-kz)$ has phasor $E_x(z)=E_0e^{-jkz}$. The first equation gives
 
 $$
 \begin{aligned}
--ikE_x&=-i\omega\mu_0H_y,\\
+-jkE_x&=-j\omega\mu_0H_y,\\
 H_y&=\frac{k}{\omega\mu_0}E_x, \\
-H_y&=\frac{E_0 k}{\mu_0 \omega}e^{-ikz}, \\
-H_y&=\frac{E_0}{\eta_0}e^{-ikz}.
+H_y&=\frac{E_0 k}{\mu_0 \omega}e^{-jkz}, \\
+H_y&=\frac{E_0}{\eta_0}e^{-jkz}.
 \end{aligned}
 $$
 
@@ -136,14 +136,14 @@ $$
 
 $$
 \begin{aligned}
-(-ik)H_y &= -\epsilon_0 (i\omega) E_x,\\
-k\left(\frac{E_0 k}{\mu_0\omega} e^{-ikz}\right) &= \epsilon_0 \omega E_0 e^{-ikz},\\
+(-jk)H_y &= -\epsilon_0 (j\omega) E_x,\\
+k\left(\frac{E_0 k}{\mu_0\omega} e^{-jkz}\right) &= \epsilon_0 \omega E_0 e^{-jkz},\\
 k^2 &= \mu_0 \epsilon_0 \omega^2,\\
 k &= \frac{\omega}{c}
 \end{aligned}
 $$
 
-**What became simpler?** Each derivative became a multiplication, by $i\omega$ in time or $\mp ik$ in space. Solving the differential equation no longer requires integrating!
+**What became simpler?** Each derivative became a multiplication, by $j\omega$ in time or $\mp jk$ in space. Solving the differential equation no longer requires integrating!
 :::
 
 ### 4. Measuring ground motion with radar phase
@@ -154,7 +154,7 @@ A radar satellite operating at $5.405\ \mathrm{GHz}$ observes a point on the gro
 
 (b) How many wavelengths fit into the round trip? Why is the absolute phase of a single echo not useful on its own for finding $R$?
 
-(c) Between two passes of the satellite, the ground moves $3\ \mathrm{mm}$ away from the radar along the line of sight. Using the round-trip factor $e^{-i2k\Delta R}$, find the change in echo phase.
+(c) Between two passes of the satellite, the ground moves $3\ \mathrm{mm}$ away from the radar along the line of sight. Using the round-trip factor $e^{-j2k\Delta R}$, find the change in echo phase.
 
 (d) What line-of-sight displacement changes the phase by exactly $2\pi$? What does this mean when you interpret a measured phase change?
 
@@ -177,7 +177,7 @@ $$
 \simeq-0.68\ \mathrm{rad}\approx-39^\circ.
 $$
 
-The sign follows from $e^{-i2k\Delta R}$: moving away makes the phase more negative. 
+The sign follows from $e^{-j2k\Delta R}$: moving away makes the phase more negative.
 
 (d) $|\Delta\phi|=2\pi$ when $\Delta R=\lambda/2\simeq2.8\ \mathrm{cm}$. Displacements that differ by a multiple of $\lambda/2$ give the same measured phase. A phase change of $39^\circ$ could therefore also mean $3.0\ \mathrm{mm}+2.8\ \mathrm{cm}$, and so on. Extra information is needed to choose between them, such as the assumption that the ground moves smoothly in time and space.
 :::

@@ -55,7 +55,7 @@ for(const id of ['time','sensor'])document.getElementById(id).addEventListener('
 document.getElementById('reset').addEventListener('click',()=>{document.getElementById('time').value='0.4';document.getElementById('sensor').value='150';update();});update();
 '''
 FREQUENCY_BODY = '''
-<div class="title">Temporal frequency and spatial frequency</div>
+<div class="title">Frequency and wavenumber</div>
 <div class="controls">
 <label>Frequency: <output id="frequency-label"></output><input id="frequency" aria-label="Frequency in megahertz" type="range" min="20" max="200" step="10" value="100"></label>
 <label>Phase: <output id="phase-label"></output><input id="phase" aria-label="Phase in degrees" type="range" min="-180" max="180" step="15" value="0"></label>
@@ -71,7 +71,7 @@ function update(){
  document.getElementById('frequency-label').value=(f/1e6).toFixed(0)+' MHz';document.getElementById('phase-label').value=deg.toFixed(0)+'°';
  plot('temporal',x=>Math.cos(omega*x*1e-9+phi),60,'Time t (ns), at z = 0','Time trace','#009fc4');
  plot('spatial',x=>Math.cos(-k*x+phi),18,'Position z (m), at t = 0','Spatial snapshot','#d26b26');
- document.getElementById('values').textContent='T = '+(period*1e9).toFixed(2)+' ns; λ = '+lambda.toFixed(2)+' m; ω = '+(omega/1e6).toFixed(1)+' × 10⁶ rad/s; k = '+k.toFixed(3)+' rad/m; spatial frequency = '+(1/lambda).toFixed(3)+' cycles/m.  fλ = ω/k = 3.0 × 10⁸ m/s.';
+ document.getElementById('values').textContent='T = '+(period*1e9).toFixed(2)+' ns; λ = '+lambda.toFixed(2)+' m; ω = '+(omega/1e6).toFixed(1)+' × 10⁶ rad/s; wavenumber k = '+k.toFixed(3)+' rad/m; spatial frequency = '+(1/lambda).toFixed(3)+' cycles/m.  fλ = ω/k = 3.0 × 10⁸ m/s.';
 }
 for(const id of ['frequency','phase'])document.getElementById(id).addEventListener('input',update);
 document.getElementById('reset').addEventListener('click',()=>{document.getElementById('frequency').value='100';document.getElementById('phase').value='0';update();});update();
@@ -81,7 +81,7 @@ def build():
     dest=ROOT/'interactives'; dest.mkdir(exist_ok=True)
     for name,title,body,js in [
         ('pulse','Plane-wave pulse explorer',PULSE_BODY,PULSE_JS),
-        ('frequency','Plane-wave spatial-frequency explorer',FREQUENCY_BODY,FREQUENCY_JS),
+        ('frequency','Plane-wave wavenumber explorer',FREQUENCY_BODY,FREQUENCY_JS),
     ]:
         page='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>'+STYLE+'</style></head><body>'+body+'<script>'+COMMON+js+'</script></body></html>'
         (dest/(name+'.html')).write_text(page)

@@ -1,7 +1,7 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plane-wave spatial-frequency explorer</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plane-wave wavenumber explorer</title><style>
 *{box-sizing:border-box}body{font:15px system-ui,sans-serif;color:#243743;background:#fff;margin:0;padding:12px}label{display:block;font-weight:600;margin:8px 0}input[type=range]{width:100%;accent-color:#008dab}output{font-weight:400;font-variant-numeric:tabular-nums}button{font:inherit;border:1px solid #78909b;border-radius:4px;background:#fff;padding:6px 15px;cursor:pointer}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.plots{display:grid;grid-template-columns:1fr 1fr;gap:12px}canvas{width:100%;height:auto;border:1px solid #ccd8de;background:#fff}.readout{line-height:1.7;padding:8px 0;font-variant-numeric:tabular-nums}.hint{color:#435963;font-size:14px;margin:6px 0}.title{font-weight:600;margin:4px 0 8px} @media(max-width:650px){.plots,.controls{grid-template-columns:1fr}.hint{font-size:13px}}
 </style></head><body>
-<div class="title">Temporal frequency and spatial frequency</div>
+<div class="title">Frequency and wavenumber</div>
 <div class="controls">
 <label>Frequency: <output id="frequency-label"></output><input id="frequency" aria-label="Frequency in megahertz" type="range" min="20" max="200" step="10" value="100"></label>
 <label>Phase: <output id="phase-label"></output><input id="phase" aria-label="Phase in degrees" type="range" min="-180" max="180" step="15" value="0"></label>
@@ -35,7 +35,7 @@ function update(){
  document.getElementById('frequency-label').value=(f/1e6).toFixed(0)+' MHz';document.getElementById('phase-label').value=deg.toFixed(0)+'°';
  plot('temporal',x=>Math.cos(omega*x*1e-9+phi),60,'Time t (ns), at z = 0','Time trace','#009fc4');
  plot('spatial',x=>Math.cos(-k*x+phi),18,'Position z (m), at t = 0','Spatial snapshot','#d26b26');
- document.getElementById('values').textContent='T = '+(period*1e9).toFixed(2)+' ns; λ = '+lambda.toFixed(2)+' m; ω = '+(omega/1e6).toFixed(1)+' × 10⁶ rad/s; k = '+k.toFixed(3)+' rad/m; spatial frequency = '+(1/lambda).toFixed(3)+' cycles/m.  fλ = ω/k = 3.0 × 10⁸ m/s.';
+ document.getElementById('values').textContent='T = '+(period*1e9).toFixed(2)+' ns; λ = '+lambda.toFixed(2)+' m; ω = '+(omega/1e6).toFixed(1)+' × 10⁶ rad/s; wavenumber k = '+k.toFixed(3)+' rad/m; spatial frequency = '+(1/lambda).toFixed(3)+' cycles/m.  fλ = ω/k = 3.0 × 10⁸ m/s.';
 }
 for(const id of ['frequency','phase'])document.getElementById(id).addEventListener('input',update);
 document.getElementById('reset').addEventListener('click',()=>{document.getElementById('frequency').value='100';document.getElementById('phase').value='0';update();});update();

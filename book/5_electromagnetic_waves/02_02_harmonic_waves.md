@@ -1,6 +1,6 @@
 # Harmonic waves and complex notation
 
-In {doc}`plane_waves_1d` we found that a sinusoid $E_0\cos(\omega t-kz)$ solves the wave equation provided $k=\omega/c$, and that sums of such sinusoids give travelling waves of any shape. We now look more closely at a single sinusoid, and introduce the complex notation that radar engineers and electromagnetics textbooks use almost everywhere.
+In {doc}`02_01_plane_waves_1d` we found that a sinusoid $E_0\cos(\omega t-kz)$ solves the wave equation provided $k=\omega/c$, and that sums of such sinusoids give travelling waves of any shape. We now look more closely at a single sinusoid, and introduce the complex notation that radar engineers and electromagnetics textbooks use almost everywhere.
 
 ## Harmonic waves: frequency in time and in space
 
@@ -17,7 +17,7 @@ $$
 \boxed{k=\frac{2\pi}{\lambda}.}
 $$
 
-The **wavenumber $k$ is angular spatial frequency**: phase change per metre, measured in rad/m. It plays the same role for position that $\omega$ plays for time. If we count whole cycles rather than radians, the spatial frequency is $1/\lambda$, just as ordinary temporal frequency is $f=1/T$.
+The **wavenumber $k$** measures phase change per metre, in rad/m. It is an angular spatial frequency. It plays the same role for position that $\omega$ plays for time. If we count whole cycles rather than radians, the spatial frequency is $1/\lambda$, just as ordinary temporal frequency is $f=1/T$.
 
 | | Time, at fixed position | Space, at fixed time |
 |---|---|---|
@@ -66,13 +66,13 @@ A vacuum wave has $E_x=E_0\cos(2\pi\,10^8t-kz)$, using seconds and metres.
 Keeping track of amplitudes and phases with cosines soon gets tiresome. Euler's identity gives us a more convenient language:
 
 $$
-\cos\theta=\operatorname{Re}\{e^{i\theta}\}.
+\cos\theta=\operatorname{Re}\{e^{j\theta}\}.
 $$
 
-We can represent the same harmonic field by the complex expression
+Using $j$ for the imaginary unit, $j^2=-1$, we can represent the same harmonic field by the complex expression
 
 $$
-\boxed{E_x(z,t)=E_0e^{i(\omega t-kz+\phi)}.}
+\boxed{E_x(z,t)=E_0e^{j(\omega t-kz+\phi)}.}
 $$ (eq:em-plane-harmonic-complex)
 
 Formally, the measurable field is the **real part** of this expression. In practice, we will use the same symbol and treat harmonic fields as complex-valued, remembering to take the real part when we want the physical field. This is standard working practice in electromagnetics; getting comfortable with it will make the subject much easier.
@@ -80,43 +80,43 @@ Formally, the measurable field is the **real part** of this expression. In pract
 We can also separate out the time dependence:
 
 $$
-E_x(z,t)=E_x(z)e^{i\omega t},\qquad
-E_x(z)=E_0e^{i\phi}e^{-ikz}.
+E_x(z,t)=E_x(z)e^{j\omega t},\qquad
+E_x(z)=E_0e^{j\phi}e^{-jkz}.
 $$
 
-The time-independent complex amplitude $E_x(z)$ is called a **phasor**. It stores both amplitude and phase. To recover the physical field, use $\operatorname{Re}\{E_x(z)e^{i\omega t}\}$. Using the same symbol is slightly ambiguous, but the context tells us which representation we mean.
+The time-independent complex amplitude $E_x(z)$ is called a **phasor**. It stores both amplitude and phase. To recover the physical field, use $\operatorname{Re}\{E_x(z)e^{j\omega t}\}$. Using the same symbol is slightly ambiguous, but the context tells us which representation we mean.
 
 ### Simplifying derivatives using phasors
 
 For a harmonic field,
 
 $$
-\frac{\partial\vec E}{\partial t}=i\omega\vec E,
+\frac{\partial\vec E}{\partial t}=j\omega\vec E,
 $$
 
 and for a wave travelling along $+z$,
 
 $$
-\frac{\partial\vec E}{\partial z}=-ik\vec E.
+\frac{\partial\vec E}{\partial z}=-jk\vec E.
 $$
 
 Differentiation becomes multiplication. Maxwell's curl equations, written for the phasors, are then
 
 $$
-\vec\nabla\times\vec E=-i\omega\mu_0\vec H,
+\vec\nabla\times\vec E=-j\omega\mu_0\vec H,
 \qquad
-\vec\nabla\times\vec H=i\omega\epsilon_0\vec E.
+\vec\nabla\times\vec H=j\omega\epsilon_0\vec E.
 $$ (eq:em-plane-phasor-maxwell)
 
 The curl still has its geometric meaning. Complex notation handles the harmonic time dependence; it does not replace vector calculus.
 
-Our choice of $e^{+i\omega t}$ agrees with the {doc}`Fourier convention used for mechanical waves <../4_mechanical_waves/impedance>`. With this convention, a forward-travelling wave has $e^{-ikz}$. Changing convention is possible, but changing it halfway through a calculation is asking for trouble.
+Our choice of $e^{+j\omega t}$ agrees with the {doc}`Fourier convention used for mechanical waves <../4_mechanical_waves/impedance>`. With this convention, a forward-travelling wave has $e^{-jkz}$. Changing convention is possible, but changing it halfway through a calculation is asking for trouble.
 
 ### What about a radar pulse?
 
-A radar usually transmits a short pulse, not an endless sinusoid. A pulse is not a single harmonic wave, but, as we saw in {doc}`plane_waves_1d`, Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
+A radar usually transmits a short pulse, not an endless sinusoid. A pulse is not a single harmonic wave, but, as we saw in {doc}`02_01_plane_waves_1d`, Fourier analysis lets us build it from harmonic components with different frequencies, amplitudes and phases. Because Maxwell's equations are linear, we can solve for those components separately and add them afterwards. This is why harmonic solutions are useful even when the radar transmits a pulse.
 
-```{admonition} Turn up the spatial frequency
+```{admonition} Turn up the wavenumber
 :class: tip
 
 Change the temporal frequency and compare the time trace with the spatial snapshot below. Predict what will happen to the spacing between crests before moving the slider. Watch $\omega$, $k$, $T$ and $\lambda$ together. Increasing frequency changes how many oscillations fit into a second and a metre; in vacuum it does not change the speed.

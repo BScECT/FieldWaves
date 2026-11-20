@@ -2,7 +2,7 @@
 
 Date: 2026-11-01. Branch: `EMwaves`.
 
-Student material: `book/5_electromagnetic_waves/history_maxwell.md`.
+Student material: `book/5_electromagnetic_waves/01_history_maxwell.md`.
 
 ## Suggested pacing (60-minute lecture, adjustable)
 
