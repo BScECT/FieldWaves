@@ -148,10 +148,16 @@ parts:
         - file: 5_electromagnetic_waves/04_02_lossy_dielectrics.md
         - file: 5_electromagnetic_waves/04_03_conductors_and_skin_depth.md
         - file: 5_electromagnetic_waves/04_04_radar_penetration.md
-      # Keep heading-only pages hidden until content is added.
-      # - file: 5_electromagnetic_waves/05_01_interface_scattering.md
+      - file: 5_electromagnetic_waves/05_00_interfaces.md
+        sections:
+        - file: 5_electromagnetic_waves/05_01_normal_incidence.md
+        - file: 5_electromagnetic_waves/05_02_conducting_reflection.md
+        - file: 5_electromagnetic_waves/05_03_oblique_incidence.md
+        - file: 5_electromagnetic_waves/05_04_polarization_at_interface.md
+        - file: 5_electromagnetic_waves/05_05_finite_object_scattering.md
+        - file: 5_electromagnetic_waves/05_06_practice.md
+      # Multilayer development is deferred.
       # - file: 5_electromagnetic_waves/05_02_multilayer_frequency_response.md
-      # - file: 5_electromagnetic_waves/05_03_practice_3.md
     - file: 5_electromagnetic_waves/labs/lab_em_waves_solutions.md
     - file: 5_electromagnetic_waves/labs/lab2_em_waves_solutions.md
     # - file: 5_electromagnetic_waves/labs/lab2_em_waves_quiz.md

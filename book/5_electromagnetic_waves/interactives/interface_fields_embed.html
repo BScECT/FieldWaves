@@ -1,0 +1,95 @@
+<iframe title="Match the fields: soil moisture and reflection" style="width:100%;height:1510px;border:0" sandbox="allow-scripts" loading="lazy" srcdoc="&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;Match the fields: soil moisture and reflection&lt;/title&gt;&lt;style&gt;*{box-sizing:border-box}body{margin:0;padding:14px;color:#253a46;background:white;font:15px system-ui,sans-serif}h2{font-size:22px;margin:0 0 8px}p{line-height:1.5;margin:8px 0}.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:15px 0}label{font-weight:600;display:block}output{display:block;font-weight:400;font-variant-numeric:tabular-nums;min-height:23px}input[type=range]{width:100%;accent-color:#007fa8}input[type=checkbox]{accent-color:#007fa8}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}button{font:inherit;background:white;border:1px solid #78909b;border-radius:4px;padding:6px 12px;color:#253a46}.legend,.hint,details{font-size:14px;line-height:1.5;color:#435963}.key{display:inline-block;width:20px;border-top:3px solid;vertical-align:middle;margin-right:5px}.air{color:#007fa8}.soil{color:#63823a}.reflected{color:#b65e22}.fields canvas{display:block;width:100%;height:auto;margin:7px 0}.powers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}.power-track{height:16px;background:#e5edf0;overflow:hidden;border:1px solid #cad6dc}.power-fill{height:100%}.readout{font-variant-numeric:tabular-nums;line-height:1.6}.summary{padding:9px 12px;background:#f2f7fa;margin-top:10px}.history canvas{display:block;width:100%;height:auto}summary{cursor:pointer;font-weight:600}details p{margin:8px 0}button:focus-visible,input:focus-visible{outline:3px solid #007fa8;outline-offset:3px}@media(max-width:620px){.controls{grid-template-columns:1fr 1fr}.powers{grid-template-columns:1fr}body{font-size:14px}}@media(max-width:390px){.controls{grid-template-columns:1fr}}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h2&gt;Rain changes the soil. What happens to the reflected wave?&lt;/h2&gt;
+&lt;p&gt;Keep the transmitter and interface fixed. Change the &lt;strong&gt;volumetric water content&lt;/strong&gt;—the fraction of the whole soil volume occupied by water—and watch the material response and field matching change.&lt;/p&gt;
+&lt;div class=&quot;controls&quot;&gt;
+&lt;label&gt;Soil water content&lt;output id=&quot;moisture-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;moisture&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;45&quot; step=&quot;.1&quot; value=&quot;5&quot; aria-label=&quot;Volumetric soil water content in percent&quot;&gt;&lt;/label&gt;
+&lt;label&gt;Oscillation phase ωt&lt;output id=&quot;phase-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;phase&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;360&quot; step=&quot;any&quot; value=&quot;35&quot; aria-label=&quot;Carrier oscillation phase in degrees&quot;&gt;&lt;/label&gt;
+&lt;label&gt;Example: rain, then drying&lt;output id=&quot;day-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;day&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;10&quot; step=&quot;.05&quot; value=&quot;0&quot; aria-label=&quot;Day in an illustrative rain and drying sequence&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class=&quot;actions&quot;&gt;&lt;button id=&quot;dry&quot; type=&quot;button&quot;&gt;Before rain&lt;/button&gt;&lt;button id=&quot;rain&quot; type=&quot;button&quot;&gt;After rain&lt;/button&gt;&lt;button id=&quot;drying&quot; type=&quot;button&quot;&gt;Drying out&lt;/button&gt;&lt;button id=&quot;play&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Play wave&lt;/button&gt;&lt;button id=&quot;reset&quot; type=&quot;button&quot;&gt;Reset&lt;/button&gt;&lt;label&gt;&lt;input id=&quot;components&quot; type=&quot;checkbox&quot;&gt; Show incident and reflected components&lt;/label&gt;&lt;/div&gt;
+&lt;p class=&quot;hint&quot;&gt;The day sequence represents separate visits to the same ground. The phase control shows one much faster wave cycle, slowed for viewing. Each moisture setting is a steady harmonic solution.&lt;/p&gt;
+&lt;div class=&quot;readout summary&quot; aria-live=&quot;polite&quot;&gt;&lt;div id=&quot;material&quot;&gt;&lt;/div&gt;&lt;div id=&quot;coefficients&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p class=&quot;legend&quot;&gt;&lt;span class=&quot;air&quot;&gt;&lt;span class=&quot;key&quot;&gt;&lt;/span&gt;Total field in air&lt;/span&gt; · &lt;span class=&quot;soil&quot;&gt;&lt;span class=&quot;key&quot;&gt;&lt;/span&gt;Transmitted field in soil&lt;/span&gt;. Optional dashed curves: incident (grey), reflected (orange).&lt;/p&gt;
+&lt;div class=&quot;fields&quot;&gt;&lt;canvas id=&quot;electric&quot; width=&quot;1000&quot; height=&quot;270&quot; role=&quot;img&quot; aria-label=&quot;Real electric field across the interface with a fixed amplitude scale&quot;&gt;&lt;/canvas&gt;&lt;canvas id=&quot;magnetic&quot; width=&quot;1000&quot; height=&quot;270&quot; role=&quot;img&quot; aria-label=&quot;Real magnetic field across the interface normalized by the incident magnetic amplitude&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
+&lt;div class=&quot;readout&quot; id=&quot;boundary&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;powers&quot;&gt;&lt;div&gt;&lt;div id=&quot;reflected-label&quot; class=&quot;readout&quot;&gt;&lt;/div&gt;&lt;div class=&quot;power-track&quot; role=&quot;meter&quot; id=&quot;reflected-meter&quot; aria-label=&quot;Reflected fraction of incident power&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;div class=&quot;power-fill&quot; id=&quot;reflected-bar&quot; style=&quot;background:#b65e22&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div id=&quot;transmitted-label&quot; class=&quot;readout&quot;&gt;&lt;/div&gt;&lt;div class=&quot;power-track&quot; role=&quot;meter&quot; id=&quot;transmitted-meter&quot; aria-label=&quot;Transmitted fraction of incident power&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;div class=&quot;power-fill&quot; id=&quot;transmitted-bar&quot; style=&quot;background:#63823a&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p class=&quot;readout&quot; id=&quot;comparison&quot;&gt;&lt;/p&gt;
+&lt;div class=&quot;history&quot;&gt;&lt;canvas id=&quot;history&quot; width=&quot;1000&quot; height=&quot;270&quot; role=&quot;img&quot; aria-label=&quot;Modeled plane-interface reflected power over an illustrative rain and drying sequence&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
+&lt;p class=&quot;hint&quot; id=&quot;history-hint&quot;&gt;&lt;/p&gt;
+&lt;details&gt;&lt;summary&gt;Read the model and its assumptions&lt;/summary&gt;
+&lt;p&gt;The soil has fixed porosity φ = 0.45. Mineral grains occupy 1−φ, water occupies θᵥ and air occupies φ−θᵥ. Water replaces pore air; it does not replace the mineral grains. The illustration uses real relative permittivities εᵣ,solid = 5, εᵣ,water = 80 and εᵣ,air = 1:&lt;/p&gt;
+&lt;p&gt;√εᵣ,soil = (1−φ)√εᵣ,solid + θᵥ√εᵣ,water + (φ−θᵥ)√εᵣ,air.&lt;/p&gt;
+&lt;p&gt;All media are nonmagnetic and lossless here. At fixed f = 300 MHz, k₂/k₁ = √εᵣ,soil, η₂/η₁ = 1/√εᵣ,soil, and λ₂/λ₁ = 1/√εᵣ,soil. With the common factor eʲωᵗ, E₁/Eᵢ = e⁻ʲᵏ¹ᶻ + r e⁺ʲᵏ¹ᶻ and E₂/Eᵢ = t e⁻ʲᵏ²ᶻ. The reflected H has the opposite companion sign. r = (η₂−η₁)/(η₂+η₁), t = 1+r, ℛ = |r|² and 𝒯 = (η₁/η₂)|t|².&lt;/p&gt;
+&lt;p&gt;Electric amplitude Eᵢ = 1 V/m. H is normalized by Eᵢ/η₁ so it fits on a dimensionless graph. Fixed axes let you compare moisture settings. At the interface, E and H each match across the boundary; E and H do not have the same physical units.&lt;/p&gt;
+&lt;p&gt;The illustrative weather sequence starts at 5% water content, rises to 30% between days 1 and 2, then dries towards 5% with a three-day exponential time scale. This is a supplied scenario, not a soil-water forecast. Moving the moisture slider chooses a custom state outside that day sequence.&lt;/p&gt;
+&lt;p&gt;This activity isolates the material dependence of normal-incidence reflection. It supplies a building block for interpreting changing radar echoes. Off-nadir radar backscatter also needs target geometry and roughness; this graph is not a prediction of radar σ⁰. Dielectric loss, conductivity, vegetation, changing roughness and subsurface reflectors are outside this activity. The mixing parameters are teaching choices, not a calibrated soil retrieval.&lt;/p&gt;
+&lt;p&gt;Background: &lt;a href=&quot;https://em.geosci.xyz/content/physical_properties/dielectric_permittivity/dielectric_permittivity_factors.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;EM GeoSci: porosity, saturation and dielectric response&lt;/a&gt;.&lt;/p&gt;&lt;/details&gt;&lt;script&gt;
+&quot;use strict&quot;;
+const P={&quot;porosity&quot;: 0.45, &quot;solid&quot;: 5.0, &quot;water&quot;: 80.0, &quot;air&quot;: 1.0, &quot;frequency&quot;: 300000000.0, &quot;incident&quot;: 1.0},C=299792458,EPS0=8.8541878128e-12,ETA0=1/(EPS0*C),D=Math.PI/180;
+const $=id=&gt;document.getElementById(id);
+let historyActive=true,playing=false,raf=null,lastTime=null;
+function moistureAtDay(day){return day&lt;1?.05:day&lt;2?.05+.25*(day-1):.05+.25*Math.exp(-(day-2)/3);}
+function model(theta,phaseDegrees=0){
+ const n=(1-P.porosity)*Math.sqrt(P.solid)+theta*Math.sqrt(P.water)+(P.porosity-theta)*Math.sqrt(P.air);
+ const er=n*n,eta=ETA0/n,r=(1-n)/(1+n),t=2/(1+n),R=r*r,T=n*t*t;
+ return {theta,n,er,eta,r,t,R,T,k1:2*Math.PI*P.frequency/C,k2:2*Math.PI*P.frequency/C*n,lambda1:C/P.frequency,lambda2:C/P.frequency/n,phase:phaseDegrees*D};
+}
+function fields(p,z){
+ const incident=Math.cos(p.phase-p.k1*z),reflected=p.r*Math.cos(p.phase+p.k1*z),transmitted=p.t*Math.cos(p.phase-p.k2*z);
+ return {ei:incident,er:reflected,et:transmitted,hi:incident,hr:-reflected,ht:p.n*transmitted,E:z&lt;=0?incident+reflected:transmitted,H:z&lt;=0?incident-reflected:p.n*transmitted};
+}
+function line(c,fn,xmin,xmax,X,Y,color,width=2.5,dash=[]){
+ c.strokeStyle=color;c.lineWidth=width;c.setLineDash(dash);c.beginPath();for(let i=0;i&lt;=850;i++){const x=xmin+(xmax-xmin)*i/850;if(i===0)c.moveTo(X(x),Y(fn(x)));else c.lineTo(X(x),Y(fn(x)));}c.stroke();c.setLineDash([]);
+}
+function fieldPlot(id,p,magnetic){
+ const cv=$(id),c=cv.getContext(&#x27;2d&#x27;),W=cv.width,H=cv.height,l=67,r=25,top=43,b=43,xmin=-1,xmax=.7,ymax=2.05;
+ const X=x=&gt;l+(x-xmin)/(xmax-xmin)*(W-l-r),Y=y=&gt;top+(ymax-y)/(2*ymax)*(H-top-b);
+ c.clearRect(0,0,W,H);c.fillStyle=&#x27;#f2f7fa&#x27;;c.fillRect(l,top,X(0)-l,H-top-b);c.fillStyle=&#x27;#fff7ee&#x27;;c.fillRect(X(0),top,W-r-X(0),H-top-b);
+ c.fillStyle=&#x27;#253a46&#x27;;c.font=&#x27;21px system-ui&#x27;;c.textAlign=&#x27;left&#x27;;c.fillText(magnetic?&#x27;Magnetic field: η₁ Hᵧ / Eᵢ&#x27;:&#x27;Electric field: Eₓ / Eᵢ&#x27;,l,25);
+ c.font=&#x27;17px system-ui&#x27;;
+ for(const y of [-2,-1,0,1,2]){c.strokeStyle=y===0?&#x27;#b7c7cf&#x27;:&#x27;#e0e9ed&#x27;;c.lineWidth=1;c.beginPath();c.moveTo(l,Y(y));c.lineTo(W-r,Y(y));c.stroke();c.fillStyle=&#x27;#435963&#x27;;c.textAlign=&#x27;right&#x27;;c.fillText(String(y),l-9,Y(y)+5);}
+ for(const x of [-1,-.5,0,.5]){c.fillStyle=&#x27;#435963&#x27;;c.textAlign=&#x27;center&#x27;;c.fillText(String(x),X(x),H-b+23);}
+ c.save();c.beginPath();c.rect(l,top,W-l-r,H-top-b);c.clip();
+ if($(&#x27;components&#x27;).checked){line(c,z=&gt;fields(p,z)[magnetic?&#x27;hi&#x27;:&#x27;ei&#x27;],xmin,0,X,Y,&#x27;#7d8d96&#x27;,1.8,[7,5]);line(c,z=&gt;fields(p,z)[magnetic?&#x27;hr&#x27;:&#x27;er&#x27;],xmin,0,X,Y,&#x27;#b65e22&#x27;,1.8,[5,4]);}
+ line(c,z=&gt;fields(p,z)[magnetic?&#x27;H&#x27;:&#x27;E&#x27;],xmin,0,X,Y,&#x27;#007fa8&#x27;,3);
+ line(c,z=&gt;fields(p,z)[magnetic?&#x27;ht&#x27;:&#x27;et&#x27;],0,xmax,X,Y,&#x27;#63823a&#x27;,3);
+ c.strokeStyle=&#x27;#253a46&#x27;;c.lineWidth=1.5;c.beginPath();c.moveTo(X(0),top);c.lineTo(X(0),H-b);c.stroke();
+ const v=magnetic?p.n*p.t*Math.cos(p.phase):p.t*Math.cos(p.phase);c.fillStyle=&#x27;#253a46&#x27;;c.beginPath();c.arc(X(0),Y(v),4.5,0,2*Math.PI);c.fill();c.restore();
+ c.fillStyle=&#x27;#435963&#x27;;c.textAlign=&#x27;left&#x27;;c.font=&#x27;16px system-ui&#x27;;c.fillText(&#x27;Air&#x27;,l+10,top+18);c.fillText(&#x27;Soil&#x27;,X(0)+10,top+18);c.textAlign=&#x27;center&#x27;;c.font=&#x27;17px system-ui&#x27;;c.fillText(&#x27;Position z (m); interface at z = 0&#x27;,(l+W-r)/2,H-5);
+}
+function historyPlot(p){
+ const cv=$(&#x27;history&#x27;),c=cv.getContext(&#x27;2d&#x27;),W=cv.width,H=cv.height,l=67,r=25,top=44,b=43;
+ const X=x=&gt;l+x/10*(W-l-r),Y=y=&gt;top+(.5-y)/.5*(H-top-b);
+ c.clearRect(0,0,W,H);c.fillStyle=&#x27;#253a46&#x27;;c.font=&#x27;21px system-ui&#x27;;c.textAlign=&#x27;left&#x27;;c.fillText(&#x27;A changing surface: reflected fraction ℛ over days&#x27;,l,25);
+ c.fillStyle=&#x27;#eaf1f5&#x27;;c.fillRect(X(1),top,X(2)-X(1),H-top-b);c.fillStyle=&#x27;#435963&#x27;;c.font=&#x27;15px system-ui&#x27;;c.fillText(&#x27;Rain&#x27;,X(1)+8,top+18);
+ c.font=&#x27;17px system-ui&#x27;;for(const y of [0,.1,.2,.3,.4,.5]){c.strokeStyle=&#x27;#e0e9ed&#x27;;c.lineWidth=1;c.beginPath();c.moveTo(l,Y(y));c.lineTo(W-r,Y(y));c.stroke();c.fillStyle=&#x27;#435963&#x27;;c.textAlign=&#x27;right&#x27;;c.fillText((100*y).toFixed(0)+&#x27;%&#x27;,l-9,Y(y)+5);}
+ for(const x of [0,2,4,6,8,10]){c.textAlign=&#x27;center&#x27;;c.fillText(String(x),X(x),H-b+22);}
+ line(c,d=&gt;model(moistureAtDay(d)).R,0,10,X,Y,&#x27;#b65e22&#x27;,3);
+ c.strokeStyle=&#x27;#7d8d96&#x27;;c.lineWidth=1.4;c.setLineDash([5,4]);c.beginPath();c.moveTo(l,Y(p.R));c.lineTo(W-r,Y(p.R));c.stroke();c.setLineDash([]);
+ if(historyActive){const day=Number($(&#x27;day&#x27;).value);c.strokeStyle=&#x27;#253a46&#x27;;c.beginPath();c.moveTo(X(day),top);c.lineTo(X(day),H-b);c.stroke();c.fillStyle=&#x27;#253a46&#x27;;c.beginPath();c.arc(X(day),Y(p.R),5,0,2*Math.PI);c.fill();}
+ c.fillStyle=&#x27;#253a46&#x27;;c.textAlign=&#x27;center&#x27;;c.fillText(&#x27;Day in the illustrative wetting/drying sequence&#x27;,(l+W-r)/2,H-5);
+}
+function draw(){
+ const p=model(Number($(&#x27;moisture&#x27;).value)/100,Number($(&#x27;phase&#x27;).value)),ref=model(.05);
+ $(&#x27;moisture-label&#x27;).value=(100*p.theta).toFixed(1)+&#x27;% of soil volume&#x27;;$(&#x27;phase-label&#x27;).value=Number($(&#x27;phase&#x27;).value).toFixed(0)+&#x27;°&#x27;;
+ $(&#x27;day-label&#x27;).value=historyActive?&#x27;Day &#x27;+Number($(&#x27;day&#x27;).value).toFixed(2):&#x27;Custom moisture; choose a day to rejoin&#x27;;
+ $(&#x27;material&#x27;).textContent=&#x27;Water content → εᵣ = &#x27;+p.er.toFixed(2)+&#x27; → ηsoil = &#x27;+p.eta.toFixed(1)+&#x27; Ω; wavelength in soil = &#x27;+p.lambda2.toFixed(3)+&#x27; m.&#x27;;
+ $(&#x27;coefficients&#x27;).textContent=&#x27;Electric amplitude coefficients: r = &#x27;+p.r.toFixed(3)+&#x27;, t = &#x27;+p.t.toFixed(3)+&#x27;. Frequency = 300 MHz; incident peak Eᵢ = 1 V/m.&#x27;;
+ const E=p.t*Math.cos(p.phase),H=p.n*p.t/ETA0*Math.cos(p.phase);
+ $(&#x27;boundary&#x27;).textContent=&#x27;At z = 0: E₁ₓ = E₂ₓ = &#x27;+E.toFixed(3)+&#x27; V/m; H₁ᵧ = H₂ᵧ = &#x27;+(1000*H).toFixed(3)+&#x27; mA/m. Both fields match across the interface.&#x27;;
+ $(&#x27;reflected-label&#x27;).textContent=&#x27;Reflected power ℛ = &#x27;+(100*p.R).toFixed(1)+&#x27;%&#x27;;$(&#x27;transmitted-label&#x27;).textContent=&#x27;Transmitted power 𝒯 = &#x27;+(100*p.T).toFixed(1)+&#x27;%&#x27;;
+ for(const [key,v] of [[&#x27;reflected&#x27;,p.R],[&#x27;transmitted&#x27;,p.T]]){$(key+&#x27;-bar&#x27;).style.width=(100*v)+&#x27;%&#x27;;$(key+&#x27;-meter&#x27;).setAttribute(&#x27;aria-valuenow&#x27;,String(100*v));}
+ $(&#x27;comparison&#x27;).textContent=&#x27;ℛ + 𝒯 = &#x27;+(p.R+p.T).toFixed(3)+&#x27;. Reflected power is &#x27;+(p.R/ref.R).toFixed(2)+&#x27; × the before-rain value, with the same illumination.&#x27;;
+ $(&#x27;history-hint&#x27;).textContent=historyActive?&#x27;The dot marks this visit; the dashed line is its reflected-power fraction. Change the day to follow wetting and drying.&#x27;:&#x27;The dashed line marks your custom moisture state; the weather curve remains the supplied example.&#x27;;
+ fieldPlot(&#x27;electric&#x27;,p,false);fieldPlot(&#x27;magnetic&#x27;,p,true);historyPlot(p);
+ window.interfaceFieldsState={...p,historyActive,day:Number($(&#x27;day&#x27;).value)};
+}
+function stop(){playing=false;if(raf!==null)cancelAnimationFrame(raf);raf=null;lastTime=null;$(&#x27;play&#x27;).textContent=&#x27;Play wave&#x27;;$(&#x27;play&#x27;).setAttribute(&#x27;aria-pressed&#x27;,&#x27;false&#x27;);}
+function tick(now){if(!playing)return;if(lastTime!==null)$(&#x27;phase&#x27;).value=String((Number($(&#x27;phase&#x27;).value)+Math.min(now-lastTime,100)*.07)%360);lastTime=now;draw();raf=requestAnimationFrame(tick);}
+function chooseDay(day){historyActive=true;$(&#x27;day&#x27;).value=String(day);$(&#x27;moisture&#x27;).value=String(100*moistureAtDay(day));draw();}
+$(&#x27;moisture&#x27;).addEventListener(&#x27;input&#x27;,()=&gt;{historyActive=false;draw();});$(&#x27;day&#x27;).addEventListener(&#x27;input&#x27;,()=&gt;chooseDay(Number($(&#x27;day&#x27;).value)));
+$(&#x27;phase&#x27;).addEventListener(&#x27;input&#x27;,()=&gt;{stop();draw();});$(&#x27;components&#x27;).addEventListener(&#x27;change&#x27;,draw);
+$(&#x27;dry&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;chooseDay(0));$(&#x27;rain&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;chooseDay(2));$(&#x27;drying&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;chooseDay(5));
+$(&#x27;play&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{if(playing){stop();return;}playing=true;lastTime=null;$(&#x27;play&#x27;).textContent=&#x27;Pause wave&#x27;;$(&#x27;play&#x27;).setAttribute(&#x27;aria-pressed&#x27;,&#x27;true&#x27;);raf=requestAnimationFrame(tick);});
+$(&#x27;reset&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{stop();$(&#x27;phase&#x27;).value=&#x27;35&#x27;;$(&#x27;components&#x27;).checked=false;chooseDay(0);});
+document.addEventListener(&#x27;visibilitychange&#x27;,()=&gt;{if(document.hidden)stop();});draw();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>

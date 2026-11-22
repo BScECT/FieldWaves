@@ -1,0 +1,126 @@
+"""Embedded plane-interface phase-matching explorer, exp(+j omega t).
+
+Python generates self-contained HTML for the static TeachBook host. Unit phase
+factors isolate matching of tangential wavenumbers from Fresnel amplitudes.
+"""
+from pathlib import Path
+import html
+ROOT=Path(__file__).resolve().parents[1]
+STYLE='''*{box-sizing:border-box}body{margin:0;padding:14px;color:#253a46;background:white;font:15px system-ui,sans-serif}h2{font-size:22px;margin:0 0 8px}p{line-height:1.5;margin:8px 0}.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:14px 0}label{display:block;font-weight:600}output{display:block;font-weight:400;font-variant-numeric:tabular-nums;min-height:23px}input[type=range]{width:100%;accent-color:#007fa8}button{font:inherit;background:white;color:#253a46;border:1px solid #78909b;border-radius:4px;padding:6px 12px}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.actions label{font-weight:400}.summary{background:#f2f7fa;padding:9px 12px;font-variant-numeric:tabular-nums;line-height:1.6}.valid{color:#466627}.near{color:#007fa8}.invalid{color:#a44d19}.legend,.hint,details{font-size:14px;color:#435963;line-height:1.5}.key{display:inline-block;width:20px;border-top:3px solid;vertical-align:middle;margin-right:4px}.incident{color:#007fa8}.reflected{color:#8b467c}.transmitted{color:#63823a}canvas{display:block;width:100%;height:auto;margin:8px 0}.phase-control{margin-top:12px}.vectors{font-family:ui-monospace,monospace;font-size:14px;line-height:1.7;overflow-wrap:anywhere}summary{cursor:pointer;font-weight:600}details p{margin:8px 0}button:focus-visible,input:focus-visible{outline:3px solid #007fa8;outline-offset:3px}input:disabled{opacity:.55}@media(max-width:600px){.controls{grid-template-columns:1fr 1fr}body{font-size:14px}}@media(max-width:390px){.controls{grid-template-columns:1fr}}'''
+BODY=r'''<h2>Make the phases meet along an entire boundary</h2>
+<p>Wavefronts are lines of equal phase in this flat <strong>xz view</strong>. Change the incident angle and material, then try a transmitted angle of your own. Agreement at x = 0 is built in. Does it survive everywhere else?</p>
+<div class="controls">
+<label>Incident angle θᵢ<output id="incident-label"></output><input id="incident" type="range" min="0" max="75" step=".1" value="45" aria-label="Incidence angle in degrees from the normal"></label>
+<label>Relative permittivity εᵣ₂<output id="material-label"></output><input id="material" type="range" min="1" max="9" step=".1" value="4" aria-label="Relative permittivity in medium two"></label>
+<label>Transmitted angle θₜ<output id="transmitted-label"></output><input id="transmitted" type="range" min="0" max="85" step=".1" value="20.7048" disabled aria-label="Proposed transmitted angle in degrees from the normal"></label>
+</div>
+<div class="actions"><label><input id="manual" type="checkbox"> Choose θₜ myself</label><button id="same-angle" type="button">Try θₜ = θᵢ</button><button id="offset-angle" type="button">Try 10° too large</button><button id="match" type="button">Match the phases</button><button id="normal" type="button">Normal incidence</button><button id="reset" type="button">Reset</button></div>
+<div class="summary" aria-live="polite"><div id="status"></div><div id="tangential"></div><div id="spacing"></div><div id="mismatch"></div></div>
+<p class="legend"><span class="incident"><span class="key"></span>Incident</span> · <span class="transmitted"><span class="key"></span>Transmitted</span> · <span class="reflected"><span class="key" style="border-top-style:dashed"></span>Reflected (optional)</span>. Lines: wave crests. Arrows: propagation directions. Coloured dots beside the boundary mark the crest intersections.</p>
+<div class="actions"><label><input id="reflected" type="checkbox"> Add reflected wavefronts</label><button id="play" type="button" aria-pressed="false">Play</button></div>
+<canvas id="fronts" width="1000" height="630" role="img" aria-label="Equal-scale xz view of wavefronts meeting a vertical interface with incidence, reflection and refraction directions"></canvas>
+<div class="phase-control"><label>Oscillation phase ωt<output id="phase-label"></output><input id="phase" type="range" min="0" max="360" step="any" value="0" aria-label="Oscillation phase in degrees"></label></div>
+<p class="hint">The black ring marks the common phase-reference point x = z = 0. It need not be a crest at every instant. The wavefront spacing and geometry are calculated from the vector wavenumbers.</p>
+<canvas id="boundary" width="1000" height="280" role="img" aria-label="Unit phase factors along the interface, showing agreement at the origin and any mismatch elsewhere"></canvas>
+<p class="hint">The lower plot compares unit phase factors, Re{exp[j(ωt − k<sub>x</sub>x)]}. These phase factors have unit amplitudes; full electric-field amplitudes are matched separately. The next section matches those amplitudes.</p>
+<details><summary>Read the vector wavenumbers and the PDE check</summary><div class="vectors"><div id="ki"></div><div id="kr"></div><div id="kt"></div></div><p id="bulk-check"></p><p>Coordinates are displayed in units of the wavelength λ₁ in medium 1. The drawing has equal spatial scales along x and z. Wavevector components below are normalized by k₁; arrows in the drawing indicate direction. Angles are measured from the interface normal, the z axis.</p></details>
+<details><summary>Equations and assumptions</summary>
+<p>Medium 1 is air, with εᵣ₁ = 1; both media are isotropic, nonmagnetic and lossless. The fixed frequency is 100 MHz. Thus k₂/k₁ = √εᵣ₂ and v₂/v₁ = 1/√εᵣ₂. We keep εᵣ₂ ≥ 1 so a propagating transmitted wave exists throughout the incidence-angle range.</p>
+<p>Incident kᵢ/k₁ = sin θᵢ x̂ + cos θᵢ ẑ; reflected kᵣ/k₁ = sin θᵢ x̂ − cos θᵢ ẑ. Transmitted kₜ/k₁ = √εᵣ₂(sin θₜ x̂ + cos θₜ ẑ). Each proposed wave has the allowed magnitude in its own medium, even when the chosen transmitted angle fails the boundary condition.</p>
+<p>At z = 0 the common time factor leaves spatial phases −kᵢ,ₓ x, −kᵣ,ₓ x and −kₜ,ₓ x. Matching the entire boundary requires kᵢ,ₓ = kᵣ,ₓ = kₜ,ₓ. The automatic setting solves sin θₜ = sin θᵢ/√εᵣ₂. The reflected angle equals the incident angle. Crest spacing along the boundary is 2π/|kₓ|; at kₓ = 0 there is no phase variation along it.</p>
+<p>All phase factors are one at the origin before restoring the common time factor. Changing a constant phase offset could move that agreement point, but it cannot repair unequal phase gradients along the interface. A near-match label means less than 0.05 rad phase mismatch over the displayed tangential interval; exact matching along the whole interface still requires equal tangential wavenumbers. This activity isolates phase matching; it leaves amplitudes, energy fractions and polarization response to the following section. Animation is slowed for viewing.</p>
+</details>'''
+JS=r'''
+"use strict";
+const LIGHT=299792458,F=1e8,LAMBDA=LIGHT/F,K1=2*Math.PI/LAMBDA,D=Math.PI/180;
+const $=id=>document.getElementById(id),fmt=x=>Math.abs(x)<1e-12?'0':Number(x.toPrecision(4)).toString();
+let playing=false,raf=null,lastTime=null;
+function model(incident,er,manual,trial){
+ const ti=incident*D,n=Math.sqrt(er),correct=Math.asin(Math.sin(ti)/n)/D,theta=manual?trial:correct,tt=theta*D;
+ const qi=Math.sin(ti),zi=Math.cos(ti),qt=n*Math.sin(tt),zt=n*Math.cos(tt),dq=qt-qi;
+ return {incident,er,n,theta,correct,manual,qi,zi,qt,zt,dq,ki:[qi,zi],kr:[qi,-zi],kt:[qt,zt],matched:Math.abs(dq)<1e-10,nearMatched:4*Math.PI*Math.abs(dq)<.05};
+}
+function phaseFactor(q,x,phase){return Math.cos(phase-2*Math.PI*q*x);}
+function segment(a,b,level,u0,u1,v0,v1){
+ const points=[];
+ function push(u,v){if(u>=u0-1e-10&&u<=u1+1e-10&&v>=v0-1e-10&&v<=v1+1e-10&&!points.some(p=>Math.hypot(p[0]-u,p[1]-v)<1e-9))points.push([u,v]);}
+ if(Math.abs(a)>1e-12){push(u0,(level-b*u0)/a);push(u1,(level-b*u1)/a);}
+ if(Math.abs(b)>1e-12){push((level-a*v0)/b,v0);push((level-a*v1)/b,v1);}
+ if(points.length<2)return null;let pair=null,max=-1;
+ for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){const d=Math.hypot(points[i][0]-points[j][0],points[i][1]-points[j][1]);if(d>max){pair=[points[i],points[j]];max=d;}}
+ return pair;
+}
+function arrow(c,p,q,color,width=3){
+ c.strokeStyle=color;c.fillStyle=color;c.lineWidth=width;c.beginPath();c.moveTo(...p);c.lineTo(...q);c.stroke();const angle=Math.atan2(q[1]-p[1],q[0]-p[0]);c.beginPath();c.moveTo(...q);c.lineTo(q[0]-13*Math.cos(angle-.36),q[1]-13*Math.sin(angle-.36));c.lineTo(q[0]-13*Math.cos(angle+.36),q[1]-13*Math.sin(angle+.36));c.closePath();c.fill();
+}
+function circle(c,x,y,r,color,stroke=false){c.beginPath();c.arc(x,y,r,0,2*Math.PI);if(stroke){c.strokeStyle=color;c.lineWidth=2;c.stroke();}else{c.fillStyle=color;c.fill();}}
+function angleArc(c,cx,cy,r,a,b,color,label){
+ c.strokeStyle=color;c.lineWidth=1.7;c.beginPath();for(let i=0;i<=30;i++){const t=a+(b-a)*i/30,x=cx+r*Math.cos(t),y=cy+r*Math.sin(t);if(i===0)c.moveTo(x,y);else c.lineTo(x,y);}c.stroke();
+ const m=(a+b)/2;c.fillStyle=color;c.font='19px system-ui';c.textAlign='center';c.fillText(label,cx+(r+24)*Math.cos(m),cy+(r+24)*Math.sin(m)+5);
+}
+function wavefronts(p){
+ const cv=$('fronts'),c=cv.getContext('2d'),l=65,t=60,w=900,h=500,u0=-3.6,u1=3.6,v0=-2,v1=2;
+ const X=u=>l+(u-u0)/(u1-u0)*w,Y=v=>t+(v1-v)/(v1-v0)*h,phase=Number($('phase').value)*D,cycles=phase/(2*Math.PI),origin=[X(0),Y(0)];
+ c.clearRect(0,0,cv.width,cv.height);c.fillStyle='#f2f7fa';c.fillRect(l,t,w/2,h);c.fillStyle='#fff7ee';c.fillRect(X(0),t,w/2,h);
+ c.fillStyle='#253a46';c.textAlign='left';c.font='21px system-ui';c.fillText('Wavefronts and propagation directions',l,25);c.font='17px system-ui';c.fillText('Medium 1: air',l+8,50);c.fillText('Medium 2',X(0)+12,50);
+ const families=[[p.qi,p.zi,u0,0,'#007fa8',[]],[p.qt,p.zt,0,u1,'#63823a',[]]];
+ if($('reflected').checked)families.unshift([p.qi,-p.zi,u0,0,'#8b467c',[7,5]]);
+ for(const [a,b,left,right,color,dash] of families){
+  c.strokeStyle=color;c.lineWidth=2;c.setLineDash(dash);
+  for(let j=-24;j<=24;j++){const s=segment(a,b,cycles-j,left,right,v0,v1);if(!s)continue;c.beginPath();c.moveTo(X(s[0][0]),Y(s[0][1]));c.lineTo(X(s[1][0]),Y(s[1][1]));c.stroke();}
+ }
+ c.setLineDash([]);c.strokeStyle='#253a46';c.lineWidth=2.5;c.beginPath();c.moveTo(X(0),t);c.lineTo(X(0),t+h);c.stroke();
+ c.strokeStyle='#90a4ae';c.lineWidth=1;c.setLineDash([5,5]);c.beginPath();c.moveTo(l,Y(0));c.lineTo(l+w,Y(0));c.stroke();c.setLineDash([]);
+ for(const [q,offset,color] of [[p.qi,-6,'#007fa8'],[p.qt,6,'#63823a']])if(Math.abs(q)>1e-12)for(let j=-12;j<=12;j++){
+  const v=(cycles-j)/q;if(v>=v0&&v<=v1){if(offset<0&&$('reflected').checked)circle(c,X(0)+offset,Y(v),7,'#8b467c',true);circle(c,X(0)+offset,Y(v),4.5,color);}
+ }
+ const ti=p.incident*D,tt=p.theta*D;
+ const ip=[X(-1.4*Math.cos(ti)),Y(-1.4*Math.sin(ti))],iq=[X(-.16*Math.cos(ti)),Y(-.16*Math.sin(ti))];
+ arrow(c,ip,iq,'#007fa8',3.6);c.fillStyle='#007fa8';c.textAlign='right';c.font='20px system-ui';c.fillText('kᵢ',ip[0]-10,ip[1]+15);
+ const tp=[X(.16*Math.cos(tt)),Y(.16*Math.sin(tt))],tq=[X(1.4*Math.cos(tt)),Y(1.4*Math.sin(tt))];
+ arrow(c,tp,tq,'#63823a',3.6);c.fillStyle='#63823a';c.textAlign='left';c.fillText('kₜ',tq[0]+9,tq[1]-8);
+ if($('reflected').checked){const rp=[X(-.16*Math.cos(ti)),Y(.16*Math.sin(ti))],rq=[X(-1.4*Math.cos(ti)),Y(1.4*Math.sin(ti))];arrow(c,rp,rq,'#8b467c',3);c.fillStyle='#8b467c';c.textAlign='right';c.fillText('kᵣ',rq[0]-9,rq[1]-8);}
+ if(ti>.01)angleArc(c,...origin,47,Math.PI-ti,Math.PI,'#007fa8','θᵢ');
+ if(tt>.01)angleArc(c,...origin,62,-tt,0,'#63823a','θₜ');
+ circle(c,...origin,10,'#253a46',true);c.fillStyle='#253a46';c.textAlign='left';c.font='16px system-ui';c.fillText('x = 0',origin[0]+14,origin[1]+24);
+ c.font='17px system-ui';for(const u of [-3,-2,-1,0,1,2,3]){c.textAlign='center';c.fillStyle='#435963';c.fillText(String(u),X(u),t+h+25);}for(const v of [-2,-1,0,1,2]){c.textAlign='right';c.fillText(String(v),l-10,Y(v)+5);}
+ c.fillStyle='#253a46';c.textAlign='center';c.fillText('Normal coordinate z / λ₁',l+w/2,cv.height-14);c.textAlign='left';c.fillText('↑ x / λ₁',10,t-15);
+}
+function boundaryPlot(p){
+ const cv=$('boundary'),c=cv.getContext('2d'),l=65,r=35,t=44,b=47,phase=Number($('phase').value)*D;
+ const X=x=>l+(x+2)/4*(cv.width-l-r),Y=y=>t+(1.2-y)/2.4*(cv.height-t-b);
+ c.clearRect(0,0,cv.width,cv.height);c.fillStyle='#253a46';c.textAlign='left';c.font='21px system-ui';c.fillText('Along z = 0: do the unit phase factors agree?',l,25);c.font='17px system-ui';
+ for(const y of [-1,0,1]){c.strokeStyle='#e0e9ed';c.lineWidth=1;c.beginPath();c.moveTo(l,Y(y));c.lineTo(cv.width-r,Y(y));c.stroke();c.fillStyle='#435963';c.textAlign='right';c.fillText(String(y),l-10,Y(y)+5);}for(const x of [-2,-1,0,1,2]){c.textAlign='center';c.fillText(String(x),X(x),cv.height-b+23);}
+ const curves=[[p.qt,'#63823a',4,[]],[p.qi,'#007fa8',2.1,[]]];if($('reflected').checked)curves.push([p.qi,'#8b467c',1.7,[6,5]]);
+ for(const [q,color,width,dash] of curves){c.strokeStyle=color;c.lineWidth=width;c.setLineDash(dash);c.beginPath();for(let i=0;i<=900;i++){const x=-2+4*i/900,y=phaseFactor(q,x,phase);if(i===0)c.moveTo(X(x),Y(y));else c.lineTo(X(x),Y(y));}c.stroke();}
+ c.setLineDash([]);c.strokeStyle='#253a46';c.lineWidth=1;c.beginPath();c.moveTo(X(0),t);c.lineTo(X(0),cv.height-b);c.stroke();circle(c,X(0),Y(Math.cos(phase)),4.5,'#253a46');c.fillStyle='#253a46';c.textAlign='center';c.font='17px system-ui';c.fillText('Tangential coordinate x / λ₁',cv.width/2,cv.height-8);
+}
+function draw(){
+ const manual=$('manual').checked,p=model(Number($('incident').value),Number($('material').value),manual,Number($('transmitted').value));
+ if(!manual)$('transmitted').value=String(p.theta);$('transmitted').disabled=!manual;
+ $('incident-label').value=p.incident.toFixed(1)+'° from the normal';$('material-label').value='εᵣ₂ = '+p.er.toFixed(1)+'; k₂/k₁ = '+fmt(p.n)+'; v₂/v₁ = '+fmt(1/p.n);$('transmitted-label').value=p.theta.toFixed(2)+'°'+(manual?' (your trial)':' (phase matched)');$('phase-label').value=Number($('phase').value).toFixed(0)+'°';
+ $('status').className=p.matched?'valid':p.nearMatched?'near':'invalid';$('status').textContent=p.matched?'Phases match along the entire interface.':p.nearMatched?'Nearly matched on this view. Exact phase matching requires equal tangential wavenumbers.':'Boundary mismatch: the phases agree at x = 0, but their spatial gradients differ.';
+ $('tangential').textContent='Tangential wavenumbers: kᵢ,ₓ = kᵣ,ₓ = '+fmt(K1*p.qi)+' rad/m; kₜ,ₓ = '+fmt(K1*p.qt)+' rad/m.';
+ const spacing=q=>Math.abs(q)<1e-12?'uniform phase (infinite crest spacing)':fmt(LAMBDA/Math.abs(q))+' m between crests';
+ $('spacing').textContent='Along the boundary: incident '+spacing(p.qi)+'; transmitted '+spacing(p.qt)+'.';
+ $('mismatch').textContent='At x = λ₁, transmitted minus incident phase Δφ = '+fmt(-2*Math.PI*p.dq)+' rad. It is independent of the carrier phase.';
+ $('ki').textContent='kᵢ/k₁ = '+fmt(p.qi)+' x̂ + '+fmt(p.zi)+' ẑ';$('kr').textContent='kᵣ/k₁ = '+fmt(p.qi)+' x̂ − '+fmt(p.zi)+' ẑ';$('kt').textContent='kₜ/k₁ = '+fmt(p.qt)+' x̂ + '+fmt(p.zt)+' ẑ';
+ $('bulk-check').textContent='Bulk check: |kᵢ|/k₁ = |kᵣ|/k₁ = 1 and |kₜ|/k₂ = '+fmt(Math.hypot(p.qt,p.zt)/p.n)+'. Each trial wave satisfies the bulk wavenumber relation. '+(p.matched?'The boundary phase test also passes.':p.nearMatched?'This trial is close on the displayed interval; use Match the phases to enforce the exact condition.':'The boundary phase test is a separate condition, and this trial fails it.');
+ wavefronts(p);boundaryPlot(p);window.phaseMatchingState={...p,phase:Number($('phase').value),reflected:$('reflected').checked};
+}
+function stop(){playing=false;if(raf!==null)cancelAnimationFrame(raf);raf=null;lastTime=null;$('play').textContent='Play';$('play').setAttribute('aria-pressed','false');}
+function tick(now){if(!playing)return;if(lastTime!==null)$('phase').value=String((Number($('phase').value)+Math.min(now-lastTime,100)*.07)%360);lastTime=now;draw();raf=requestAnimationFrame(tick);}
+for(const id of ['incident','material','transmitted'])$(id).addEventListener('input',draw);$('manual').addEventListener('change',draw);$('reflected').addEventListener('change',draw);$('phase').addEventListener('input',()=>{stop();draw();});
+$('same-angle').addEventListener('click',()=>{$('manual').checked=true;$('transmitted').value=$('incident').value;draw();});
+$('offset-angle').addEventListener('click',()=>{const p=model(Number($('incident').value),Number($('material').value),false,0);$('manual').checked=true;$('transmitted').value=String(Math.min(85,p.correct+10));draw();});
+$('match').addEventListener('click',()=>{$('manual').checked=false;draw();});$('normal').addEventListener('click',()=>{$('incident').value='0';$('manual').checked=false;draw();});
+$('play').addEventListener('click',()=>{if(playing){stop();return;}playing=true;lastTime=null;$('play').textContent='Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(tick);});
+$('reset').addEventListener('click',()=>{stop();$('incident').value='45';$('material').value='4';$('manual').checked=false;$('reflected').checked=false;$('phase').value='0';draw();});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});draw();
+'''
+def build(root=ROOT):
+    dest=root/'interactives';dest.mkdir(exist_ok=True)
+    title='Make the phases meet: wavefronts and tangential wavenumbers'
+    page='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title><style>'+STYLE+'</style></head><body>'+BODY+'<script>'+JS+'</script></body></html>'
+    (dest/'phase_matching.html').write_text(page)
+    (dest/'phase_matching_embed.html').write_text('<iframe title="'+title+'" style="width:100%;height:1630px;border:0" sandbox="allow-scripts" loading="lazy" srcdoc="'+html.escape(page,quote=True)+'"></iframe>\n')
+if __name__=='__main__':build()

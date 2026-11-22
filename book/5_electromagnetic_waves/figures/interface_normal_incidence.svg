@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title description">
+<title id="title">Normal incidence at a plane interface</title>
+<desc id="description">A two-dimensional x-z view of two media meeting at z equals zero. Incident and transmitted waves propagate rightward, with electric reference vectors up the page and magnetic reference vectors out of the page. The reflected wave propagates leftward, with electric reference vector up the page and magnetic reference vector into the page. Dot and cross symbols distinguish the magnetic directions.</desc>
+<defs>
+  <marker id="arrow-k" markerWidth="9" markerHeight="9" refX="8.1" refY="4.5" viewBox="0 0 9 9" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#253a46"/></marker>
+  <marker id="arrow-e" markerWidth="9" markerHeight="9" refX="8.1" refY="4.5" viewBox="0 0 9 9" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#007fa8"/></marker>
+  <marker id="arrow-axis" markerWidth="7" markerHeight="7" refX="6.2" refY="3.5" viewBox="0 0 7 7" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#647680"/></marker>
+</defs>
+<rect width="1200" height="620" fill="white"/>
+<g id="media" inkscape:groupmode="layer" inkscape:label="Media and boundary">
+  <rect x="20" y="24" width="580" height="528" rx="0" fill="#f2f7fa"/>
+  <rect x="600" y="24" width="580" height="528" rx="0" fill="#fff7ee"/>
+  <path d="M600 35V550" fill="none" stroke="#253a46" stroke-width="2.5"/>
+</g>
+<g id="material-labels" inkscape:groupmode="layer" inkscape:label="Material labels">
+<text x="300" y="66" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="bold" fill="#253a46" text-anchor="middle">Medium 1</text>
+<text x="268" y="102" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#253a46" text-anchor="end">ε<tspan baseline-shift="sub" font-size="16">1</tspan></text>
+<text x="332" y="102" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#253a46" text-anchor="start">μ<tspan baseline-shift="sub" font-size="16">1</tspan></text>
+<text x="900" y="66" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="bold" fill="#253a46" text-anchor="middle">Medium 2</text>
+<text x="868" y="102" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#253a46" text-anchor="end">ε<tspan baseline-shift="sub" font-size="16">2</tspan></text>
+<text x="932" y="102" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#253a46" text-anchor="start">μ<tspan baseline-shift="sub" font-size="16">2</tspan></text>
+<text x="600" y="578" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#253a46" text-anchor="middle">z = 0</text>
+</g>
+<g id="wave-i" inkscape:groupmode="layer" inkscape:label="Incident wave">
+<text x="240" y="148" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="normal" fill="#253a46" text-anchor="middle">Incident</text>
+<path d="M240 290H470" stroke="#253a46" stroke-width="3.2" fill="none" marker-end="url(#arrow-k)"/>
+<path d="M240 290V190" stroke="#007fa8" stroke-width="3.8" fill="none" marker-end="url(#arrow-e)"/>
+<g fill="white" stroke="#b65e22" stroke-width="2.7"><circle cx="240" cy="290" r="13"/>
+<circle cx="240" cy="290" r="3.4" fill="#b65e22" stroke="none"/>
+</g>
+<text x="262" y="230" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="28" fill="#007fa8" text-anchor="start">E<tspan baseline-shift="sub" font-size="18">i</tspan></text>
+<text x="455" y="275" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#253a46" text-anchor="middle">k<tspan baseline-shift="sub" font-size="17">i</tspan></text>
+<text x="265" y="324" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#b65e22" text-anchor="start">H<tspan baseline-shift="sub" font-size="17">i</tspan></text>
+</g>
+<g id="wave-t" inkscape:groupmode="layer" inkscape:label="Transmitted wave">
+<text x="820" y="148" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="normal" fill="#253a46" text-anchor="middle">Transmitted</text>
+<path d="M820 290H1050" stroke="#253a46" stroke-width="3.2" fill="none" marker-end="url(#arrow-k)"/>
+<path d="M820 290V190" stroke="#007fa8" stroke-width="3.8" fill="none" marker-end="url(#arrow-e)"/>
+<g fill="white" stroke="#b65e22" stroke-width="2.7"><circle cx="820" cy="290" r="13"/>
+<circle cx="820" cy="290" r="3.4" fill="#b65e22" stroke="none"/>
+</g>
+<text x="842" y="230" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="28" fill="#007fa8" text-anchor="start">E<tspan baseline-shift="sub" font-size="18">t</tspan></text>
+<text x="1035" y="275" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#253a46" text-anchor="middle">k<tspan baseline-shift="sub" font-size="17">t</tspan></text>
+<text x="845" y="324" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#b65e22" text-anchor="start">H<tspan baseline-shift="sub" font-size="17">t</tspan></text>
+</g>
+<g id="wave-r" inkscape:groupmode="layer" inkscape:label="Reflected wave">
+<text x="440" y="353" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="normal" fill="#253a46" text-anchor="middle">Reflected</text>
+<path d="M440 495H210" stroke="#253a46" stroke-width="3.2" fill="none" marker-end="url(#arrow-k)"/>
+<path d="M440 495V395" stroke="#007fa8" stroke-width="3.8" fill="none" marker-end="url(#arrow-e)"/>
+<g fill="white" stroke="#b65e22" stroke-width="2.7"><circle cx="440" cy="495" r="13"/>
+<path d="M434.41 489.41L445.59 500.59M434.41 500.59L445.59 489.41" fill="none" stroke-linecap="round"/>
+</g>
+<text x="462" y="435" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="28" fill="#007fa8" text-anchor="start">E<tspan baseline-shift="sub" font-size="18">r</tspan></text>
+<text x="225" y="480" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#253a46" text-anchor="middle">k<tspan baseline-shift="sub" font-size="17">r</tspan></text>
+<text x="465" y="529" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#b65e22" text-anchor="start">H<tspan baseline-shift="sub" font-size="17">r</tspan></text>
+</g>
+<g id="coordinate-axes" inkscape:groupmode="layer" inkscape:label="Coordinate axes">
+<path d="M92 496V417" fill="none" stroke="#647680" stroke-width="2" marker-end="url(#arrow-axis)"/><path d="M92 496H166" fill="none" stroke="#647680" stroke-width="2" marker-end="url(#arrow-axis)"/>
+<text x="90" y="405" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#647680" text-anchor="middle">x</text>
+<text x="179" y="503" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#647680" text-anchor="start">z</text>
+<circle cx="92" cy="496" r="7" fill="white" stroke="#647680" stroke-width="1.8"/><circle cx="92" cy="496" r="2" fill="#647680"/>
+<text x="78" y="525" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="23" fill="#647680" text-anchor="middle">y</text>
+</g>
+<g id="magnetic-legend" inkscape:groupmode="layer" inkscape:label="Magnetic direction legend">
+<g fill="white" stroke="#b65e22" stroke-width="2.7"><circle cx="246" cy="593" r="11"/>
+<circle cx="246" cy="593" r="3.4" fill="#b65e22" stroke="none"/>
+</g>
+<text x="268" y="601" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="start">out of page (+y)</text>
+<g fill="white" stroke="#b65e22" stroke-width="2.7"><circle cx="780" cy="593" r="11"/>
+<path d="M775.27 588.27L784.73 597.73M775.27 597.73L784.73 588.27" fill="none" stroke-linecap="round"/>
+</g>
+<text x="802" y="601" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="start">into page (−y)</text>
+</g></svg>
