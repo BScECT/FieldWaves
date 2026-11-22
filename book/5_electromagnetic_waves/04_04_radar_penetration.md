@@ -119,4 +119,4 @@ $$
 \eta=\frac{\omega\mu}{k},\qquad e^{-jk(\omega)d}.
 $$
 
-The impedance enters field matching at an interface. The exponential describes one-way propagation through a layer of thickness $d$. Combining them will let us ask which echoes return, how layers interfere, and what their frequency response tells us about the ground.
+The impedance enters field matching at an interface. The exponential describes one-way propagation over a distance $d$. In {doc}`05_00_interfaces` we use these ingredients to ask how much of a wave enters the ground and how much returns. A conducting example will make the return field tangible: the incident field drives a current, and that current generates an additional field.

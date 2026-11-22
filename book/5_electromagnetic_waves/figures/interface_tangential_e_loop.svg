@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1200" height="530" viewBox="0 0 1200 530" role="img" aria-labelledby="title description">
+<title id="title">Shrinking a Faraday loop across an interface</title>
+<desc id="description">Two flat x-z views compare a rectangular loop of fixed tangential length ell and decreasing normal width h. The electric field lies along x on both sides of the interface at z equals zero. Dots show a finite magnetic field through the page. As h tends to zero the shaded loop area ell h vanishes, so the magnetic flux vanishes while the magnetic field remains finite. Clockwise traversal follows the left long side upward and the right long side downward.</desc>
+<defs>
+<marker id="walk" markerWidth="5" markerHeight="5" refX="4.3" refY="2.5" viewBox="0 0 5 5" orient="auto"><path d="M0 0L5 2.5L0 5Z" fill="#253a46"/></marker>
+<marker id="electric" markerWidth="8" markerHeight="8" refX="7.2" refY="4" viewBox="0 0 8 8" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#007fa8"/></marker>
+<marker id="dimension" markerWidth="6" markerHeight="6" refX="3" refY="3" viewBox="0 0 6 6" orient="auto-start-reverse"><path d="M6 0L0 3L6 6" fill="none" stroke="#647680" stroke-width="1"/></marker>
+<marker id="shrink" markerWidth="7" markerHeight="7" refX="6.2" refY="3.5" viewBox="0 0 7 7" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#647680"/></marker>
+</defs>
+<rect width="1200" height="530" fill="white"/>
+<g id="panel-300" inkscape:groupmode="layer" inkscape:label="A narrow loop">
+<text x="300" y="35" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="bold" fill="#253a46" text-anchor="middle">A narrow loop</text>
+<rect x="35" y="63" width="265" height="338" fill="#f2f7fa"/><rect x="300" y="63" width="265" height="338" fill="#fff7ee"/>
+<text x="150" y="91" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="middle">Medium 1</text>
+<text x="450" y="91" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="middle">Medium 2</text>
+<text x="300" y="121" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="22" fill="#253a46" text-anchor="middle">z = 0</text>
+<path d="M300 130V394" fill="none" stroke="#253a46" stroke-width="1.7"/>
+<rect x="260" y="160" width="80" height="190" fill="#efc38d" fill-opacity=".48" stroke="none"/>
+<circle cx="230" cy="206" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="230" cy="206" r="2.5" fill="#b65e22"/>
+<circle cx="280" cy="206" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="280" cy="206" r="2.5" fill="#b65e22"/>
+<circle cx="320" cy="293" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="320" cy="293" r="2.5" fill="#b65e22"/>
+<circle cx="370" cy="293" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="370" cy="293" r="2.5" fill="#b65e22"/>
+<path d="M260 350V160H340V350Z" fill="none" stroke="#253a46" stroke-width="2"/>
+<path d="M260 301V223" fill="none" stroke="#253a46" stroke-width="2" marker-end="url(#walk)"/>
+<path d="M340 210V288" fill="none" stroke="#253a46" stroke-width="2" marker-end="url(#walk)"/>
+<path d="M273 160H327" fill="none" stroke="#253a46" stroke-width="1.8" marker-end="url(#walk)"/>
+<path d="M327 350H273" fill="none" stroke="#253a46" stroke-width="1.8" marker-end="url(#walk)"/>
+<path d="M172 327V190" fill="none" stroke="#007fa8" stroke-width="3.3" marker-end="url(#electric)"/>
+<text x="155" y="258" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#007fa8" text-anchor="end">E<tspan baseline-shift="sub" font-size="17">1x</tspan></text>
+<path d="M428 327V190" fill="none" stroke="#007fa8" stroke-width="3.3" marker-end="url(#electric)"/>
+<text x="445" y="258" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#007fa8" text-anchor="start">E<tspan baseline-shift="sub" font-size="17">2x</tspan></text>
+<path d="M197 160H252" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M197 350H252" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M205 165V345" fill="none" stroke="#647680" stroke-width="1.4" marker-start="url(#dimension)" marker-end="url(#dimension)"/>
+<text x="195" y="264" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#647680" text-anchor="end">ℓ</text>
+<path d="M260 355V380M340 355V380" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M264 371H336" fill="none" stroke="#647680" stroke-width="1.4" marker-start="url(#dimension)" marker-end="url(#dimension)"/>
+<text x="300" y="419" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#647680" text-anchor="middle">h</text>
+<text x="300" y="454" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="normal" fill="#253a46" text-anchor="middle">Area = ℓ h</text>
+</g>
+<g id="panel-900" inkscape:groupmode="layer" inkscape:label="Shrink h, keep ℓ fixed">
+<text x="900" y="35" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="bold" fill="#253a46" text-anchor="middle">Shrink h, keep ℓ fixed</text>
+<rect x="635" y="63" width="265" height="338" fill="#f2f7fa"/><rect x="900" y="63" width="265" height="338" fill="#fff7ee"/>
+<text x="750" y="91" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="middle">Medium 1</text>
+<text x="1050" y="91" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#253a46" text-anchor="middle">Medium 2</text>
+<text x="900" y="121" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="22" fill="#253a46" text-anchor="middle">z = 0</text>
+<path d="M900 130V394" fill="none" stroke="#253a46" stroke-width="1.7"/>
+<rect x="894" y="160" width="12" height="190" fill="#efc38d" fill-opacity=".48" stroke="none"/>
+<circle cx="830" cy="206" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="830" cy="206" r="2.5" fill="#b65e22"/>
+<circle cx="880" cy="206" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="880" cy="206" r="2.5" fill="#b65e22"/>
+<circle cx="920" cy="293" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="920" cy="293" r="2.5" fill="#b65e22"/>
+<circle cx="970" cy="293" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="970" cy="293" r="2.5" fill="#b65e22"/>
+<path d="M894 350V160H906V350Z" fill="none" stroke="#253a46" stroke-width="2"/>
+<path d="M894 301V223" fill="none" stroke="#253a46" stroke-width="2" marker-end="url(#walk)"/>
+<path d="M906 210V288" fill="none" stroke="#253a46" stroke-width="2" marker-end="url(#walk)"/>
+<path d="M772 327V190" fill="none" stroke="#007fa8" stroke-width="3.3" marker-end="url(#electric)"/>
+<text x="755" y="258" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#007fa8" text-anchor="end">E<tspan baseline-shift="sub" font-size="17">1x</tspan></text>
+<path d="M1028 327V190" fill="none" stroke="#007fa8" stroke-width="3.3" marker-end="url(#electric)"/>
+<text x="1045" y="258" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#007fa8" text-anchor="start">E<tspan baseline-shift="sub" font-size="17">2x</tspan></text>
+<path d="M797 160H886" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M797 350H886" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M805 165V345" fill="none" stroke="#647680" stroke-width="1.4" marker-start="url(#dimension)" marker-end="url(#dimension)"/>
+<text x="795" y="264" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="27" fill="#647680" text-anchor="end">ℓ</text>
+<path d="M894 355V380M906 355V380" fill="none" stroke="#647680" stroke-width="1"/>
+<path d="M867 371H893" fill="none" stroke="#647680" stroke-width="1.4" marker-end="url(#shrink)"/>
+<path d="M933 371H907" fill="none" stroke="#647680" stroke-width="1.4" marker-end="url(#shrink)"/>
+<text x="900" y="419" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="25" fill="#647680" text-anchor="middle">h → 0</text>
+<text x="900" y="454" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="normal" fill="#253a46" text-anchor="middle">Area → 0</text>
+</g>
+<path d="M577 246H624" fill="none" stroke="#647680" stroke-width="2.4" marker-end="url(#shrink)"/>
+<g id="axes" inkscape:groupmode="layer" inkscape:label="Coordinate guide">
+<path d="M72 441V408" fill="none" stroke="#647680" stroke-width="1.5" marker-end="url(#shrink)"/>
+<path d="M72 441H114" fill="none" stroke="#647680" stroke-width="1.5" marker-end="url(#shrink)"/>
+<text x="69" y="397" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="21" fill="#647680" text-anchor="middle">x</text>
+<text x="123" y="448" font-family="STIX Two Math, DejaVu Serif, serif" font-style="italic" font-size="21" fill="#647680" text-anchor="start">z</text>
+</g>
+<g id="flux-message" inkscape:groupmode="layer" inkscape:label="Flux limit">
+<circle cx="225" cy="500" r="8" fill="white" fill-opacity=".85" stroke="#b65e22" stroke-width="1.7"/><circle cx="225" cy="500" r="2.5" fill="#b65e22"/>
+<text x="246" y="508" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="normal" fill="#b65e22" text-anchor="start">B stays finite</text>
+<text x="622" y="508" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="normal" fill="#253a46" text-anchor="middle">Shrinking area ⇒ magnetic flux → 0</text>
+</g></svg>
