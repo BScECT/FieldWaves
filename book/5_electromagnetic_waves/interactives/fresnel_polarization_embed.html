@@ -1,0 +1,118 @@
+<iframe id="fresnel-activity" title="Polarization, Brewster angle and sunglasses" style="width:100%;height:1850px;border:0" sandbox="allow-scripts" loading="lazy" srcdoc="&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;Polarization, Brewster angle and sunglasses&lt;/title&gt;&lt;style&gt;
+*{box-sizing:border-box}body{margin:0;padding:14px;background:white;color:#253a46;font:15px system-ui,sans-serif;line-height:1.5}
+h2{font-size:22px;margin:0 0 8px}h3{font-size:18px;margin:18px 0 8px}p{margin:8px 0}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:16px 0}
+label{display:block;font-weight:600}output{display:block;font-weight:400;font-variant-numeric:tabular-nums}
+input[type=range],select{width:100%;accent-color:#007fa8}select,button{font:inherit;color:inherit;background:white;border:1px solid #78909b;border-radius:4px;padding:6px 10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.actions label{font-weight:400}
+.summary{background:#f2f7fa;padding:10px 12px;margin:12px 0;font-variant-numeric:tabular-nums}
+.legend,.hint,details{font-size:14px;color:#435963}.h{color:#007fa8}.v{color:#b65e22}.key{display:inline-block;width:20px;border-top:3px solid;vertical-align:middle;margin-right:4px}.v .key{border-top-style:dashed}
+svg.plot{display:block;width:100%;height:auto;overflow:visible}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{padding:5px 9px;text-align:right;border-bottom:1px solid #d8e2e8}th:first-child,td:first-child{text-align:left}
+.lens-panel{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center}.track{height:18px;background:#e8eef1;border:1px solid #c3d2da}.fill{height:100%;background:#63823a}.lens-axis{max-width:180px;width:100%}summary{cursor:pointer;font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #007fa8;outline-offset:3px}
+@media(max-width:620px){.controls{grid-template-columns:1fr 1fr}body{font-size:14px}.lens-panel{grid-template-columns:130px 1fr}}
+@media(max-width:390px){.controls{grid-template-columns:1fr}.lens-panel{grid-template-columns:1fr}.lens-axis{margin:auto}th,td{padding:5px}}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h2&gt;Find the missing reflected polarization&lt;/h2&gt;
+&lt;p&gt;Move the angle and compare &lt;strong&gt;reflected power&lt;/strong&gt; for H and V. Can one reflected component disappear while the other remains?&lt;/p&gt;
+&lt;div class=&quot;controls&quot;&gt;
+&lt;label&gt;Incidence angle θᵢ&lt;output id=&quot;angle-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;angle&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;89&quot; step=&quot;any&quot; value=&quot;40&quot; aria-label=&quot;Incidence angle in degrees from the downward normal&quot;&gt;&lt;/label&gt;
+&lt;label&gt;Relative permittivity εᵣ₂&lt;output id=&quot;er-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;er&quot; type=&quot;range&quot; min=&quot;1&quot; max=&quot;25&quot; step=&quot;any&quot; value=&quot;2.25&quot; aria-label=&quot;Real relative permittivity of medium two&quot;&gt;&lt;/label&gt;
+&lt;label&gt;Material example&lt;select id=&quot;preset&quot;&gt;&lt;option value=&quot;glass&quot;&gt;Glass, visible light: n₂ = 1.50&lt;/option&gt;&lt;option value=&quot;water&quot;&gt;Water, visible light: n₂ = 1.333&lt;/option&gt;&lt;option value=&quot;radar&quot;&gt;Radar dielectric example: εᵣ₂ = 9&lt;/option&gt;&lt;option value=&quot;matched&quot;&gt;Same material as air: εᵣ₂ = 1&lt;/option&gt;&lt;option value=&quot;custom&quot;&gt;Custom lossless dielectric&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class=&quot;actions&quot;&gt;&lt;button id=&quot;normal&quot; type=&quot;button&quot;&gt;Normal incidence&lt;/button&gt;&lt;button id=&quot;reveal&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Reveal Brewster angle&lt;/button&gt;&lt;button id=&quot;brewster&quot; type=&quot;button&quot; disabled&gt;Go to Brewster angle&lt;/button&gt;&lt;button id=&quot;reset&quot; type=&quot;button&quot;&gt;Reset&lt;/button&gt;&lt;/div&gt;
+&lt;p class=&quot;legend&quot;&gt;&lt;span class=&quot;h&quot;&gt;&lt;span class=&quot;key&quot;&gt;&lt;/span&gt;H reflected power ℛH&lt;/span&gt; · &lt;span class=&quot;v&quot;&gt;&lt;span class=&quot;key&quot;&gt;&lt;/span&gt;V reflected power ℛV&lt;/span&gt;. Both curves use unit incident power in their own polarization. The vertical line marks your angle.&lt;/p&gt;
+&lt;svg id=&quot;curves&quot; class=&quot;plot&quot; role=&quot;img&quot; aria-label=&quot;H and V reflected-power fractions versus incidence angle from zero to ninety degrees&quot;&gt;&lt;/svg&gt;
+&lt;div class=&quot;summary&quot; aria-live=&quot;polite&quot;&gt;&lt;div id=&quot;angles&quot;&gt;&lt;/div&gt;&lt;div id=&quot;minimum&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;table aria-label=&quot;Reflected and transmitted fractions of incident power&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Polarization&lt;/th&gt;&lt;th&gt;Reflected ℛ&lt;/th&gt;&lt;th&gt;Transmitted 𝒯&lt;/th&gt;&lt;th&gt;ℛ + 𝒯&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;th class=&quot;h&quot;&gt;H&lt;/th&gt;&lt;td id=&quot;rh&quot;&gt;&lt;/td&gt;&lt;td id=&quot;th&quot;&gt;&lt;/td&gt;&lt;td id=&quot;sumh&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;th class=&quot;v&quot;&gt;V&lt;/th&gt;&lt;td id=&quot;rv&quot;&gt;&lt;/td&gt;&lt;td id=&quot;tv&quot;&gt;&lt;/td&gt;&lt;td id=&quot;sumv&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;h3&gt;Read the rays and the field directions&lt;/h3&gt;
+&lt;label&gt;Show electric-field basis&lt;select id=&quot;basis&quot;&gt;&lt;option value=&quot;H&quot;&gt;Horizontal (H)&lt;/option&gt;&lt;option value=&quot;V&quot;&gt;Vertical (V)&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+&lt;svg id=&quot;geometry&quot; class=&quot;plot&quot; role=&quot;img&quot; aria-label=&quot;Side view of a horizontal interface, incident reflected and transmitted rays, and the selected electric-field basis&quot;&gt;&lt;/svg&gt;
+&lt;p class=&quot;hint&quot; id=&quot;geometry-note&quot;&gt;&lt;/p&gt;
+&lt;h3&gt;Why do polarizing sunglasses reduce glare?&lt;/h3&gt;
+&lt;p&gt;Now illuminate the same surface with &lt;strong&gt;unpolarized light&lt;/strong&gt;: half the incident power in each of the independent H and V components. View only the reflected light through an ideal linear polarizer.&lt;/p&gt;
+&lt;div class=&quot;actions&quot;&gt;&lt;label&gt;&lt;input id=&quot;lens&quot; type=&quot;checkbox&quot; checked&gt; Add polarizing lens&lt;/label&gt;&lt;button id=&quot;upright&quot; type=&quot;button&quot;&gt;Upright sunglasses: pass V&lt;/button&gt;&lt;button id=&quot;sideways&quot; type=&quot;button&quot;&gt;Turn the lens 90°: pass H&lt;/button&gt;&lt;/div&gt;
+&lt;label&gt;Transmission-axis rotation α from V&lt;output id=&quot;axis-label&quot;&gt;&lt;/output&gt;&lt;input id=&quot;axis&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;90&quot; step=&quot;1&quot; value=&quot;0&quot; aria-label=&quot;Polarizer transmission-axis angle from V in degrees&quot;&gt;&lt;/label&gt;
+&lt;div class=&quot;lens-panel&quot;&gt;&lt;svg id=&quot;lens-view&quot; class=&quot;lens-axis&quot; viewBox=&quot;0 0 180 170&quot; role=&quot;img&quot; aria-label=&quot;Polarizer axis in the transverse H V plane, viewed along the reflected ray&quot;&gt;&lt;/svg&gt;&lt;div&gt;&lt;p id=&quot;glare&quot;&gt;&lt;/p&gt;&lt;p id=&quot;after&quot;&gt;&lt;/p&gt;&lt;p id=&quot;remaining-label&quot;&gt;&lt;/p&gt;&lt;div class=&quot;track&quot; id=&quot;remaining-meter&quot; role=&quot;meter&quot; aria-label=&quot;Reflected glare remaining after the lens&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot;&gt;&lt;div class=&quot;fill&quot; id=&quot;remaining-bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;p class=&quot;hint&quot;&gt;Bar: fraction of the &lt;em&gt;reflected glare&lt;/em&gt; remaining. Numeric powers are fractions of the original incident sunlight.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p class=&quot;hint&quot;&gt;The lens view looks along the reflected ray. V is the transverse direction in the vertical incidence plane; it is generally tilted relative to the vertical z axis. Only &lt;strong&gt;polarizing&lt;/strong&gt; sunglasses select an electric-field direction; ordinary tint reduces both components.&lt;/p&gt;
+&lt;details&gt;&lt;summary&gt;Equations, signed amplitudes and assumptions&lt;/summary&gt;
+&lt;p id=&quot;amplitudes&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Medium 1 is air (n₁ = 1). Both media are lossless, isotropic and nonmagnetic, so n₂ = √εᵣ₂, η₂/η₁ = 1/n₂ and sin θₜ = sin θᵢ/n₂. The electric amplitudes follow the H/V basis conventions in the text. ℛ = r²; 𝒯 = n₂ cos θₜ/cos θᵢ × t². Transmission is calculated independently, rather than assigned as 1−ℛ.&lt;/p&gt;
+&lt;p&gt;For n₂ ≠ n₁, θB = arctan(n₂/n₁) and θB + θₜ = 90°. At εᵣ₂ = 1 there is no interface contrast: neither polarization reflects at any angle, so no unique Brewster angle is shown. The control stops at 89° to keep a nonzero incident normal power flux; the curves approach grazing incidence.&lt;/p&gt;
+&lt;p&gt;For unit total incident unpolarized power, the reflected H and V powers are ℛH/2 and ℛV/2. An ideal lens with axis α from V transmits [ℛH sin²α + ℛV cos²α]/2. The two independent polarization powers add; their field amplitudes are not added coherently.&lt;/p&gt;
+&lt;p&gt;The glass and water presets use approximate &lt;em&gt;visible-light&lt;/em&gt; indices; liquid water&#x27;s radar-frequency permittivity is very different. The radar preset is a separate illustrative lossless dielectric. These are single planar-interface calculations at a chosen frequency, not a rough-surface backscatter or real-lens model. Roughness, absorption and imperfect polarizers can prevent complete glare extinction.&lt;/p&gt;
+&lt;/details&gt;
+&lt;script&gt;
+&quot;use strict&quot;;
+const D=Math.PI/180,H=&#x27;#007fa8&#x27;,V=&#x27;#b65e22&#x27;,INK=&#x27;#253a46&#x27;,GREEN=&#x27;#63823a&#x27;;
+const $=id=&gt;document.getElementById(id),pct=x=&gt;(100*x).toFixed(3)+&#x27;%&#x27;,signed=x=&gt;Math.abs(x)&lt;1e-12?&#x27;0&#x27;:x.toFixed(4);
+let revealed=false;
+function fresnel(angle,er){
+ const ti=angle*D,n=Math.sqrt(er),tt=Math.asin(Math.sin(ti)/n),ci=Math.cos(ti),ct=Math.cos(tt);
+ const rH=(ci-n*ct)/(ci+n*ct),tH=2*ci/(ci+n*ct),rV=(ct-n*ci)/(ct+n*ci),tV=2*ci/(ct+n*ci),q=n*ct/ci;
+ return {angle,er,n,ti,tt,rH,tH,rV,tV,RH:rH*rH,RV:rV*rV,TH:q*tH*tH,TV:q*tV*tV,brewster:er===1?null:Math.atan(n)/D};
+}
+function glare(p,alpha,lens){const a=alpha*D,before=(p.RH+p.RV)/2,after=lens?(p.RH*Math.sin(a)**2+p.RV*Math.cos(a)**2)/2:before;return {before,after,remaining:before&gt;1e-24?after/before:null};}
+const line=(x1,y1,x2,y2,color,width=1,dash=&#x27;&#x27;)=&gt;`&lt;line x1=&quot;${x1}&quot; y1=&quot;${y1}&quot; x2=&quot;${x2}&quot; y2=&quot;${y2}&quot; stroke=&quot;${color}&quot; stroke-width=&quot;${width}&quot; ${dash?&#x27;stroke-dasharray=&quot;&#x27;+dash+&#x27;&quot;&#x27;:&#x27;&#x27;}/&gt;`;
+const label=(x,y,s,color=INK,anchor=&#x27;start&#x27;,size=13)=&gt;{const subs={&#x27;ᵢ&#x27;:&#x27;i&#x27;,&#x27;ᵣ&#x27;:&#x27;r&#x27;,&#x27;ₜ&#x27;:&#x27;t&#x27;};const text=s.replace(/[ᵢᵣₜ]/g,c=&gt;`&lt;tspan baseline-shift=&quot;sub&quot; font-size=&quot;${size*.75}&quot;&gt;${subs[c]}&lt;/tspan&gt;`);return `&lt;text x=&quot;${x}&quot; y=&quot;${y}&quot; fill=&quot;${color}&quot; text-anchor=&quot;${anchor}&quot; font-family=&quot;system-ui,sans-serif&quot; font-size=&quot;${size}&quot;&gt;${text}&lt;/text&gt;`;};
+const dot=(x,y,r,color)=&gt;`&lt;circle cx=&quot;${x}&quot; cy=&quot;${y}&quot; r=&quot;${r}&quot; fill=&quot;${color}&quot;/&gt;`;
+function arrow(x,y,u,v,color,width=2){const a=Math.atan2(v-y,u-x),l=9;return line(x,y,u,v,color,width)+`&lt;path d=&quot;M${u},${v} L${u-l*Math.cos(a-.4)},${v-l*Math.sin(a-.4)} L${u-l*Math.cos(a+.4)},${v-l*Math.sin(a+.4)} Z&quot; fill=&quot;${color}&quot;/&gt;`;}
+function scene(id,h,draw){const e=$(id),w=Math.max(280,e.clientWidth||700);e.setAttribute(&#x27;viewBox&#x27;,`0 0 ${w} ${h}`);e.innerHTML=draw(w,h);}
+function curves(p){scene(&#x27;curves&#x27;,330,(w,h)=&gt;{
+ const l=48,r=14,t=15,b=48,X=a=&gt;l+(w-l-r)*a/90,Y=f=&gt;h-b-(h-b-t)*f;let s=&#x27;&#x27;;
+ for(const y of [0,.25,.5,.75,1])s+=line(l,Y(y),w-r,Y(y),&#x27;#dce5ea&#x27;)+label(l-7,Y(y)+4,String(y),INK,&#x27;end&#x27;,12);
+ for(const a of [0,15,30,45,60,75,90])s+=label(X(a),h-b+20,String(a),INK,&#x27;middle&#x27;,12);
+ s+=line(l,t,l,h-b,INK)+line(l,h-b,w-r,h-b,INK)+label((l+w-r)/2,h-5,&#x27;Incidence angle from the normal (degrees)&#x27;,INK,&#x27;middle&#x27;,w&lt;400?11:13)+label(l,t-3,&#x27;Reflected power fraction&#x27;,INK,&#x27;start&#x27;,12);
+ for(const [key,col,dash] of [[&#x27;RH&#x27;,H,&#x27;&#x27;],[&#x27;RV&#x27;,V,&#x27;7 4&#x27;]]){let d=&#x27;&#x27;;for(let a=0;a&lt;=899;a++){const angle=a/10,v=fresnel(angle,p.er)[key];d+=(a?&#x27;L&#x27;:&#x27;M&#x27;)+X(angle)+&#x27;,&#x27;+Y(v)+&#x27; &#x27;;}s+=`&lt;path d=&quot;${d}&quot; fill=&quot;none&quot; stroke=&quot;${col}&quot; stroke-width=&quot;2.7&quot; stroke-dasharray=&quot;${dash}&quot;/&gt;`;}
+ if(revealed&amp;&amp;p.brewster!==null)s+=line(X(p.brewster),t,X(p.brewster),h-b,GREEN,1.5,&#x27;3 4&#x27;)+dot(X(p.brewster),Y(0),4,GREEN);
+ s+=line(X(p.angle),t,X(p.angle),h-b,&#x27;#738794&#x27;,1.2,&#x27;5 4&#x27;)+dot(X(p.angle),Y(p.RH),4,H)+dot(X(p.angle),Y(p.RV),4,V);
+ return s;
+});}
+function geometry(p){scene(&#x27;geometry&#x27;,340,(w,h)=&gt;{
+ const ox=w/2,oy=185,L=Math.min(135,w*.33),sin=Math.sin(p.ti),cos=Math.cos(p.ti),st=Math.sin(p.tt),ct=Math.cos(p.tt),basis=$(&#x27;basis&#x27;).value,col=basis===&#x27;H&#x27;?H:V;
+ let s=`&lt;rect x=&quot;5&quot; y=&quot;${oy}&quot; width=&quot;${w-10}&quot; height=&quot;${h-oy-12}&quot; fill=&quot;#f0f5f8&quot;/&gt;`+line(5,oy,w-5,oy,INK,2)+line(ox,30,ox,h-15,&#x27;#8b9ca5&#x27;,1,&#x27;4 4&#x27;);
+ s+=label(8,20,&#x27;Medium 1 (air)&#x27;)+label(8,h-15,&#x27;Medium 2&#x27;)+label(w-8,oy+18,&#x27;z = 0&#x27;,INK,&#x27;end&#x27;)+arrow(w-20,oy+45,w-20,oy+87,INK)+label(w-29,oy+103,&#x27;+z&#x27;,INK,&#x27;middle&#x27;);
+ const rays=[{s:[ox-L*sin,oy-L*cos],e:[ox,oy],mid:[ox-.58*L*sin,oy-.58*L*cos],dx:sin,dz:cos,name:&#x27;kᵢ&#x27;,tx:ox-L*sin,ty:oy-L*cos-12,ref:false},
+ {s:[ox,oy],e:[ox+L*sin,oy-L*cos],mid:[ox+.58*L*sin,oy-.58*L*cos],dx:sin,dz:-cos,name:&#x27;kᵣ&#x27;,tx:ox+L*sin,ty:oy-L*cos-12,ref:true},
+ {s:[ox,oy],e:[ox+L*st,oy+L*ct],mid:[ox+.60*L*st,oy+.60*L*ct],dx:st,dz:ct,name:&#x27;kₜ&#x27;,tx:ox+L*st+12,ty:oy+L*ct+8,ref:false}];
+ for(const ray of rays){s+=arrow(...ray.s,...ray.e,&#x27;#697e8a&#x27;,2)+label(ray.tx+(p.angle&lt;8?(ray.ref?25:-25):0),ray.ty,ray.name,INK,&#x27;middle&#x27;);const [mx,my]=ray.mid;
+  if(basis===&#x27;H&#x27;)s+=`&lt;circle cx=&quot;${mx}&quot; cy=&quot;${my}&quot; r=&quot;8&quot; fill=&quot;white&quot; stroke=&quot;${col}&quot; stroke-width=&quot;2&quot;/&gt;`+dot(mx,my,2.5,col);
+  else {const ex=ray.ref?-ray.dz:ray.dz,ez=ray.ref?ray.dx:-ray.dx;s+=arrow(mx-13*ex,my-13*ez,mx+13*ex,my+13*ez,col,2.5);}
+ }
+ s+=label(ox+8,48,&#x27;Normal&#x27;,INK,&#x27;start&#x27;,12);
+ s+=label(8,43,`θᵢ = ${p.angle.toFixed(1)}°`,INK,&#x27;start&#x27;,12)+label(8,61,`θₜ = ${(p.tt/D).toFixed(1)}°`,INK,&#x27;start&#x27;,12);
+ if(revealed&amp;&amp;p.brewster!==null&amp;&amp;Math.abs(p.angle-p.brewster)&lt;.02){const d=16,rx=d*sin,ry=-d*cos,tx=d*st,ty=d*ct;s+=line(ox+rx,oy+ry,ox+rx+tx,oy+ry+ty,GREEN,1.5)+line(ox+tx,oy+ty,ox+rx+tx,oy+ry+ty,GREEN,1.5)+label(w-8,h-38,&#x27;kᵣ perpendicular to kₜ&#x27;,GREEN,&#x27;end&#x27;,12);}
+ return s;
+});
+ $(&#x27;geometry-note&#x27;).textContent=$(&#x27;basis&#x27;).value===&#x27;H&#x27;?&#x27;H: dots denote +y, out of this xz view. Each E is parallel to the interface and perpendicular to its ray. The ray arrows indicate directions; a reflected ray is drawn even when its amplitude is zero.&#x27;:&#x27;V: orange arrows show the positive electric-field basis vectors in the xz plane, with positive x components. All are perpendicular to their own ray. Signed amplitudes can reverse the field; arrow lengths do not show amplitudes.&#x27;;
+}
+function lensView(alpha,on){const a=alpha*D,x=48*Math.sin(a),y=-48*Math.cos(a);$(&#x27;lens-view&#x27;).innerHTML=`&lt;circle cx=&quot;90&quot; cy=&quot;80&quot; r=&quot;59&quot; fill=&quot;${on?&#x27;#f0f5f8&#x27;:&#x27;white&#x27;}&quot; stroke=&quot;#8096a3&quot; stroke-width=&quot;2&quot;/&gt;`+line(28,80,152,80,H,1,&#x27;3 4&#x27;)+line(90,18,90,142,V,1,&#x27;3 4&#x27;)+label(162,85,&#x27;H&#x27;,H,&#x27;middle&#x27;)+label(90,13,&#x27;V&#x27;,V,&#x27;middle&#x27;)+(on?line(90-x,80-y,90+x,80+y,GREEN,5):label(90,85,&#x27;No lens&#x27;,INK,&#x27;middle&#x27;))+label(90,165,&#x27;View along reflected ray&#x27;,INK,&#x27;middle&#x27;,11);}
+function draw(){
+ const p=fresnel(Number($(&#x27;angle&#x27;).value),Number($(&#x27;er&#x27;).value)),alpha=Number($(&#x27;axis&#x27;).value),on=$(&#x27;lens&#x27;).checked,g=glare(p,alpha,on);
+ $(&#x27;angle-label&#x27;).value=p.angle.toFixed(2)+&#x27;°&#x27;;$(&#x27;er-label&#x27;).value=p.er.toFixed(4)+&#x27;; n₂ = &#x27;+p.n.toFixed(3);$(&#x27;axis-label&#x27;).value=alpha.toFixed(0)+&#x27;°&#x27;+(alpha===0?&#x27; — pass V, block H&#x27;:alpha===90?&#x27; — pass H, block V&#x27;:&#x27;&#x27;);$(&#x27;axis&#x27;).disabled=!on;
+ $(&#x27;angles&#x27;).textContent=&#x27;θₜ = &#x27;+(p.tt/D).toFixed(2)+&#x27;°; θᵢ + θₜ = &#x27;+(p.angle+p.tt/D).toFixed(2)+&#x27;°.&#x27;;
+ $(&#x27;minimum&#x27;).textContent=p.brewster===null?&#x27;No material contrast: both reflected powers are zero at every angle.&#x27;:revealed?&#x27;Brewster angle θB = &#x27;+p.brewster.toFixed(2)+&#x27;° (green dotted marker). There ℛV = 0 and θᵢ + θₜ = 90°.&#x27;:&#x27;Find the minimum of the orange curve, then reveal its angle. Compare the two ray directions there.&#x27;;
+ $(&#x27;reveal&#x27;).textContent=revealed?&#x27;Hide Brewster angle&#x27;:&#x27;Reveal Brewster angle&#x27;;$(&#x27;reveal&#x27;).setAttribute(&#x27;aria-pressed&#x27;,String(revealed));$(&#x27;brewster&#x27;).disabled=!revealed||p.brewster===null;
+ for(const [id,x] of [[&#x27;rh&#x27;,p.RH],[&#x27;rv&#x27;,p.RV],[&#x27;th&#x27;,p.TH],[&#x27;tv&#x27;,p.TV]])$(id).textContent=pct(x);
+ $(&#x27;sumh&#x27;).textContent=(p.RH+p.TH).toFixed(6);$(&#x27;sumv&#x27;).textContent=(p.RV+p.TV).toFixed(6);
+ $(&#x27;amplitudes&#x27;).textContent=&#x27;Signed field coefficients at this angle: rH = &#x27;+signed(p.rH)+&#x27;, tH = &#x27;+signed(p.tH)+&#x27;; rV = &#x27;+signed(p.rV)+&#x27;, tV = &#x27;+signed(p.tV)+&#x27;.&#x27;;
+ $(&#x27;glare&#x27;).textContent=&#x27;Reflected glare before lens: &#x27;+pct(g.before)+&#x27; of incident sunlight (H: &#x27;+pct(p.RH/2)+&#x27;, V: &#x27;+pct(p.RV/2)+&#x27;).&#x27;;
+ $(&#x27;after&#x27;).textContent=&#x27;Reaching the eye&#x27;+(on?&#x27; through lens&#x27;:&#x27;, no lens&#x27;)+&#x27;: &#x27;+pct(g.after)+&#x27; of incident sunlight.&#x27;;
+ $(&#x27;remaining-label&#x27;).textContent=g.remaining===null?&#x27;No reflected glare to filter.&#x27;:pct(g.remaining)+&#x27; of the reflected glare remains.&#x27;;
+ $(&#x27;remaining-bar&#x27;).style.width=(g.remaining===null?0:100*g.remaining)+&#x27;%&#x27;;$(&#x27;remaining-meter&#x27;).setAttribute(&#x27;aria-valuenow&#x27;,String(g.remaining===null?0:100*g.remaining));$(&#x27;remaining-meter&#x27;).setAttribute(&#x27;aria-valuetext&#x27;,g.remaining===null?&#x27;No reflected glare&#x27;:pct(g.remaining)+&#x27; remaining&#x27;);
+ curves(p);geometry(p);lensView(alpha,on);window.fresnelState={...p,...g,alpha,lens:on,revealed};
+}
+for(const id of [&#x27;angle&#x27;,&#x27;axis&#x27;])$(id).addEventListener(&#x27;input&#x27;,draw);
+$(&#x27;er&#x27;).addEventListener(&#x27;input&#x27;,()=&gt;{$(&#x27;preset&#x27;).value=&#x27;custom&#x27;;draw();});
+$(&#x27;preset&#x27;).addEventListener(&#x27;change&#x27;,()=&gt;{const er={glass:2.25,water:1.333**2,radar:9,matched:1}[$(&#x27;preset&#x27;).value];if(er!==undefined)$(&#x27;er&#x27;).value=String(er);draw();});
+for(const id of [&#x27;basis&#x27;,&#x27;lens&#x27;])$(id).addEventListener(&#x27;change&#x27;,draw);
+$(&#x27;normal&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{$(&#x27;angle&#x27;).value=&#x27;0&#x27;;draw();});
+$(&#x27;reveal&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{revealed=!revealed;draw();});
+$(&#x27;brewster&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{const p=fresnel(Number($(&#x27;angle&#x27;).value),Number($(&#x27;er&#x27;).value));if(p.brewster!==null)$(&#x27;angle&#x27;).value=String(p.brewster);draw();});
+for(const [id,a] of [[&#x27;upright&#x27;,0],[&#x27;sideways&#x27;,90]])$(id).addEventListener(&#x27;click&#x27;,()=&gt;{$(&#x27;lens&#x27;).checked=true;$(&#x27;axis&#x27;).value=String(a);draw();});
+$(&#x27;reset&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{revealed=false;$(&#x27;angle&#x27;).value=&#x27;40&#x27;;$(&#x27;er&#x27;).value=&#x27;2.25&#x27;;$(&#x27;preset&#x27;).value=&#x27;glass&#x27;;$(&#x27;basis&#x27;).value=&#x27;H&#x27;;$(&#x27;lens&#x27;).checked=true;$(&#x27;axis&#x27;).value=&#x27;0&#x27;;draw();});
+window.addEventListener(&#x27;resize&#x27;,draw);draw();
+function reportHeight(){parent.postMessage({type:&#x27;fresnel-height&#x27;,height:Math.ceil(document.body.getBoundingClientRect().height)+4},&#x27;*&#x27;);}
+new ResizeObserver(reportHeight).observe(document.body);reportHeight();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+<script>(function(){const f=document.getElementById('fresnel-activity');window.addEventListener('message',function(e){if(e.source===f.contentWindow&&e.data&&e.data.type==='fresnel-height'&&Number.isFinite(e.data.height)){f.style.height=Math.max(500,Math.min(4000,e.data.height))+'px';}});})();</script>
