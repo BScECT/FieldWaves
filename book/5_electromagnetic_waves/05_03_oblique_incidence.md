@@ -1,6 +1,6 @@
 # Oblique incidence: phase must match along the interface
 
-The wave now arrives at an angle. The interface is still $z=0$, and we choose the **plane of incidence** as the $xz$ plane: it contains the incoming propagation direction and the interface normal. All angles below are measured from that normal.
+The wave now arrives at an angle. The interface is still $z=0$, and we choose the **plane of incidence** as the $xz$ plane: it contains the incoming propagation direction and the interface normal. Keep the downward-positive $z$ convention introduced in {doc}`05_01_normal_incidence`: the incident and transmitted waves have positive $k_z$, while the reflected wave has negative $k_z$. All angles below are measured from the normal.
 
 We already know Snell's law from {doc}`mechanical waves <../4_mechanical_waves/snells_law>`. We will recover it by asking whether the fields can satisfy Maxwell's boundary conditions everywhere along the interface. That gives the familiar result another meaning.
 

@@ -1,6 +1,16 @@
 # Normal incidence: the familiar problem with electromagnetic fields
 
-A flat interface separates medium 1, at $z<0$, from medium 2, at $z>0$. A plane wave arrives along $+z$, perpendicular to the interface. This is **normal incidence**. Begin with the lossless media from {doc}`04_01_material_response`:
+A flat interface separates medium 1, at $z<0$, from medium 2, at $z>0$. A plane wave arrives along $+z$, perpendicular to the interface. This is **normal incidence**.
+
+```{admonition} Coordinate convention: positive z now points down
+:class: note
+
+For the horizontal ground interface, we now choose **positive $z$ downwards**, into medium 2, with $z=0$ at the surface. This reverses the upward-positive vertical coordinate used earlier in the book. The Cartesian axes still form a right-handed set.
+
+This choice makes increasing $z$ increasing depth. With our unchanged time convention $e^{j\omega t}$, a downward-travelling wave has $k_z>0$ and retains the familiar spatial factor $e^{-jk_z z}$. Its phase is $\omega t-k_z z$: following a constant phase gives $dz/dt=\omega/k_z>0$, which now means motion downwards. An upward-travelling reflected wave has $k_z<0$, giving $e^{+j|k_z|z}$. The coordinate direction has changed; the propagation rule and the physics have not.
+```
+
+Begin with the lossless media from {doc}`04_01_material_response`:
 
 $$
 k_m=\omega\sqrt{\mu_m\epsilon_m},\qquad
