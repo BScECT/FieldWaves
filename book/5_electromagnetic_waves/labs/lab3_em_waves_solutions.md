@@ -195,13 +195,11 @@ Radar satellites label each image channel with two letters. The first gives the 
 
 (a) $\lambda=c/f$:
 
-$$
-\begin{aligned}
-\text{Sentinel-1 (C band):}\quad\lambda&=\frac{3.00\times10^8}{5.405\times10^9}\simeq5.55\ \mathrm{cm},\\
-\text{ALOS-4 and NISAR (L band):}\quad\lambda&=\frac{3.00\times10^8}{1.26\times10^9}\simeq24\ \mathrm{cm},\\
-\text{Biomass (P band):}\quad\lambda&=\frac{3.00\times10^8}{435\times10^6}\simeq69\ \mathrm{cm}.
-\end{aligned}
-$$
+| Mission | Band | $\lambda=c/f$ |
+|---|---|---|
+| Sentinel-1 | C | $\dfrac{3.00\times10^8}{5.405\times10^9}\simeq5.55\ \mathrm{cm}$ |
+| ALOS-4 and NISAR | L | $\dfrac{3.00\times10^8}{1.26\times10^9}\simeq24\ \mathrm{cm}$ |
+| Biomass | P | $\dfrac{3.00\times10^8}{435\times10^6}\simeq69\ \mathrm{cm}$ |
 
 Biomass, with a wavelength of about $70\ \mathrm{cm}$, is comparable to trunks and large branches, while leaves and twigs are much smaller than its wavelength. Its radar is designed to sense the woody parts of the forest, where trees store most of their carbon.
 
@@ -332,12 +330,12 @@ The forward wave emitted by the current cancels the incident wave exactly: there
 
 $$
 \begin{aligned}
-E_x(0)&=E_0-E_0=0&&\text{(electric fields cancel)},\\
-H_y(0)&=\frac{E_0}{\eta}+\frac{E_0}{\eta}=\frac{2E_0}{\eta}&&\text{(magnetic fields add)}.
+E_x(0)&=E_0-E_0=0,\\
+H_y(0)&=\frac{E_0}{\eta}+\frac{E_0}{\eta}=\frac{2E_0}{\eta}.
 \end{aligned}
 $$
 
-Behind the plate $\vec H_2=0$. With $\hat z\times\hat y=-\hat x$,
+The electric fields cancel and the magnetic fields add. Behind the plate $\vec H_2=0$. With $\hat z\times\hat y=-\hat x$,
 
 $$
 \hat z\times(\vec H_2-\vec H_1)=\hat z\times\left(-\hat y\,\frac{2E_0}{\eta}\right)=\hat x\,\frac{2E_0}{\eta}=\vec K.
